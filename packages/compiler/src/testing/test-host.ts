@@ -1,7 +1,7 @@
 import assert from "assert";
 import type { RmOptions } from "fs";
 import { readdir, readFile, stat } from "fs/promises";
-import { globby } from "globby";
+// import { globby } from "globby";
 import { join } from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 import { logDiagnostics, logVerboseTestOutput } from "../core/diagnostics.js";
@@ -342,8 +342,9 @@ async function createTestHostInternal(): Promise<TestHost> {
 }
 
 export async function findFilesFromPattern(directory: string, pattern: string): Promise<string[]> {
-  return globby(pattern, {
-    cwd: directory,
-    onlyFiles: true,
-  });
+  // return globby(pattern, {
+  //   cwd: directory,
+  //   onlyFiles: true,
+  // });
+  throw "globby removed";
 }
