@@ -1,4 +1,4 @@
-import { ok, strictEqual } from "assert";
+// import { ok, strictEqual } from "assert";
 import { applyCodeFix } from "../core/code-fixes.js";
 import {
   CodeFix,
@@ -9,6 +9,7 @@ import {
   visitChildren,
 } from "../core/index.js";
 import { mutate } from "../utils/misc.js";
+import { ok, strictEqual } from "./expect.js";
 import { createTestHost } from "./test-host.js";
 import { extractCursor } from "./test-server-host.js";
 import { trimBlankLines } from "./test-utils.js";

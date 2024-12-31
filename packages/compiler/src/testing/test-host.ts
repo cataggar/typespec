@@ -1,9 +1,9 @@
-import assert from "assert";
+// import assert from "assert";
 import type { RmOptions } from "fs";
 import { readdir, readFile, stat } from "fs/promises";
 // import { globby } from "globby";
 import { join } from "path";
-import { fileURLToPath, pathToFileURL } from "url";
+// import { fileURLToPath, pathToFileURL } from "url";
 import { logDiagnostics, logVerboseTestOutput } from "../core/diagnostics.js";
 import { createLogger } from "../core/logger/logger.js";
 import { NodeHost } from "../core/node-host.js";
@@ -150,6 +150,24 @@ function createTestCompilerHost(
 
     ...options?.compilerHostOverrides,
   };
+}
+
+function fileURLToPath(url: string): string {
+  console.log("WARN fileURLToPath", url);
+  return url;
+}
+
+class Url {
+  href: string;
+
+  constructor(href: string) {
+    this.href = href;
+  }
+}
+
+export function pathToFileURL(path: string): Url {
+  console.log("WARN pathToFileURL", path);
+  return new Url(path);
 }
 
 export async function createTestFileSystem(options?: TestHostOptions): Promise<TestFileSystem> {
@@ -304,11 +322,12 @@ async function createTestHostInternal(): Promise<TestHost> {
     compileAndDiagnose,
     testTypes,
     libraries,
-    get program() {
-      assert(
-        program,
-        "Program cannot be accessed without calling compile, diagnose, or compileAndDiagnose.",
-      );
+    get program(): Program {
+      if (!program) {
+        throw new Error(
+          "Program cannot be accessed without calling compile, diagnose, or compileAndDiagnose.",
+        );
+      }
       return program;
     },
   };

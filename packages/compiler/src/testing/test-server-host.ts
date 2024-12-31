@@ -1,12 +1,17 @@
 import { ok } from "assert";
-import { pathToFileURL } from "url";
+// import { pathToFileURL } from "url";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { Diagnostic } from "vscode-languageserver/node.js";
 import { parse, visitChildren } from "../core/parser.js";
 import { IdentifierNode, SyntaxKind } from "../core/types.js";
 import { Server, ServerHost, createServer } from "../server/index.js";
 import { createStringMap } from "../utils/misc.js";
-import { StandardTestLibrary, TestHostOptions, createTestFileSystem } from "./test-host.js";
+import {
+  StandardTestLibrary,
+  TestHostOptions,
+  createTestFileSystem,
+  pathToFileURL,
+} from "./test-host.js";
 import { resolveVirtualPath } from "./test-utils.js";
 import { TestFileSystem } from "./types.js";
 
