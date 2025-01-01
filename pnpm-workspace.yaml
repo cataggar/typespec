@@ -3,6 +3,8 @@ packages:
   - "packages/compiler"
   - "packages/internal-build-utils"
   - "packages/tmlanguage-generator"
+  - "packages/tspd"
+  - "packages/prettier-plugin-typespec" # used by tspd
   # - "e2e"
   # - "website"
   - "!packages/http-client-csharp/**"
