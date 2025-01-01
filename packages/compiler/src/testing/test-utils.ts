@@ -1,8 +1,7 @@
-import { fail, ok } from "assert";
-import { fileURLToPath } from "url";
-import { getTypeName, NodeHost, resolvePath, Type } from "../core/index.js";
+// import { fail, ok } from "assert";
+// import { fileURLToPath } from "url";
+import { resolvePath, Type } from "../core/index.js";
 import { CompilerOptions } from "../core/options.js";
-import { findProjectRoot } from "../utils/misc.js";
 import {
   BasicTestRunner,
   TestHost,
@@ -20,7 +19,8 @@ export function resolveVirtualPath(path: string, ...paths: string[]) {
 
 /** Find the package root from the provided file */
 export function findTestPackageRoot(fileUrl: string): Promise<string> {
-  return findProjectRoot(NodeHost.stat, fileURLToPath(fileUrl)) as Promise<string>;
+  throw `no node.js in browser`;
+  // return findProjectRoot(NodeHost.stat, fileURLToPath(fileUrl)) as Promise<string>;
 }
 /**
  * Define a test library defaulting to the most common library structure.
@@ -143,14 +143,15 @@ export function trimBlankLines(code: string) {
 export function expectTypeEquals(actual: Type | undefined, expected: Type) {
   if (actual === expected) return;
 
-  ok(actual, "Expected value to be defined");
+  throw `no node.js in browser`;
+  // ok(actual, "Expected value to be defined");
 
-  const message = [`Expected type ${getTypeName(actual)} to be ${getTypeName(expected)}:`];
-  if (actual.kind !== expected.kind) {
-    message.push(`kind: ${actual.kind} !== ${expected.kind}`);
-  }
-  if ("symbol" in actual && "symbol" in expected) {
-    message.push(`symbol: ${expected && actual.symbol === expected.symbol}`);
-  }
-  fail(message.join("\n"));
+  // const message = [`Expected type ${getTypeName(actual)} to be ${getTypeName(expected)}:`];
+  // if (actual.kind !== expected.kind) {
+  //   message.push(`kind: ${actual.kind} !== ${expected.kind}`);
+  // }
+  // if ("symbol" in actual && "symbol" in expected) {
+  //   message.push(`symbol: ${expected && actual.symbol === expected.symbol}`);
+  // }
+  // fail(message.join("\n"));
 }

@@ -1,7 +1,29 @@
-import { fail, match, strictEqual } from "assert";
+// import { fail, match, strictEqual } from "assert";
 import { Diagnostic, NoTarget, Type, formatDiagnostic, getSourceLocation } from "../core/index.js";
 import { isArray } from "../utils/misc.js";
 import { resolveVirtualPath } from "./test-utils.js";
+
+export function ok(value: unknown, message?: string): asserts value {
+  if (!value) {
+    fail(message ?? `Expected value to be truthy but got ${value}`);
+  }
+}
+
+function fail(message: string): never {
+  throw new Error(message);
+}
+
+export function strictEqual<T>(actual: T, expected: T, message?: string): void {
+  if (actual !== expected) {
+    fail(message ?? `Expected ${expected} but got ${actual}`);
+  }
+}
+
+function match(value: string, expectation: RegExp, message?: string): void {
+  if (!expectation.test(value)) {
+    fail(message ?? `Expected ${value} to match ${expectation}`);
+  }
+}
 
 /**
  * Assert there is no diagnostics.
