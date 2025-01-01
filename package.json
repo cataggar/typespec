@@ -23,7 +23,6 @@
     "lint:fix": "eslint . --fix",
     "merge-coverage": "c8 -- report --reporter=cobertura --reporter=text",
     "pack:all": "chronus pack --pack-destination ./temp/artifacts",
-    "preinstall": "npx only-allow pnpm",
     "prepare-publish": "pnpm chronus version",
     "purge": "rimraf --glob \"packages/*/node_modules/\"",
     "regen-docs": "pnpm -r --parallel --aggregate-output --reporter=append-only run regen-docs",
@@ -87,5 +86,12 @@
     "overrides": {
       "@fluentui/react-theme": "9.1.17"
     }
-  }
+  },
+  "workspaces": [
+    "packages/compiler",
+    "packages/internal-build-utils",
+    "packages/tmlanguage-generator",
+    "packages/tspd",
+    "packages/prettier-plugin-typespec"
+  ]
 }
