@@ -12,7 +12,7 @@ export async function test() {
   console.log(diagnostics);
 }
 
-export const typescript = { version, test };
+export const compilerShow = { version, test };
 
 // Use top-level await for ESM entrypoint
 if (process.argv[1] && process.argv[1].endsWith("index.js")) {

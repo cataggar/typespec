@@ -6,14 +6,21 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p .",
-    "test": "node dist/index.js"
+    "build": "vite build",
+    "build1": "tsc -p .",
+    "test": "node dist/index.js",
+    "componentize": "pnpm exec jco componentize dist/index.js --wit wit -o dist/b.wasm -d clocks -d random -d http"
   },
   "dependencies": {
-    "@typespec/compiler": "*"
+    "@typespec/compiler": "workspace:^"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "~5.8.2",
+    "@bytecodealliance/jco": "*",
+    "@typespec/bundler": "workspace:^",
+    "vite": "^6.2.7",
+    "vite-plugin-checker": "^0.9.1",
+    "vite-plugin-dts": "4.5.4"
   },
   "license": "MIT"
 }
