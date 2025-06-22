@@ -21,4 +21,7 @@ export const NodeAssert: SystemAssert = {
   ok(value: any, message?: string) {
     assert.ok(value, message);
   },
+  async rejects(asyncFn, error, message) {
+    await assert.rejects(asyncFn, error, message);
+  },
 };

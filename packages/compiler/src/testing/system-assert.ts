@@ -6,6 +6,11 @@ export interface SystemAssert {
   deepStrictEqual(actual: any, expected: any, message?: string): void;
   match(value: string, regex: RegExp, message?: string): void;
   ok(value: any, message?: string): void;
+  rejects(
+    asyncFn: (() => Promise<any>) | Promise<any>,
+    error?: any,
+    message?: string,
+  ): Promise<void>;
 }
 
 let assert: SystemAssert;
