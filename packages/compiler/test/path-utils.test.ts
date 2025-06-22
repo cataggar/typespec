@@ -1,4 +1,3 @@
-import { assert } from "../src/testing/system-assert.js";
 import { describe, it } from "vitest";
 import {
   getAnyExtensionFromPath,
@@ -12,6 +11,7 @@ import {
   reducePathComponents,
   resolvePath,
 } from "../src/core/path-utils.js";
+import { assert } from "../src/testing/system-assert.js";
 
 describe("compiler: path utils", () => {
   it("normalizeSlashes", () => {

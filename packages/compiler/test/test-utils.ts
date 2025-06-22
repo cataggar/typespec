@@ -1,6 +1,6 @@
-import { ok } from "assert";
 import type { Diagnostic } from "../src/index.js";
 import { expectDiagnosticEmpty } from "../src/testing/expect.js";
+import { assert } from "../src/testing/system-assert.js";
 
 export interface Test<I extends unknown[], R> {
   compile(...args: I): Promise<R>;
@@ -15,7 +15,7 @@ export function defineTest<T extends unknown[], R>(
     compile: async (...args) => {
       const [called, diagnostics] = await fn(...args);
       expectDiagnosticEmpty(diagnostics);
-      ok(called, "Decorator was not called");
+      assert.ok(called, "Decorator was not called");
 
       return called;
     },

@@ -1,4 +1,3 @@
-import { assert } from "../src/testing/system-assert.js";
 import { readFile } from "fs/promises";
 import { URL } from "url";
 import { describe, it } from "vitest";
@@ -18,6 +17,7 @@ import {
 } from "../src/core/scanner.js";
 import { DiagnosticMatch, expectDiagnostics } from "../src/testing/expect.js";
 import { extractSquiggles } from "../src/testing/source-utils.js";
+import { assert } from "../src/testing/system-assert.js";
 
 type TokenEntry = [
   Token,
@@ -501,8 +501,14 @@ describe("compiler: scanner", () => {
       );
     }
     // cspell:disable-next-line
-    assert.ok(isIdentifierContinue(0x200c), "U+200C (ZWNJ) should be allowed to continue identifier.");
-    assert.ok(isIdentifierContinue(0x200d), "U+200D (ZWJ) should be allowed to continue identifier.");
+    assert.ok(
+      isIdentifierContinue(0x200c),
+      "U+200C (ZWNJ) should be allowed to continue identifier.",
+    );
+    assert.ok(
+      isIdentifierContinue(0x200d),
+      "U+200D (ZWJ) should be allowed to continue identifier.",
+    );
   });
 
   describe("keyword collision", () => {
