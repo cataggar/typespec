@@ -1,15 +1,13 @@
-// SystemAssert interface for pluggable assertion implementations
 export interface SystemAssert {
-  fail(message?: string): never;
-  strictEqual(actual: any, expected: any, message?: string): void;
-  notStrictEqual(actual: any, expected: any, message?: string): void;
-  deepStrictEqual(actual: any, expected: any, message?: string): void;
-  match(value: string, regex: RegExp, message?: string): void;
-  ok(value: any, message?: string): void;
+  fail(message?: string | Error): never;
+  strictEqual<T>(actual: unknown, expected: T, message?: string | Error): asserts actual is T;
+  notStrictEqual(actual: unknown, expected: unknown, message?: string | Error): void;
+  deepStrictEqual<T>(actual: unknown, expected: T, message?: string | Error): asserts actual is T;
+  match(value: string, regExp: RegExp, message?: string | Error): void;
+  ok(value: unknown, message?: string | Error): asserts value;
   rejects(
-    asyncFn: (() => Promise<any>) | Promise<any>,
-    error?: any,
-    message?: string,
+    block: (() => Promise<unknown>) | Promise<unknown>,
+    message?: string | Error,
   ): Promise<void>;
 }
 
