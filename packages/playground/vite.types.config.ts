@@ -1,17 +1,16 @@
+import { defineConfig } from "vite";
+import dts from "vite-plugin-dts";
+import checker from "vite-plugin-checker";
 import react from "@vitejs/plugin-react";
 import { readFileSync } from "fs";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
-import { defineConfig } from "vite";
-import checker from "vite-plugin-checker";
-import dts from "vite-plugin-dts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
 const packageJson = JSON.parse(readFileSync(resolve(__dirname, "package.json")).toString());
 const dependencies = Object.keys(packageJson.dependencies);
 const externals = [
-  ...dependencies.filter((dep) => dep !== "@typespec/compiler"),
+  ...dependencies, // Remove the filter that excludes @typespec/compiler
   "swagger-ui-dist/swagger-ui-es-bundle.js",
   "swagger-ui-dist/swagger-ui.css",
   "@typespec/bundler/vite",
@@ -27,28 +26,16 @@ export default defineConfig({
     target: "esnext",
     minify: false,
     chunkSizeWarningLimit: 3000,
+    emptyOutDir: false,
     lib: {
-      entry: {
-        index: "src/index.ts",
-        "state-storage": "src/state-storage.ts",
-        "react/index": "src/react/index.ts",
-        "react/viewers/index": "src/react/viewers/index.tsx",
-        "tooling/index": "src/tooling/index.ts",
-        "vite/index": "src/vite/index.ts",
-        types: "src/types.ts",
-        "compiler-testing": resolve(__dirname, "../../compiler/src/testing/index.ts"),
-      },
-      cssFileName: "style",
+      entry: "src/types.ts",
       formats: ["es"],
-      fileName: (format, entryName) => entryName + ".js",
+      fileName: () => "types.js",
     },
     rollupOptions: {
       external: (id) => externals.some((x) => id.startsWith(x)),
       output: {
-        entryFileNames: (chunkInfo) => {
-          if (chunkInfo.name === "types") return "types.js";
-          return "[name].js";
-        },
+        entryFileNames: "types.js",
         inlineDynamicImports: true,
         manualChunks: undefined,
         preserveModules: false,
@@ -59,21 +46,11 @@ export default defineConfig({
   esbuild: {
     logOverride: { "this-is-undefined-in-esm": "silent" },
   },
-  assetsInclude: [/\.tsp$/],
-  optimizeDeps: {},
   plugins: [
     react({}),
     dts({
-      logLevel: "silent", // checker reports the errors
+      logLevel: "silent",
     }),
-    checker({
-      // e.g. use TypeScript check
-      typescript: true,
-    }),
+    checker({ typescript: true }),
   ],
-  server: {
-    fs: {
-      strict: false,
-    },
-  },
 });
