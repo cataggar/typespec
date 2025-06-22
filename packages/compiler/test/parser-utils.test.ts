@@ -1,9 +1,9 @@
-import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { SyntaxKind, TypeSpecScriptNode } from "../src/ast/index.js";
 import { getNodeAtPosition, parse } from "../src/core/parser.js";
 import { Node } from "../src/core/types.js";
 import { extractCursor } from "../src/testing/source-utils.js";
+import { assert } from "../src/testing/system-assert.js";
 import { dumpAST } from "./ast-test-utils.js";
 
 describe("compiler: parser utils", () => {
@@ -23,9 +23,9 @@ describe("compiler: parser utils", () => {
           ┆
         }
       `);
-      ok(node);
-      strictEqual(node.kind, SyntaxKind.NamespaceStatement as const);
-      strictEqual(node.id.sv, "Foo");
+      assert.ok(node);
+      assert.strictEqual(node.kind, SyntaxKind.NamespaceStatement as const);
+      assert.strictEqual(node.id.sv, "Foo");
     });
 
     it("return identifier for property return type", async () => {
@@ -34,17 +34,17 @@ describe("compiler: parser utils", () => {
           prop: stri┆ng
         }
       `);
-      ok(node);
-      strictEqual(node.kind, SyntaxKind.Identifier as const);
-      strictEqual(node.sv, "string");
+      assert.ok(node);
+      assert.strictEqual(node.kind, SyntaxKind.Identifier as const);
+      assert.strictEqual(node.sv, "string");
     });
 
     it("return string literal when in non completed string", async () => {
       const { node } = await getNodeAtCursor(`
         import "┆
       `);
-      ok(node);
-      strictEqual(node.kind, SyntaxKind.StringLiteral);
+      assert.ok(node);
+      assert.strictEqual(node.kind, SyntaxKind.StringLiteral);
     });
 
     it("return string literal when in non completed multi line string", async () => {
@@ -53,17 +53,17 @@ describe("compiler: parser utils", () => {
           prop: """┆
         }
       `);
-      ok(node);
-      strictEqual(node.kind, SyntaxKind.StringLiteral);
+      assert.ok(node);
+      assert.strictEqual(node.kind, SyntaxKind.StringLiteral);
     });
 
     it("return missing identifier between dot and close paren", async () => {
       const { node } = await getNodeAtCursor(`
         @myDecN.┆)
       `);
-      ok(node);
-      strictEqual(node.kind, SyntaxKind.Identifier as const);
-      strictEqual(node.sv, "<missing identifier>1");
+      assert.ok(node);
+      assert.strictEqual(node.kind, SyntaxKind.Identifier as const);
+      assert.strictEqual(node.sv, "<missing identifier>1");
     });
   });
 });
