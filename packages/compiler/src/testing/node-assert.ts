@@ -9,7 +9,16 @@ export const NodeAssert: SystemAssert = {
   strictEqual(actual: any, expected: any, message?: string) {
     assert.strictEqual(actual, expected, message);
   },
+  notStrictEqual(actual: any, expected: any, message?: string) {
+    assert.notStrictEqual(actual, expected, message);
+  },
+  deepStrictEqual(actual: any, expected: any, message?: string) {
+    assert.deepStrictEqual(actual, expected, message);
+  },
   match(value: string, regex: RegExp, message?: string) {
     assert.match(value, regex, message);
+  },
+  ok(value: any, message?: string) {
+    assert.ok(value, message);
   },
 };
