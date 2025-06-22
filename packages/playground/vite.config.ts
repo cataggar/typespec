@@ -11,7 +11,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const packageJson = JSON.parse(readFileSync(resolve(__dirname, "package.json")).toString());
 const dependencies = Object.keys(packageJson.dependencies);
 const externals = [
-  ...dependencies,
+  ...dependencies.filter((dep) => dep !== "@typespec/compiler"),
   "swagger-ui-dist/swagger-ui-es-bundle.js",
   "swagger-ui-dist/swagger-ui.css",
   "@typespec/bundler/vite",
@@ -35,6 +35,7 @@ export default defineConfig({
         "react/viewers/index": "src/react/viewers/index.tsx",
         "tooling/index": "src/tooling/index.ts",
         "vite/index": "src/vite/index.ts",
+        types: "src/types.ts",
       },
       cssFileName: "style",
       formats: ["es"],

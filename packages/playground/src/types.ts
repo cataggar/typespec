@@ -5,6 +5,7 @@ import type {
   PackageJson,
   TypeSpecLibrary,
 } from "@typespec/compiler";
+export { createTestRunner } from "@typespec/compiler/testing";
 
 export interface PlaygroundSample {
   filename: string;

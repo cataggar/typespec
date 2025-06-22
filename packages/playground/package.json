@@ -48,7 +48,10 @@
       "default": "./dist/react/viewers/index.js"
     },
     "./style.css": "./dist/style.css",
-    "./styles.css": "./dist/style.css"
+    "./styles.css": "./dist/style.css",
+    "./types": {
+      "default": "./dist/types-DNGMvLyf.js"
+    }
   },
   "engines": {
     "node": ">=20.0.0"
