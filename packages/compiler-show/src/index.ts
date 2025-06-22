@@ -1,10 +1,12 @@
+import { MANIFEST } from "@typespec/compiler";
 import { createTestRunner } from "@typespec/compiler/testing";
 
 function version(): string {
-  return "0.0.1";
+  return MANIFEST.version;
 }
 
 export async function test() {
+  console.log(`TypeSpec Compiler ${version()}`);
   const runner = await createTestRunner();
   const diagnostics = await runner.compile("model Bar {}");
   console.log(diagnostics);
