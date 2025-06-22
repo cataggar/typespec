@@ -1,4 +1,4 @@
-import assert from "assert";
+import { assert } from "../src/testing/system-assert.js";
 import { readFile } from "fs/promises";
 import { URL } from "url";
 import { describe, it } from "vitest";
@@ -412,18 +412,18 @@ describe("compiler: scanner", () => {
       maxKeywordLengthFound = Math.max(maxKeywordLengthFound, name.length);
 
       assert.strictEqual(TokenDisplay[token], `'${name}'`, "token display should match");
-      assert(
+      assert.ok(
         isKeyword(token) || isReservedKeyword(token),
         `${name} should be classified as a keyword or reserved keyword`,
       );
       if (!isReservedKeyword(token)) {
         if (nonStatementKeywords.includes(token)) {
-          assert(
+          assert.ok(
             !isStatementKeyword(token),
             `${name} should not be classified as a statement keyword`,
           );
         } else {
-          assert(isStatementKeyword(token), `${name} should be classified as statement keyword`);
+          assert.ok(isStatementKeyword(token), `${name} should be classified as statement keyword`);
         }
       }
     }
@@ -451,7 +451,7 @@ describe("compiler: scanner", () => {
         token !== Token.NumericLiteral
       ) {
         assert.strictEqual(TokenDisplay[token], `'${str}'`);
-        assert(isPunctuation(token), `'${str}' should be classified as punctuation`);
+        assert.ok(isPunctuation(token), `'${str}' should be classified as punctuation`);
       }
     }
 
@@ -477,11 +477,11 @@ describe("compiler: scanner", () => {
   ];
 
   it("allows additional identifier start characters", () => {
-    assert(isIdentifierStart("$".codePointAt(0)!), "'$' should be allowed to start identifier.");
-    assert(isIdentifierStart("_".codePointAt(0)!), "'_' should be allowed to start identifier.");
+    assert.ok(isIdentifierStart("$".codePointAt(0)!), "'$' should be allowed to start identifier.");
+    assert.ok(isIdentifierStart("_".codePointAt(0)!), "'_' should be allowed to start identifier.");
 
     for (const codePoint of otherIDStart) {
-      assert(
+      assert.ok(
         isIdentifierStart(codePoint),
         `U+${codePoint.toString(16)} should be allowed to start identifier.`,
       );
@@ -490,19 +490,19 @@ describe("compiler: scanner", () => {
 
   it("allows additional identifier continuation characters", () => {
     //prettier-ignore
-    assert(isIdentifierContinue("$".codePointAt(0)!), "'$' should be allowed to continue identifier.");
+    assert.ok(isIdentifierContinue("$".codePointAt(0)!), "'$' should be allowed to continue identifier.");
     //prettier-ignore
-    assert(isIdentifierContinue("_".codePointAt(0)!), "'_' should be allowed to continue identifier.");
+    assert.ok(isIdentifierContinue("_".codePointAt(0)!), "'_' should be allowed to continue identifier.");
 
     for (const codePoint of [...otherIDStart, ...otherIdContinue]) {
-      assert(
+      assert.ok(
         isIdentifierContinue(codePoint),
         `U+${codePoint.toString(16)} should be allowed to continue identifier.`,
       );
     }
     // cspell:disable-next-line
-    assert(isIdentifierContinue(0x200c), "U+200C (ZWNJ) should be allowed to continue identifier.");
-    assert(isIdentifierContinue(0x200d), "U+200D (ZWJ) should be allowed to continue identifier.");
+    assert.ok(isIdentifierContinue(0x200c), "U+200C (ZWNJ) should be allowed to continue identifier.");
+    assert.ok(isIdentifierContinue(0x200d), "U+200D (ZWJ) should be allowed to continue identifier.");
   });
 
   describe("keyword collision", () => {
