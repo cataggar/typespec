@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { VisibilityFilter } from "../src/core/visibility/core.js";
 import {
@@ -32,12 +31,13 @@ import {
   expectDiagnosticEmpty,
   expectDiagnostics,
 } from "../src/testing/index.js";
+import { assert } from "../src/testing/system-assert.js";
 
 function assertSetsEqual<T>(a: Set<T>, b: Set<T>): void {
-  strictEqual(a.size, b.size);
+  assert.strictEqual(a.size, b.size);
 
   for (const item of a) {
-    ok(b.has(item));
+    assert.ok(b.has(item));
   }
 }
 
@@ -98,8 +98,8 @@ describe("compiler: visibility core", () => {
 
     const lifecycleEnum = getLifecycleVisibilityEnum(runner.program);
 
-    strictEqual(lifecycleEnum, lifecycle.type);
-    strictEqual(lifecycleEnum, runner.program.resolveTypeReference("TypeSpec.Lifecycle")[0]);
+    assert.strictEqual(lifecycleEnum, lifecycle.type);
+    assert.strictEqual(lifecycleEnum, runner.program.resolveTypeReference("TypeSpec.Lifecycle")[0]);
   });
 
   describe("visibility seals", () => {
@@ -116,15 +116,15 @@ describe("compiler: visibility core", () => {
 
       const lifecycle = getLifecycleVisibilityEnum(runner.program);
 
-      ok(!isSealed(runner.program, x));
-      ok(!isSealed(runner.program, x, lifecycle));
-      ok(!isSealed(runner.program, x, Dummy));
+      assert.ok(!isSealed(runner.program, x));
+      assert.ok(!isSealed(runner.program, x, lifecycle));
+      assert.ok(!isSealed(runner.program, x, Dummy));
 
       sealVisibilityModifiersForProgram(runner.program);
 
-      ok(isSealed(runner.program, x));
-      ok(isSealed(runner.program, x, lifecycle));
-      ok(isSealed(runner.program, x, Dummy));
+      assert.ok(isSealed(runner.program, x));
+      assert.ok(isSealed(runner.program, x, lifecycle));
+      assert.ok(isSealed(runner.program, x, Dummy));
     });
 
     it("seals visibility modifiers for a visibility class", async () => {
@@ -140,15 +140,15 @@ describe("compiler: visibility core", () => {
 
       const lifecycle = getLifecycleVisibilityEnum(runner.program);
 
-      ok(!isSealed(runner.program, x));
-      ok(!isSealed(runner.program, x, lifecycle));
-      ok(!isSealed(runner.program, x, Dummy));
+      assert.ok(!isSealed(runner.program, x));
+      assert.ok(!isSealed(runner.program, x, lifecycle));
+      assert.ok(!isSealed(runner.program, x, Dummy));
 
       sealVisibilityModifiers(runner.program, x, lifecycle);
 
-      ok(!isSealed(runner.program, x));
-      ok(isSealed(runner.program, x, lifecycle));
-      ok(!isSealed(runner.program, x, Dummy));
+      assert.ok(!isSealed(runner.program, x));
+      assert.ok(isSealed(runner.program, x, lifecycle));
+      assert.ok(!isSealed(runner.program, x, Dummy));
     });
 
     it("seals visibility modifiers for a property", async () => {
@@ -166,23 +166,23 @@ describe("compiler: visibility core", () => {
 
       const lifecycle = getLifecycleVisibilityEnum(runner.program);
 
-      ok(!isSealed(runner.program, x));
-      ok(!isSealed(runner.program, x, lifecycle));
-      ok(!isSealed(runner.program, x, Dummy));
+      assert.ok(!isSealed(runner.program, x));
+      assert.ok(!isSealed(runner.program, x, lifecycle));
+      assert.ok(!isSealed(runner.program, x, Dummy));
 
-      ok(!isSealed(runner.program, y));
-      ok(!isSealed(runner.program, y, lifecycle));
-      ok(!isSealed(runner.program, y, Dummy));
+      assert.ok(!isSealed(runner.program, y));
+      assert.ok(!isSealed(runner.program, y, lifecycle));
+      assert.ok(!isSealed(runner.program, y, Dummy));
 
       sealVisibilityModifiers(runner.program, x);
 
-      ok(isSealed(runner.program, x));
-      ok(isSealed(runner.program, x, lifecycle));
-      ok(isSealed(runner.program, x, Dummy));
+      assert.ok(isSealed(runner.program, x));
+      assert.ok(isSealed(runner.program, x, lifecycle));
+      assert.ok(isSealed(runner.program, x, Dummy));
 
-      ok(!isSealed(runner.program, y));
-      ok(!isSealed(runner.program, y, lifecycle));
-      ok(!isSealed(runner.program, y, Dummy));
+      assert.ok(!isSealed(runner.program, y));
+      assert.ok(!isSealed(runner.program, y, lifecycle));
+      assert.ok(!isSealed(runner.program, y, Dummy));
     });
 
     it("correctly diagnoses modifying sealed visibility", async () => {
@@ -203,7 +203,7 @@ describe("compiler: visibility core", () => {
       removeVisibilityModifiers(runner.program, x, [Create]);
       clearVisibilityModifiersForClass(runner.program, x, Lifecycle);
 
-      ok(runner.program.diagnostics.length === 3);
+      assert.ok(runner.program.diagnostics.length === 3);
 
       expectDiagnostics(runner.program.diagnostics, [
         {
@@ -243,19 +243,19 @@ describe("compiler: visibility core", () => {
 
       const visibility = getVisibilityForClass(runner.program, x, Lifecycle);
 
-      strictEqual(visibility.size, Lifecycle.members.size);
+      assert.strictEqual(visibility.size, Lifecycle.members.size);
       for (const member of Lifecycle.members.values()) {
-        ok(visibility.has(member));
-        ok(hasVisibility(runner.program, x, member));
+        assert.ok(visibility.has(member));
+        assert.ok(hasVisibility(runner.program, x, member));
       }
 
       const dummyVisibility = getVisibilityForClass(runner.program, x, Dummy);
 
-      strictEqual(dummyVisibility.size, 1);
-      ok(dummyVisibility.has(Dummy.members.get("A")!));
-      ok(hasVisibility(runner.program, x, Dummy.members.get("A")!));
-      ok(!dummyVisibility.has(Dummy.members.get("B")!));
-      ok(!hasVisibility(runner.program, x, Dummy.members.get("B")!));
+      assert.strictEqual(dummyVisibility.size, 1);
+      assert.ok(dummyVisibility.has(Dummy.members.get("A")!));
+      assert.ok(hasVisibility(runner.program, x, Dummy.members.get("A")!));
+      assert.ok(!dummyVisibility.has(Dummy.members.get("B")!));
+      assert.ok(!hasVisibility(runner.program, x, Dummy.members.get("B")!));
     });
 
     it("adds a visibility modifier", async () => {
@@ -274,15 +274,15 @@ describe("compiler: visibility core", () => {
 
       const visibility = getVisibilityForClass(runner.program, x, Lifecycle);
 
-      strictEqual(visibility.size, 1);
+      assert.strictEqual(visibility.size, 1);
 
       for (const member of Lifecycle.members.values()) {
         if (member !== Create) {
-          ok(!visibility.has(member));
-          ok(!hasVisibility(runner.program, x, member));
+          assert.ok(!visibility.has(member));
+          assert.ok(!hasVisibility(runner.program, x, member));
         } else {
-          ok(visibility.has(member));
-          ok(hasVisibility(runner.program, x, member));
+          assert.ok(visibility.has(member));
+          assert.ok(hasVisibility(runner.program, x, member));
         }
       }
     });
@@ -302,13 +302,13 @@ describe("compiler: visibility core", () => {
 
       const visibility = getVisibilityForClass(runner.program, x, Lifecycle);
 
-      strictEqual(visibility.size, Lifecycle.members.size - 1);
+      assert.strictEqual(visibility.size, Lifecycle.members.size - 1);
 
       for (const member of Lifecycle.members.values()) {
         if (member !== Create) {
-          ok(visibility.has(member));
+          assert.ok(visibility.has(member));
         } else {
-          ok(!visibility.has(member));
+          assert.ok(!visibility.has(member));
         }
       }
     });
@@ -327,11 +327,11 @@ describe("compiler: visibility core", () => {
 
       const visibility = getVisibilityForClass(runner.program, x, Lifecycle);
 
-      strictEqual(visibility.size, 0);
+      assert.strictEqual(visibility.size, 0);
 
       for (const member of Lifecycle.members.values()) {
-        ok(!visibility.has(member));
-        ok(!hasVisibility(runner.program, x, member));
+        assert.ok(!visibility.has(member));
+        assert.ok(!hasVisibility(runner.program, x, member));
       }
     });
 
@@ -349,19 +349,19 @@ describe("compiler: visibility core", () => {
 
       const visibility = getVisibilityForClass(runner.program, x, Lifecycle);
 
-      strictEqual(visibility.size, 1);
-      ok(visibility.has(Lifecycle.members.get("Create")!));
-      ok(hasVisibility(runner.program, x, Lifecycle.members.get("Create")!));
+      assert.strictEqual(visibility.size, 1);
+      assert.ok(visibility.has(Lifecycle.members.get("Create")!));
+      assert.ok(hasVisibility(runner.program, x, Lifecycle.members.get("Create")!));
 
       resetVisibilityModifiersForClass(runner.program, x, Lifecycle);
 
       const resetVisibility = getVisibilityForClass(runner.program, x, Lifecycle);
 
-      strictEqual(resetVisibility.size, 5);
+      assert.strictEqual(resetVisibility.size, 5);
 
       for (const member of Lifecycle.members.values()) {
-        ok(resetVisibility.has(member));
-        ok(hasVisibility(runner.program, x, member));
+        assert.ok(resetVisibility.has(member));
+        assert.ok(hasVisibility(runner.program, x, member));
       }
     });
 
@@ -384,11 +384,11 @@ describe("compiler: visibility core", () => {
 
       const visibility = getVisibilityForClass(runner.program, x, Lifecycle);
 
-      strictEqual(visibility.size, Lifecycle.members.size);
+      assert.strictEqual(visibility.size, Lifecycle.members.size);
 
       for (const member of Lifecycle.members.values()) {
-        ok(visibility.has(member));
-        ok(hasVisibility(runner.program, x, member));
+        assert.ok(visibility.has(member));
+        assert.ok(hasVisibility(runner.program, x, member));
       }
     });
   });
@@ -548,7 +548,7 @@ describe("compiler: visibility core", () => {
           ]),
         ) as VisibilityFilter;
 
-        strictEqual(isVisible(runner.program, x, filter), scenario.expect);
+        assert.strictEqual(isVisible(runner.program, x, filter), scenario.expect);
       });
     }
 
@@ -581,28 +581,28 @@ describe("compiler: visibility core", () => {
         B: DummyEnum.members.get("B")!,
       };
 
-      strictEqual(
+      assert.strictEqual(
         isVisible(runner.program, x, {
           all: new Set([Lifecycle.Create, Dummy.B]),
         }),
         true,
       );
 
-      strictEqual(
+      assert.strictEqual(
         isVisible(runner.program, x, {
           any: new Set([Dummy.A]),
         }),
         false,
       );
 
-      strictEqual(
+      assert.strictEqual(
         isVisible(runner.program, x, {
           none: new Set([Lifecycle.Update]),
         }),
         true,
       );
 
-      strictEqual(
+      assert.strictEqual(
         isVisible(runner.program, x, {
           all: new Set([Lifecycle.Create]),
           none: new Set([Dummy.A]),
@@ -610,7 +610,7 @@ describe("compiler: visibility core", () => {
         true,
       );
 
-      strictEqual(
+      assert.strictEqual(
         isVisible(runner.program, x, {
           all: new Set([Lifecycle.Create, Dummy.B]),
           none: new Set([Dummy.A]),
@@ -618,7 +618,7 @@ describe("compiler: visibility core", () => {
         true,
       );
 
-      strictEqual(
+      assert.strictEqual(
         isVisible(runner.program, x, {
           all: new Set([Lifecycle.Create]),
           any: new Set([Dummy.A, Dummy.B]),
@@ -643,11 +643,11 @@ describe("compiler: visibility core", () => {
 
         const filter = getParameterVisibilityFilter(runner.program, foo, EmptyVisibilityProvider);
 
-        strictEqual(filter.all, undefined);
-        strictEqual(filter.any, undefined);
-        strictEqual(filter.none, undefined);
+        assert.strictEqual(filter.all, undefined);
+        assert.strictEqual(filter.any, undefined);
+        assert.strictEqual(filter.none, undefined);
 
-        strictEqual(isVisible(runner.program, x, filter), true);
+        assert.strictEqual(isVisible(runner.program, x, filter), true);
       });
 
       it("correctly provides visibility filter from operation", async () => {
@@ -669,12 +669,12 @@ describe("compiler: visibility core", () => {
 
         const Lifecycle = getLifecycleVisibilityEnum(runner.program);
 
-        strictEqual(filter.all, undefined);
-        strictEqual(filter.any?.size, 1);
-        strictEqual(filter.any.has(Lifecycle.members.get("Update")!), true);
-        strictEqual(filter.none, undefined);
+        assert.strictEqual(filter.all, undefined);
+        assert.strictEqual(filter.any?.size, 1);
+        assert.strictEqual(filter.any.has(Lifecycle.members.get("Update")!), true);
+        assert.strictEqual(filter.none, undefined);
 
-        strictEqual(isVisible(runner.program, x, filter), false);
+        assert.strictEqual(isVisible(runner.program, x, filter), false);
       });
 
       it("does not allow empty operation visibility constraints", async () => {
@@ -837,23 +837,23 @@ describe("compiler: visibility core", () => {
 
       const example = Result.properties.get("example");
 
-      ok(example);
+      assert.ok(example);
 
       const union = example.type;
 
-      strictEqual(union.kind, "Union");
+      assert.strictEqual(union.kind, "Union");
 
       const [A, B] = [...union.variants.values()].map((v) => v.type);
 
-      strictEqual(A.kind, "Model");
-      strictEqual(B.kind, "Model");
+      assert.strictEqual(A.kind, "Model");
+      assert.strictEqual(B.kind, "Model");
 
       const a = A.properties.get("a");
       const b = B.properties.get("b");
 
-      ok(a);
+      assert.ok(a);
 
-      strictEqual(b, undefined);
+      assert.strictEqual(b, undefined);
     });
 
     it("correctly transforms a model property reference", async () => {
@@ -879,21 +879,21 @@ describe("compiler: visibility core", () => {
 
       const example = Result.properties.get("a");
 
-      ok(example);
+      assert.ok(example);
 
       const ref = example.type;
 
-      strictEqual(ref.kind, "ModelProperty");
+      assert.strictEqual(ref.kind, "ModelProperty");
 
       const A = ref.type;
 
-      ok(A.kind === "Model");
+      assert.ok(A.kind === "Model");
 
       const a = A.properties.get("a");
       const b = A.properties.get("b");
 
-      strictEqual(a, undefined);
-      ok(b);
+      assert.strictEqual(a, undefined);
+      assert.ok(b);
     });
 
     it("correctly transforms a tuple", async () => {
@@ -918,23 +918,23 @@ describe("compiler: visibility core", () => {
 
       const example = Result.properties.get("example");
 
-      ok(example);
+      assert.ok(example);
 
       const tuple = example.type;
 
-      strictEqual(tuple.kind, "Tuple");
+      assert.strictEqual(tuple.kind, "Tuple");
 
       const [A, B] = tuple.values;
 
-      strictEqual(A.kind, "Model");
-      strictEqual(B.kind, "Model");
+      assert.strictEqual(A.kind, "Model");
+      assert.strictEqual(B.kind, "Model");
 
       const a = A.properties.get("a");
       const b = B.properties.get("b");
 
-      ok(a);
+      assert.ok(a);
 
-      strictEqual(b, undefined);
+      assert.strictEqual(b, undefined);
     });
   });
 
@@ -953,16 +953,16 @@ describe("compiler: visibility core", () => {
 
       const idRead = ExampleRead.properties.get("id")!;
 
-      ok(idRead);
+      assert.ok(idRead);
 
-      ok(!idRead.decorators.some((d) => d.decorator === $visibility));
+      assert.ok(!idRead.decorators.some((d) => d.decorator === $visibility));
 
       // Property should remain present in the Create transform of this model.
       const idReadCreate = ExampleReadCreate.properties.get("id")!;
 
-      ok(idReadCreate);
+      assert.ok(idReadCreate);
 
-      strictEqual(idRead.type, idReadCreate.type);
+      assert.strictEqual(idRead.type, idReadCreate.type);
     });
   });
 
@@ -999,30 +999,30 @@ describe("compiler: visibility core", () => {
       }
     `)) as { DataA: Model; DataB: Model };
 
-    ok(DataA);
-    ok(DataB);
+    assert.ok(DataA);
+    assert.ok(DataB);
 
-    ok(DataA.properties.has("data_a"));
-    ok(!DataA.properties.has("data_b"));
-    ok(DataB.properties.has("data_b"));
-    ok(!DataB.properties.has("data_a"));
+    assert.ok(DataA.properties.has("data_a"));
+    assert.ok(!DataA.properties.has("data_b"));
+    assert.ok(DataB.properties.has("data_b"));
+    assert.ok(!DataB.properties.has("data_a"));
 
     const dataA = DataA.properties.get("data_a")!;
     const dataB = DataB.properties.get("data_b")!;
 
-    ok(dataA.type.kind === "Model");
-    ok(dataB.type.kind === "Model");
+    assert.ok(dataA.type.kind === "Model");
+    assert.ok(dataB.type.kind === "Model");
 
     const FooA = dataA.type as Model;
     const FooB = dataB.type as Model;
 
-    ok(FooA.name === "FooA");
-    ok(FooB.name === "FooB");
+    assert.ok(FooA.name === "FooA");
+    assert.ok(FooB.name === "FooB");
 
-    ok(FooA.properties.has("foo_a"));
-    ok(!FooA.properties.has("foo_b"));
-    ok(FooB.properties.has("foo_b"));
-    ok(!FooB.properties.has("foo_a"));
+    assert.ok(FooA.properties.has("foo_a"));
+    assert.ok(!FooA.properties.has("foo_b"));
+    assert.ok(FooB.properties.has("foo_b"));
+    assert.ok(!FooB.properties.has("foo_a"));
   });
 
   it("correctly caches and deduplicates transformed instances", async () => {
@@ -1061,52 +1061,52 @@ describe("compiler: visibility core", () => {
       }
     `)) as { Out: Model };
 
-    ok(Out);
+    assert.ok(Out);
 
     const a = Out.properties.get("a");
     const b = Out.properties.get("b");
 
-    ok(a);
-    ok(b);
+    assert.ok(a);
+    assert.ok(b);
 
-    ok(a.type.kind === "Model");
-    ok(b.type.kind === "Model");
+    assert.ok(a.type.kind === "Model");
+    assert.ok(b.type.kind === "Model");
 
     const A = a.type as Model;
     const B = b.type as Model;
 
-    ok(getFriendlyName(runner.program, A) === "ReadA");
-    ok(getFriendlyName(runner.program, B) === "ReadB");
+    assert.ok(getFriendlyName(runner.program, A) === "ReadA");
+    assert.ok(getFriendlyName(runner.program, B) === "ReadB");
 
-    ok(A.properties.has("a"));
-    ok(!A.properties.has("invisible"));
+    assert.ok(A.properties.has("a"));
+    assert.ok(!A.properties.has("invisible"));
 
-    ok(B.properties.has("b"));
-    ok(!B.properties.has("invisible"));
+    assert.ok(B.properties.has("b"));
+    assert.ok(!B.properties.has("invisible"));
 
     const aC = A.properties.get("c");
     const bC = B.properties.get("c");
 
-    ok(aC);
-    ok(bC);
+    assert.ok(aC);
+    assert.ok(bC);
 
-    ok(aC.type === bC.type);
+    assert.ok(aC.type === bC.type);
 
     let C = aC.type as Model;
 
-    ok(C.kind === "Model");
-    ok(C.name === "ReadC");
+    assert.ok(C.kind === "Model");
+    assert.ok(C.name === "ReadC");
 
-    ok(!C.properties.has("invisible"));
-    ok(C.properties.has("c"));
+    assert.ok(!C.properties.has("invisible"));
+    assert.ok(C.properties.has("c"));
 
     C = bC.type as Model;
 
-    ok(C.kind === "Model");
-    ok(C.name === "ReadC");
+    assert.ok(C.kind === "Model");
+    assert.ok(C.name === "ReadC");
 
-    ok(!C.properties.has("invisible"));
-    ok(C.properties.has("c"));
+    assert.ok(!C.properties.has("invisible"));
+    assert.ok(C.properties.has("c"));
   });
 
   it("correctly caches and deduplicates instances that are not transformed", async () => {
@@ -1123,18 +1123,18 @@ describe("compiler: visibility core", () => {
       }
     `)) as { example: Operation; B: Model };
 
-    ok(example);
-    strictEqual(example.kind, "Operation");
+    assert.ok(example);
+    assert.strictEqual(example.kind, "Operation");
 
     const ReadA = example.returnType as Model;
 
-    strictEqual(ReadA.kind, "Model");
+    assert.strictEqual(ReadA.kind, "Model");
 
     const aB = ReadA.properties.get("b")!.type as Model;
 
-    strictEqual(aB.kind, "Model");
+    assert.strictEqual(aB.kind, "Model");
 
-    ok(aB === B);
+    assert.ok(aB === B);
   });
 
   it("correctly transforms arrays and records", async () => {
@@ -1154,33 +1154,33 @@ describe("compiler: visibility core", () => {
       }
     `)) as { Result: Model };
 
-    ok(Result);
+    assert.ok(Result);
 
     const array = Result.properties.get("array");
     const record = Result.properties.get("record");
 
-    ok(array);
-    ok(record);
+    assert.ok(array);
+    assert.ok(record);
 
     const arrayType = array.type;
     const recordType = record.type;
 
-    ok(arrayType.kind === "Model");
-    ok(recordType.kind === "Model");
+    assert.ok(arrayType.kind === "Model");
+    assert.ok(recordType.kind === "Model");
 
     const arrayA = (arrayType as Model).indexer!.value as Model;
     const recordA = (recordType as Model).indexer!.value as Model;
 
-    ok(arrayA.kind === "Model");
-    ok(recordA.kind === "Model");
+    assert.ok(arrayA.kind === "Model");
+    assert.ok(recordA.kind === "Model");
 
-    ok(arrayA.name === "ATransform");
-    ok(recordA.name === "ATransform");
+    assert.ok(arrayA.name === "ATransform");
+    assert.ok(recordA.name === "ATransform");
 
-    ok(arrayA === recordA);
+    assert.ok(arrayA === recordA);
 
-    ok(arrayA.properties.has("a"));
-    ok(!arrayA.properties.has("invisible"));
+    assert.ok(arrayA.properties.has("a"));
+    assert.ok(!arrayA.properties.has("invisible"));
   });
 });
 
@@ -1207,35 +1207,35 @@ function validateCreateOrUpdateTransform(
     invisible: ModelProperty | undefined;
   },
 ) {
-  strictEqual(props.r, undefined);
+  assert.strictEqual(props.r, undefined);
 
-  strictEqual(props.invisible, undefined);
+  assert.strictEqual(props.invisible, undefined);
 
   // All other visible properties are preserved
-  ok(props.c);
-  ok(props.cr);
-  ok(props.cu);
-  ok(props.cru);
-  ok(props.ru);
-  ok(props.u);
+  assert.ok(props.c);
+  assert.ok(props.cr);
+  assert.ok(props.cu);
+  assert.ok(props.cru);
+  assert.ok(props.ru);
+  assert.ok(props.u);
 
   const nested = Result.properties.get("nested");
 
-  ok(nested);
-  ok(nested.type.kind === "Model");
+  assert.ok(nested);
+  assert.ok(nested.type.kind === "Model");
 
   const nestedProps = getProperties(nested.type);
 
-  strictEqual(nestedProps.r, undefined);
+  assert.strictEqual(nestedProps.r, undefined);
 
-  ok(nestedProps.c);
-  ok(nestedProps.cr);
-  ok(nestedProps.cu);
-  ok(nestedProps.cru);
-  ok(nestedProps.ru);
-  ok(nestedProps.u);
+  assert.ok(nestedProps.c);
+  assert.ok(nestedProps.cr);
+  assert.ok(nestedProps.cu);
+  assert.ok(nestedProps.cru);
+  assert.ok(nestedProps.ru);
+  assert.ok(nestedProps.u);
 
-  strictEqual(nestedProps.invisible, undefined);
+  assert.strictEqual(nestedProps.invisible, undefined);
 }
 
 function validateUpdateTransform(
@@ -1261,36 +1261,36 @@ function validateUpdateTransform(
     invisible: ModelProperty | undefined;
   },
 ) {
-  strictEqual(props.r, undefined);
-  strictEqual(props.c, undefined);
-  strictEqual(props.cr, undefined);
+  assert.strictEqual(props.r, undefined);
+  assert.strictEqual(props.c, undefined);
+  assert.strictEqual(props.cr, undefined);
 
-  strictEqual(props.invisible, undefined);
+  assert.strictEqual(props.invisible, undefined);
 
-  ok(props.cu);
-  ok(props.cru);
-  ok(props.ru);
-  ok(props.u);
+  assert.ok(props.cu);
+  assert.ok(props.cru);
+  assert.ok(props.ru);
+  assert.ok(props.u);
 
   const nested = Result.properties.get("nested");
 
-  ok(nested);
-  ok(nested.type.kind === "Model");
+  assert.ok(nested);
+  assert.ok(nested.type.kind === "Model");
 
   // Nested properties work differently in Lifecycle Update transforms, requiring nested create-only properties to
   // additionally be visible
   const nestedProps = getProperties(nested.type);
 
-  strictEqual(nestedProps.r, undefined);
+  assert.strictEqual(nestedProps.r, undefined);
 
-  strictEqual(nestedProps.invisible, undefined);
+  assert.strictEqual(nestedProps.invisible, undefined);
 
-  ok(nestedProps.c);
-  ok(nestedProps.cr);
-  ok(nestedProps.cu);
-  ok(nestedProps.cru);
-  ok(nestedProps.ru);
-  ok(nestedProps.u);
+  assert.ok(nestedProps.c);
+  assert.ok(nestedProps.cr);
+  assert.ok(nestedProps.cu);
+  assert.ok(nestedProps.cru);
+  assert.ok(nestedProps.ru);
+  assert.ok(nestedProps.u);
 }
 
 function validateCreateTransform(
@@ -1316,34 +1316,34 @@ function validateCreateTransform(
     invisible: ModelProperty | undefined;
   },
 ) {
-  strictEqual(props.r, undefined);
-  strictEqual(props.ru, undefined);
-  strictEqual(props.u, undefined);
+  assert.strictEqual(props.r, undefined);
+  assert.strictEqual(props.ru, undefined);
+  assert.strictEqual(props.u, undefined);
 
-  strictEqual(props.invisible, undefined);
+  assert.strictEqual(props.invisible, undefined);
 
-  ok(props.c);
-  ok(props.cr);
-  ok(props.cu);
-  ok(props.cru);
+  assert.ok(props.c);
+  assert.ok(props.cr);
+  assert.ok(props.cu);
+  assert.ok(props.cru);
 
   const nested = Result.properties.get("nested");
 
-  ok(nested);
-  ok(nested.type.kind === "Model");
+  assert.ok(nested);
+  assert.ok(nested.type.kind === "Model");
 
   const nestedProps = getProperties(nested.type);
 
-  strictEqual(nestedProps.r, undefined);
-  strictEqual(nestedProps.ru, undefined);
-  strictEqual(nestedProps.u, undefined);
+  assert.strictEqual(nestedProps.r, undefined);
+  assert.strictEqual(nestedProps.ru, undefined);
+  assert.strictEqual(nestedProps.u, undefined);
 
-  strictEqual(nestedProps.invisible, undefined);
+  assert.strictEqual(nestedProps.invisible, undefined);
 
-  ok(nestedProps.c);
-  ok(nestedProps.cr);
-  ok(nestedProps.cu);
-  ok(nestedProps.cru);
+  assert.ok(nestedProps.c);
+  assert.ok(nestedProps.cr);
+  assert.ok(nestedProps.cu);
+  assert.ok(nestedProps.cru);
 }
 
 function validateReadTransform(
@@ -1369,33 +1369,33 @@ function validateReadTransform(
     invisible: ModelProperty | undefined;
   },
 ) {
-  strictEqual(props.c, undefined);
-  strictEqual(props.cu, undefined);
-  strictEqual(props.u, undefined);
+  assert.strictEqual(props.c, undefined);
+  assert.strictEqual(props.cu, undefined);
+  assert.strictEqual(props.u, undefined);
 
-  strictEqual(props.invisible, undefined);
+  assert.strictEqual(props.invisible, undefined);
 
   // All properties that have Read visibility are preserved
-  ok(props.r);
-  ok(props.cr);
-  ok(props.cru);
-  ok(props.ru);
+  assert.ok(props.r);
+  assert.ok(props.cr);
+  assert.ok(props.cru);
+  assert.ok(props.ru);
 
   const nested = Result.properties.get("nested");
 
-  ok(nested);
-  ok(nested.type.kind === "Model");
+  assert.ok(nested);
+  assert.ok(nested.type.kind === "Model");
 
   const nestedProps = getProperties(nested.type);
 
-  strictEqual(nestedProps.c, undefined);
-  strictEqual(nestedProps.cu, undefined);
-  strictEqual(nestedProps.u, undefined);
+  assert.strictEqual(nestedProps.c, undefined);
+  assert.strictEqual(nestedProps.cu, undefined);
+  assert.strictEqual(nestedProps.u, undefined);
 
-  strictEqual(nestedProps.invisible, undefined);
+  assert.strictEqual(nestedProps.invisible, undefined);
 
-  ok(nestedProps.r);
-  ok(nestedProps.cr);
-  ok(nestedProps.cru);
-  ok(nestedProps.ru);
+  assert.ok(nestedProps.r);
+  assert.ok(nestedProps.cr);
+  assert.ok(nestedProps.cru);
+  assert.ok(nestedProps.ru);
 }
