@@ -1,11 +1,4 @@
-import { NodeAssert } from "./node-assert.js";
-import { SystemAssert } from "./system-assert.js";
-
-// Default to NodeAssert for Node.js environments
-let assert: SystemAssert = NodeAssert;
-export function setSystemAssert(impl: SystemAssert) {
-  assert = impl;
-}
+import { assert } from "./system-assert.js";
 
 import { getSourceLocation } from "../core/diagnostics.js";
 import { formatDiagnostic } from "../core/logger/console-sink.js";

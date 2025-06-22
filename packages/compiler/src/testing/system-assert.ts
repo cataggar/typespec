@@ -5,7 +5,7 @@ export interface SystemAssert {
   match(value: string, regex: RegExp, message?: string): void;
 }
 
-let assert: SystemAssert;
+export let assert: SystemAssert;
 export function setSystemAssert(impl: SystemAssert) {
   assert = impl;
 }
