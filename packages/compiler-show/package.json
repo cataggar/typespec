@@ -1,0 +1,19 @@
+{
+  "name": "@typespec/compiler-show",
+  "version": "0.0.1",
+  "description": "Showcase utilities for @typespec/compiler.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "node dist/index.js"
+  },
+  "dependencies": {
+    "@typespec/compiler": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "license": "MIT"
+}
