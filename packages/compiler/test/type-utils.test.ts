@@ -1,4 +1,4 @@
-import { ok } from "assert";
+import { assert } from "../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import {
   Enum,
@@ -26,9 +26,9 @@ describe("compiler: type-utils", () => {
        model Foo<T> {t: T};
     `);
       const Foo = runner.program.checker.getGlobalNamespaceType().models.get("Foo")!;
-      ok(isTemplateDeclarationOrInstance(Foo));
-      ok(isTemplateDeclaration(Foo), "Should BE a template declaration");
-      ok(!isTemplateInstance(Foo), "Should NOT be a template instance");
+      assert.ok(isTemplateDeclarationOrInstance(Foo));
+      assert.ok(isTemplateDeclaration(Foo), "Should BE a template declaration");
+      assert.ok(!isTemplateInstance(Foo), "Should NOT be a template instance");
     });
 
     it("check model reference is a template instance", async () => {
@@ -41,9 +41,9 @@ describe("compiler: type-utils", () => {
       `)) as { Bar: Model };
       const Foo = Bar.properties.get("foo")!.type as Model;
 
-      ok(isTemplateDeclarationOrInstance(Foo));
-      ok(isTemplateInstance(Foo), "Should BE a template instance");
-      ok(!isTemplateDeclaration(Foo), "Should NOT be a template declaration");
+      assert.ok(isTemplateDeclarationOrInstance(Foo));
+      assert.ok(isTemplateInstance(Foo), "Should BE a template instance");
+      assert.ok(!isTemplateDeclaration(Foo), "Should NOT be a template declaration");
     });
 
     it("check model expression inside a template instance is also a template instance", async () => {
@@ -57,8 +57,8 @@ describe("compiler: type-utils", () => {
       const Foo = Bar.properties.get("foo")!.type as Model;
       const expr = Foo.properties.get("a")!.type;
 
-      ok(isTemplateInstance(expr), "Should BE a template instance");
-      ok(!isTemplateDeclaration(expr), "Should NOT be a template declaration");
+      assert.ok(isTemplateInstance(expr), "Should BE a template instance");
+      assert.ok(!isTemplateDeclaration(expr), "Should NOT be a template declaration");
     });
 
     it("check union expression inside a template instance is also a template instance", async () => {
@@ -72,8 +72,8 @@ describe("compiler: type-utils", () => {
       const Foo = Bar.properties.get("foo")!.type as Model;
       const expr = Foo.properties.get("a")!.type;
 
-      ok(isTemplateInstance(expr), "Should BE a template instance");
-      ok(!isTemplateDeclaration(expr), "Should NOT be a template declaration");
+      assert.ok(isTemplateInstance(expr), "Should BE a template instance");
+      assert.ok(!isTemplateDeclaration(expr), "Should NOT be a template declaration");
     });
   });
 
@@ -128,13 +128,13 @@ describe("compiler: type-utils", () => {
       ];
 
       for (const [name, type] of candidates) {
-        ok(isDeclaredInNamespace(type, Alpha), `${name} was not found recursively under Alpha`);
-        ok(isDeclaredInNamespace(type, SubAlpha), `${name} was not found under SubAlpha`);
-        ok(
+        assert.ok(isDeclaredInNamespace(type, Alpha), `${name} was not found recursively under Alpha`);
+        assert.ok(isDeclaredInNamespace(type, SubAlpha), `${name} was not found under SubAlpha`);
+        assert.ok(
           !isDeclaredInNamespace(type, Alpha, { recursive: false }),
           `${name} should not be found when recursive: false`,
         );
-        ok(
+        assert.ok(
           !isDeclaredInNamespace(type, Beta, { recursive: false }),
           `${name} should not be found in namespace Beta`,
         );
