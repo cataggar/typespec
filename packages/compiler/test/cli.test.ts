@@ -1,4 +1,3 @@
-import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { stringify } from "yaml";
 import { TypeSpecRawConfig } from "../src/config/types.js";
@@ -11,6 +10,7 @@ import {
   expectDiagnostics,
   resolveVirtualPath,
 } from "../src/testing/index.js";
+import { assert } from "../src/testing/system-assert.js";
 
 describe("compiler: cli", () => {
   let host: TestHost;
@@ -32,17 +32,14 @@ describe("compiler: cli", () => {
         env,
       );
       expectDiagnosticEmpty(diagnostics);
-      ok(options, "Options should have been set.");
+      assert.ok(options, "Options should have been set.");
       const { configFile: config, ...rest } = options;
       return rest;
     }
 
     it("no args and config: return empty options with output-dir at {cwd}/tsp-output", async () => {
       const options = await resolveCompilerOptions({});
-      deepStrictEqual(options, {
-        outputDir: `${cwd}/tsp-output`,
-        options: {},
-      });
+      assert.deepStrictEqual(options, { outputDir: `${cwd}/tsp-output`, options: {} });
     });
 
     it("error if option doesn't have =", async () => {
@@ -50,9 +47,7 @@ describe("compiler: cli", () => {
         host.compilerHost,
         "ws/main.tsp",
         cwd,
-        {
-          options: [`my-emitter.bar`],
-        },
+        { options: [`my-emitter.bar`] },
         {},
       );
 
@@ -63,32 +58,22 @@ describe("compiler: cli", () => {
     });
 
     it("--option without an emitter are moved to miscOptions", async () => {
-      const options = await resolveCompilerOptions({
-        options: [`test-debug=true`],
-      });
+      const options = await resolveCompilerOptions({ options: [`test-debug=true`] });
 
-      deepStrictEqual(options?.miscOptions, { "test-debug": "true" });
-      deepStrictEqual(options?.options, {});
+      assert.deepStrictEqual(options?.miscOptions, { "test-debug": "true" });
+      assert.deepStrictEqual(options?.options, {});
     });
 
     it("--option allows root level options", async () => {
-      const options = await resolveCompilerOptions({
-        options: [`my-emitter.foo=abc`],
-      });
+      const options = await resolveCompilerOptions({ options: [`my-emitter.foo=abc`] });
 
-      deepStrictEqual(options?.options, {
-        "my-emitter": { foo: "abc" },
-      });
+      assert.deepStrictEqual(options?.options, { "my-emitter": { foo: "abc" } });
     });
 
     it("--option allows nested options", async () => {
-      const options = await resolveCompilerOptions({
-        options: [`my-emitter.foo.bar=abc`],
-      });
+      const options = await resolveCompilerOptions({ options: [`my-emitter.foo.bar=abc`] });
 
-      deepStrictEqual(options?.options, {
-        "my-emitter": { foo: { bar: "abc" } },
-      });
+      assert.deepStrictEqual(options?.options, { "my-emitter": { foo: { bar: "abc" } } });
     });
 
     describe("config file with emitters", () => {
@@ -96,19 +81,11 @@ describe("compiler: cli", () => {
         host.addTypeSpecFile(
           "ws/tspconfig.yaml",
           stringify({
-            parameters: {
-              "custom-arg": {
-                default: "/default-arg-value",
-              },
-            },
+            parameters: { "custom-arg": { default: "/default-arg-value" } },
             emit: ["@typespec/openapi3", "@typespec/with-args"],
             options: {
-              "@typespec/openapi3": {
-                "emitter-output-dir": "{output-dir}/custom",
-              },
-              "@typespec/with-args": {
-                "emitter-output-dir": "{custom-arg}/custom",
-              },
+              "@typespec/openapi3": { "emitter-output-dir": "{output-dir}/custom" },
+              "@typespec/with-args": { "emitter-output-dir": "{custom-arg}/custom" },
             },
           }),
         );
@@ -117,7 +94,7 @@ describe("compiler: cli", () => {
       it("interpolate default output-dir in emitter output-dir", async () => {
         const options = await resolveCompilerOptions({});
 
-        strictEqual(
+        assert.strictEqual(
           options?.options?.["@typespec/openapi3"]?.["emitter-output-dir"],
           `${cwd}/tsp-output/custom`,
         );
@@ -126,7 +103,7 @@ describe("compiler: cli", () => {
       it("override output-dir from cli args", async () => {
         const options = await resolveCompilerOptions({ "output-dir": `${cwd}/my-output-dir` });
 
-        strictEqual(
+        assert.strictEqual(
           options?.options?.["@typespec/openapi3"]?.["emitter-output-dir"],
           `${cwd}/my-output-dir/custom`,
         );
@@ -137,7 +114,7 @@ describe("compiler: cli", () => {
           options: [`@typespec/openapi3.emitter-output-dir={cwd}/relative-to-cwd`],
         });
 
-        strictEqual(
+        assert.strictEqual(
           options?.options?.["@typespec/openapi3"]?.["emitter-output-dir"],
           `${cwd}/relative-to-cwd`,
         );
@@ -147,7 +124,7 @@ describe("compiler: cli", () => {
         it("use default arg value", async () => {
           const options = await resolveCompilerOptions({});
 
-          strictEqual(
+          assert.strictEqual(
             options?.options?.["@typespec/with-args"]?.["emitter-output-dir"],
             `/default-arg-value/custom`,
           );
@@ -158,7 +135,7 @@ describe("compiler: cli", () => {
             args: [`custom-arg=/my-updated-arg-value`],
           });
 
-          strictEqual(
+          assert.strictEqual(
             options?.options?.["@typespec/with-args"]?.["emitter-output-dir"],
             `/my-updated-arg-value/custom`,
           );
@@ -170,9 +147,7 @@ describe("compiler: cli", () => {
           host.compilerHost,
           "ws/main.tsp",
           cwd,
-          {
-            args: ["not-defined-arg=my-value"],
-          },
+          { args: ["not-defined-arg=my-value"] },
           {},
         );
 
@@ -183,12 +158,7 @@ describe("compiler: cli", () => {
       });
 
       it("emit diagnostic if using relative path in config paths", async () => {
-        host.addTypeSpecFile(
-          "ws/tspconfig.yaml",
-          stringify({
-            "output-dir": "./my-output",
-          }),
-        );
+        host.addTypeSpecFile("ws/tspconfig.yaml", stringify({ "output-dir": "./my-output" }));
         const [_, diagnostics] = await getCompilerOptions(
           host.compilerHost,
           "ws/main.tsp",
@@ -230,19 +200,19 @@ describe("compiler: cli", () => {
       describe(name, () => {
         it("default", async () => {
           const options = await resolveCompilerOptionsFor({});
-          strictEqual(options[resolvedName], data.default);
+          assert.strictEqual(options[resolvedName], data.default);
         });
 
         for (const { in: input, alt, expected } of data.set) {
           describe(`input: ${input}`, () => {
             it("set from the cli args", async () => {
               const options = await resolveCompilerOptionsFor({ args: { [name]: input } });
-              deepStrictEqual(options[resolvedName], expected);
+              assert.deepStrictEqual(options[resolvedName], expected);
             });
 
             it("set from the config", async () => {
               const options = await resolveCompilerOptionsFor({ config: { [name]: input } });
-              deepStrictEqual(options[resolvedName], expected);
+              assert.deepStrictEqual(options[resolvedName], expected);
             });
 
             it("both cli and config (cli wins)", async () => {
@@ -250,7 +220,7 @@ describe("compiler: cli", () => {
                 args: { [name]: input },
                 config: { [name]: alt },
               });
-              deepStrictEqual(options[resolvedName], expected);
+              assert.deepStrictEqual(options[resolvedName], expected);
             });
           });
         }
