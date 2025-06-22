@@ -1,5 +1,5 @@
-import { SystemAssert } from "./system-assert.js";
 import { NodeAssert } from "./node-assert.js";
+import { SystemAssert } from "./system-assert.js";
 
 // Default to NodeAssert for Node.js environments
 let assert: SystemAssert = NodeAssert;

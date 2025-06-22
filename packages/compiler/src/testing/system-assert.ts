@@ -4,3 +4,8 @@ export interface SystemAssert {
   strictEqual(actual: any, expected: any, message?: string): void;
   match(value: string, regex: RegExp, message?: string): void;
 }
+
+let assert: SystemAssert;
+export function setSystemAssert(impl: SystemAssert) {
+  assert = impl;
+}
