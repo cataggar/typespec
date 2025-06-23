@@ -21,8 +21,19 @@ export const NodeAssert: SystemAssert = {
   ok(value, message) {
     assert.ok(value, message);
   },
-  async rejects(block, message) {
-    await assert.rejects(block, message);
+  async rejects(
+    block: (() => Promise<unknown>) | Promise<unknown>,
+    errorOrMessage?: any,
+    message?: string,
+  ): Promise<void> {
+    // Node.js assert.rejects supports (block, error), (block, error, message), (block, message)
+    if (typeof errorOrMessage === "string" && message === undefined) {
+      await assert.rejects(block, errorOrMessage);
+    } else if (errorOrMessage !== undefined) {
+      await assert.rejects(block, errorOrMessage, message);
+    } else {
+      await assert.rejects(block);
+    }
   },
   equal(actual, expected, message) {
     assert.equal(actual, expected, message);

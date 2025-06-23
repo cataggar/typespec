@@ -1,3 +1,10 @@
+type AssertPredicate =
+  | RegExp
+  | (new () => object)
+  | ((thrown: unknown) => boolean)
+  | object
+  | Error;
+
 export interface SystemAssert {
   fail(message?: string | Error): never;
   strictEqual<T>(actual: unknown, expected: T, message?: string | Error): asserts actual is T;
@@ -7,6 +14,15 @@ export interface SystemAssert {
   ok(value: unknown, message?: string | Error): asserts value;
   rejects(
     block: (() => Promise<unknown>) | Promise<unknown>,
+    message?: string | Error,
+  ): Promise<void>;
+  rejects(
+    block: (() => Promise<unknown>) | Promise<unknown>,
+    message?: string | Error,
+  ): Promise<void>;
+  rejects(
+    block: (() => Promise<unknown>) | Promise<unknown>,
+    error: AssertPredicate,
     message?: string | Error,
   ): Promise<void>;
   equal(actual: unknown, expected: unknown, message?: string | Error): void;
