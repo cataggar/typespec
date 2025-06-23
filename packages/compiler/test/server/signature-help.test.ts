@@ -1,7 +1,7 @@
-import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
 import { MarkupKind, SignatureHelp } from "vscode-languageserver/node.js";
 import { extractCursor } from "../../src/testing/source-utils.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestServerHost } from "../../src/testing/test-server-host.js";
 
 describe("compiler: server: signature help", () => {
@@ -12,7 +12,7 @@ describe("compiler: server: signature help", () => {
       @single(┆)
       `,
       );
-      deepStrictEqual(help, {
+      assert.deepStrictEqual(help, {
         activeParameter: 0,
         activeSignature: 0,
         signatures: [
@@ -39,7 +39,7 @@ describe("compiler: server: signature help", () => {
 
     describe("decorator with multiple parameters", () => {
       function assertHelp(help: SignatureHelp | undefined, activeParameter: number) {
-        deepStrictEqual(help, {
+        assert.deepStrictEqual(help, {
           activeParameter: 0,
           activeSignature: 0,
           signatures: [
@@ -136,7 +136,7 @@ describe("compiler: server: signature help", () => {
 
     describe("decorator with rest parameter", () => {
       function assertHelp(help: SignatureHelp | undefined, activeParameter: number) {
-        deepStrictEqual(help, {
+        assert.deepStrictEqual(help, {
           activeParameter: 0,
           activeSignature: 0,
           signatures: [
@@ -244,7 +244,7 @@ describe("compiler: server: signature help", () => {
         @@single(┆)
         `,
       );
-      deepStrictEqual(help, {
+      assert.deepStrictEqual(help, {
         activeParameter: 0,
         activeSignature: 0,
         signatures: [
@@ -274,7 +274,7 @@ describe("compiler: server: signature help", () => {
 
     describe("decorator with multiple parameters", () => {
       function assertHelp(help: SignatureHelp | undefined, activeParameter: number) {
-        deepStrictEqual(help, {
+        assert.deepStrictEqual(help, {
           activeParameter: 0,
           activeSignature: 0,
           signatures: [
@@ -383,7 +383,7 @@ describe("compiler: server: signature help", () => {
 
     describe("decorator with rest parameter", () => {
       function assertHelp(help: SignatureHelp | undefined, activeParameter: number) {
-        deepStrictEqual(help, {
+        assert.deepStrictEqual(help, {
           activeParameter: 0,
           activeSignature: 0,
           signatures: [
@@ -496,7 +496,7 @@ describe("compiler: server: signature help", () => {
             alias A = ${type}1<┆
             `,
           );
-          deepStrictEqual(help, {
+          assert.deepStrictEqual(help, {
             activeParameter: 0,
             activeSignature: 0,
             signatures: [
@@ -523,7 +523,7 @@ describe("compiler: server: signature help", () => {
 
         describe("template with multiple parameters", () => {
           function assertHelp(help: SignatureHelp | undefined, activeParameter: number) {
-            deepStrictEqual(help, {
+            assert.deepStrictEqual(help, {
               activeParameter: 0,
               activeSignature: 0,
               signatures: [

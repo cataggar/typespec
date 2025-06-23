@@ -1,4 +1,3 @@
-import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { Model } from "../../src/index.js";
 import {
@@ -8,6 +7,7 @@ import {
   expectDiagnostics,
   expectTypeEquals,
 } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: scalars", () => {
   let runner: BasicTestRunner;
@@ -22,9 +22,9 @@ describe("compiler: scalars", () => {
       @test scalar A;
     `);
 
-    strictEqual(A.kind, "Scalar");
-    strictEqual(A.name, "A");
-    strictEqual(A.baseScalar, undefined);
+    assert.strictEqual(A.kind, "Scalar");
+    assert.strictEqual(A.name, "A");
+    assert.strictEqual(A.baseScalar, undefined);
   });
 
   it("declare simple scalar extending another", async () => {
@@ -32,9 +32,9 @@ describe("compiler: scalars", () => {
       @test scalar A extends numeric;
     `);
 
-    strictEqual(A.kind, "Scalar");
-    strictEqual(A.name, "A");
-    strictEqual(A.baseScalar, runner.program.checker.getStdType("numeric"));
+    assert.strictEqual(A.kind, "Scalar");
+    assert.strictEqual(A.name, "A");
+    assert.strictEqual(A.baseScalar, runner.program.checker.getStdType("numeric"));
   });
 
   it("declare scalar with template parameters", async () => {
@@ -46,8 +46,8 @@ describe("compiler: scalars", () => {
       alias B = A<"123">;
     `);
 
-    strictEqual(A.kind, "Scalar");
-    strictEqual(A.name, "A");
+    assert.strictEqual(A.kind, "Scalar");
+    assert.strictEqual(A.name, "A");
   });
 
   // Test for https://github.com/microsoft/typespec/issues/1764
@@ -60,8 +60,8 @@ describe("compiler: scalars", () => {
       alias BIns = B<"">;
     `);
 
-    strictEqual(A.kind, "Scalar");
-    strictEqual(B.kind, "Scalar");
+    assert.strictEqual(A.kind, "Scalar");
+    assert.strictEqual(B.kind, "Scalar");
   });
 
   it("allows a decimal to have a default value", async () => {
@@ -72,8 +72,8 @@ describe("compiler: scalars", () => {
     `)) as { A: Model };
 
     const def = A.properties.get("x")!.defaultValue!;
-    strictEqual(def.valueKind, "NumericValue");
-    strictEqual(def.value.asNumber(), 42);
+    assert.strictEqual(def.valueKind, "NumericValue");
+    assert.strictEqual(def.value.asNumber(), 42);
   });
 
   describe("custom scalars and default values", () => {
@@ -83,13 +83,13 @@ describe("compiler: scalars", () => {
       @test model M { p?: S = 42; }
     `);
 
-      strictEqual(S.kind, "Scalar");
-      strictEqual(M.kind, "Model");
+      assert.strictEqual(S.kind, "Scalar");
+      assert.strictEqual(M.kind, "Model");
       const p = M.properties.get("p");
-      ok(p);
+      assert.ok(p);
       expectTypeEquals(p.type, S);
-      strictEqual(p.defaultValue?.valueKind, "NumericValue");
-      strictEqual(p.defaultValue.value.asNumber(), 42);
+      assert.strictEqual(p.defaultValue?.valueKind, "NumericValue");
+      assert.strictEqual(p.defaultValue.value.asNumber(), 42);
     });
 
     it("allows custom boolean scalar to have a default value", async () => {
@@ -98,13 +98,13 @@ describe("compiler: scalars", () => {
       @test model M { p?: S = true; }
     `);
 
-      strictEqual(S.kind, "Scalar");
-      strictEqual(M.kind, "Model");
+      assert.strictEqual(S.kind, "Scalar");
+      assert.strictEqual(M.kind, "Model");
       const p = M.properties.get("p");
-      ok(p);
+      assert.ok(p);
       expectTypeEquals(p.type, S);
-      strictEqual(p.defaultValue?.valueKind, "BooleanValue");
-      strictEqual(p.defaultValue.value, true);
+      assert.strictEqual(p.defaultValue?.valueKind, "BooleanValue");
+      assert.strictEqual(p.defaultValue.value, true);
     });
 
     it("allows custom string scalar to have a default value", async () => {
@@ -113,13 +113,13 @@ describe("compiler: scalars", () => {
       @test model M { p?: S = "hello"; }
     `);
 
-      strictEqual(S.kind, "Scalar");
-      strictEqual(M.kind, "Model");
+      assert.strictEqual(S.kind, "Scalar");
+      assert.strictEqual(M.kind, "Model");
       const p = M.properties.get("p");
-      ok(p);
+      assert.ok(p);
       expectTypeEquals(p.type, S);
-      strictEqual(p.defaultValue?.valueKind, "StringValue");
-      strictEqual(p.defaultValue.value, "hello");
+      assert.strictEqual(p.defaultValue?.valueKind, "StringValue");
+      assert.strictEqual(p.defaultValue.value, "hello");
     });
 
     it("does not allow custom numeric scalar to have a default outside range", async () => {

@@ -1,6 +1,6 @@
-import { strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { TypeNameOptions, getTypeName } from "../../src/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestRunner } from "../../src/testing/test-host.js";
 
 describe("compiler: TypeNameUtils", () => {
@@ -11,7 +11,7 @@ describe("compiler: TypeNameUtils", () => {
   }
 
   async function assertNameFor(code: string, name: string, options: TypeNameOptions = {}) {
-    strictEqual(await getNameFor(code, options), name);
+    assert.strictEqual(await getNameFor(code, options), name);
   }
 
   describe("Namespaces", () => {
@@ -60,11 +60,11 @@ describe("compiler: TypeNameUtils", () => {
     }
 
     it("omit the TypeSpec qualifier", async () => {
-      strictEqual(await getNameForRef("TypeSpec.string"), "string");
+      assert.strictEqual(await getNameForRef("TypeSpec.string"), "string");
     });
 
     it("omit the TypeSpec.Reflection qualifier", async () => {
-      strictEqual(await getNameForRef("TypeSpec.Reflection.Operation"), "Operation");
+      assert.strictEqual(await getNameForRef("TypeSpec.Reflection.Operation"), "Operation");
     });
   });
 });

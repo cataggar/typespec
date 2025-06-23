@@ -1,4 +1,3 @@
-import { deepStrictEqual, ok } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   LibraryLocationContext,
@@ -12,6 +11,7 @@ import {
   expectDiagnostics,
   resolveVirtualPath,
 } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { PackageJson } from "../../src/types/package-json.js";
 
 describe("compiler: imports", () => {
@@ -24,7 +24,7 @@ describe("compiler: imports", () => {
   function expectFileLoaded(files: { typespec?: string[]; js?: string[] }) {
     const expectFileIn = (file: string, map: Map<string, unknown>) => {
       const vFile = resolveVirtualPath(file);
-      ok(
+      assert.ok(
         map.has(vFile),
         [
           `Expected ${vFile} to have been loaded but not present in:`,
@@ -139,7 +139,7 @@ describe("compiler: imports", () => {
     await host.compile("main.tsp");
     expectFileLoaded({ typespec: ["main.tsp", "node_modules/my-lib/main.tsp"] });
     const file = host.program.sourceFiles.get(resolveVirtualPath("node_modules/my-lib/main.tsp"));
-    ok(file, "File exists");
+    assert.ok(file, "File exists");
   });
 
   it("import library(with tspmain)", async () => {
@@ -168,7 +168,7 @@ describe("compiler: imports", () => {
     await host.compile("main.tsp");
     expectFileLoaded({ typespec: ["main.tsp", "node_modules/my-lib/main.tsp"] });
     const file = host.program.sourceFiles.get(resolveVirtualPath("node_modules/my-lib/main.tsp"));
-    ok(file, "File exists");
+    assert.ok(file, "File exists");
   });
 
   it("emit diagnostic when trying to load invalid relative file", async () => {
@@ -236,8 +236,11 @@ describe("compiler: imports", () => {
           await host.compile(config.entrypoint);
           for (const [filename, expectedScope] of Object.entries(scopes)) {
             const file = host.program.sourceFiles.get(resolveVirtualPath(filename));
-            ok(file, `Expected to have file "${filename}"`);
-            deepStrictEqual(host.program.getSourceFileLocationContext(file.file), expectedScope);
+            assert.ok(file, `Expected to have file "${filename}"`);
+            assert.deepStrictEqual(
+              host.program.getSourceFileLocationContext(file.file),
+              expectedScope,
+            );
           }
         },
       };

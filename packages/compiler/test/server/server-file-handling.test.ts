@@ -1,5 +1,5 @@
-import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestServerHost } from "../../src/testing/test-server-host.js";
 
 describe("compiler: server: main file", () => {
@@ -19,7 +19,11 @@ describe("compiler: server: main file", () => {
     const document = host.addOrUpdateDocument("./subdir/subfile.tsp", "model Sub extends Base {}");
 
     await host.server.checkChange({ document });
-    deepStrictEqual(host.getDiagnostics("./subdir/subfile.tsp"), [], "No diagnostics expected");
+    assert.deepStrictEqual(
+      host.getDiagnostics("./subdir/subfile.tsp"),
+      [],
+      "No diagnostics expected",
+    );
   });
 
   it("finds main file out of workspace", async () => {
@@ -41,7 +45,7 @@ describe("compiler: server: main file", () => {
     );
 
     await host.server.checkChange({ document });
-    deepStrictEqual(host.getDiagnostics("./work/test.tsp"), [], "No diagnostics expected");
+    assert.deepStrictEqual(host.getDiagnostics("./work/test.tsp"), [], "No diagnostics expected");
   });
 
   it("finds tspMain in package.json that has already been read by something else", async () => {
@@ -94,14 +98,14 @@ describe("compiler: server: main file", () => {
 
     // Neither document should have any squiggles
     await host.server.checkChange({ document: userDoc });
-    deepStrictEqual(
+    assert.deepStrictEqual(
       host.getDiagnostics("./test.tsp"),
       [],
       "No diagnostics expected in user document",
     );
 
     await host.server.checkChange({ document: libDoc });
-    deepStrictEqual(
+    assert.deepStrictEqual(
       host.getDiagnostics("./lib/lib2.tsp"),
       [],
       "No diagnostics expected in library document",
@@ -123,6 +127,6 @@ describe("compiler: server: main file", () => {
     );
 
     await host.server.checkChange({ document });
-    deepStrictEqual(host.getDiagnostics("./test.tsp"), [], "No diagnostics expected");
+    assert.deepStrictEqual(host.getDiagnostics("./test.tsp"), [], "No diagnostics expected");
   });
 });

@@ -1,4 +1,3 @@
-import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { getDiscriminatedUnionFromInheritance } from "../../src/core/helpers/discriminator-utils.js";
 import { Model, getDiscriminator } from "../../src/index.js";
@@ -9,6 +8,7 @@ import {
   expectDiagnostics,
   extractCursor,
 } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: discriminator", () => {
   let runner: BasicTestRunner;
@@ -42,9 +42,9 @@ describe("compiler: discriminator", () => {
       `)) as { Pet: Model; Cat: Model; Dog: Model };
 
       const union = checkValidDiscriminatedUnion(Pet);
-      strictEqual(union.variants.size, 2);
-      strictEqual(union.variants.get("cat"), Cat);
-      strictEqual(union.variants.get("dog"), Dog);
+      assert.strictEqual(union.variants.size, 2);
+      assert.strictEqual(union.variants.get("cat"), Cat);
+      assert.strictEqual(union.variants.get("dog"), Dog);
     });
 
     it("doesn't include unrelated types", async () => {
@@ -62,9 +62,9 @@ describe("compiler: discriminator", () => {
       `)) as { Pet: Model; Cat: Model };
 
       const union = checkValidDiscriminatedUnion(Pet);
-      strictEqual(union.variants.size, 1);
-      strictEqual(union.variants.get("cat"), Cat);
-      strictEqual(union.variants.get("aligator"), undefined);
+      assert.strictEqual(union.variants.size, 1);
+      assert.strictEqual(union.variants.get("cat"), Cat);
+      assert.strictEqual(union.variants.get("aligator"), undefined);
     });
 
     it("can use a templated type for derived types", async () => {
@@ -84,9 +84,9 @@ describe("compiler: discriminator", () => {
       `)) as { Pet: Model; Cat: Model; Dog: Model };
 
       const union = checkValidDiscriminatedUnion(Pet);
-      strictEqual(union.variants.size, 2);
-      strictEqual(union.variants.get("cat"), Cat);
-      strictEqual(union.variants.get("dog"), Dog);
+      assert.strictEqual(union.variants.size, 2);
+      assert.strictEqual(union.variants.get("cat"), Cat);
+      assert.strictEqual(union.variants.get("dog"), Dog);
     });
 
     describe("discriminator value", () => {
@@ -101,8 +101,8 @@ describe("compiler: discriminator", () => {
       `)) as { Pet: Model; Cat: Model; Dog: Model };
 
         const union = checkValidDiscriminatedUnion(Pet);
-        strictEqual(union.variants.size, 1);
-        strictEqual(union.variants.get("cat"), Cat);
+        assert.strictEqual(union.variants.size, 1);
+        assert.strictEqual(union.variants.get("cat"), Cat);
       });
 
       it("can be a union of string", async () => {
@@ -116,9 +116,9 @@ describe("compiler: discriminator", () => {
       `)) as { Pet: Model; Cat: Model; Dog: Model };
 
         const union = checkValidDiscriminatedUnion(Pet);
-        strictEqual(union.variants.size, 2);
-        strictEqual(union.variants.get("cat"), Cat);
-        strictEqual(union.variants.get("feline"), Cat);
+        assert.strictEqual(union.variants.size, 2);
+        assert.strictEqual(union.variants.get("cat"), Cat);
+        assert.strictEqual(union.variants.get("feline"), Cat);
       });
 
       it("can be a string enum member", async () => {
@@ -133,8 +133,8 @@ describe("compiler: discriminator", () => {
       `)) as { Pet: Model; Cat: Model; Dog: Model };
 
         const union = checkValidDiscriminatedUnion(Pet);
-        strictEqual(union.variants.size, 1);
-        strictEqual(union.variants.get("cat"), Cat);
+        assert.strictEqual(union.variants.size, 1);
+        assert.strictEqual(union.variants.get("cat"), Cat);
       });
     });
 
@@ -151,8 +151,8 @@ describe("compiler: discriminator", () => {
       `)) as { Pet: Model; Cat: Model; Dog: Model };
 
       const union = checkValidDiscriminatedUnion(Pet);
-      strictEqual(union.variants.size, 1);
-      strictEqual(union.variants.get("cat"), Cat);
+      assert.strictEqual(union.variants.size, 1);
+      assert.strictEqual(union.variants.get("cat"), Cat);
     });
 
     it("support nested discriminated types", async () => {
@@ -173,12 +173,12 @@ describe("compiler: discriminator", () => {
       `)) as { Pet: Model; Cat: Model; Siamese: Model };
 
       const petUnion = checkValidDiscriminatedUnion(Pet);
-      strictEqual(petUnion.variants.size, 1);
-      strictEqual(petUnion.variants.get("cat"), Cat);
+      assert.strictEqual(petUnion.variants.size, 1);
+      assert.strictEqual(petUnion.variants.get("cat"), Cat);
 
       const catUnion = checkValidDiscriminatedUnion(Cat);
-      strictEqual(catUnion.variants.size, 1);
-      strictEqual(catUnion.variants.get("siamese"), Siamese);
+      assert.strictEqual(catUnion.variants.size, 1);
+      assert.strictEqual(catUnion.variants.get("siamese"), Siamese);
     });
 
     it("support nested discriminated types with intermediate types", async () => {
@@ -203,12 +203,12 @@ describe("compiler: discriminator", () => {
       `)) as { Pet: Model; Cat: Model; Siamese: Model };
 
       const petUnion = checkValidDiscriminatedUnion(Pet);
-      strictEqual(petUnion.variants.size, 1);
-      strictEqual(petUnion.variants.get("cat"), Cat);
+      assert.strictEqual(petUnion.variants.size, 1);
+      assert.strictEqual(petUnion.variants.get("cat"), Cat);
 
       const catUnion = checkValidDiscriminatedUnion(Cat);
-      strictEqual(catUnion.variants.size, 1);
-      strictEqual(catUnion.variants.get("siamese"), Siamese);
+      assert.strictEqual(catUnion.variants.size, 1);
+      assert.strictEqual(catUnion.variants.get("siamese"), Siamese);
     });
 
     it("errors if discriminator property is not a string-like type", async () => {

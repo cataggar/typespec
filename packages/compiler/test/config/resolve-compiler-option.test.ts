@@ -1,9 +1,9 @@
-import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
 import { resolveCompilerOptions } from "../../src/config/index.js";
 import { NodeHost } from "../../src/core/node-host.js";
 import { normalizePath, resolvePath } from "../../src/index.js";
 import { expectDiagnosticEmpty, expectDiagnostics } from "../../src/testing/expect.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { findTestPackageRoot } from "../../src/testing/test-utils.js";
 
 const scenarioRoot = resolvePath(
@@ -31,7 +31,7 @@ describe("compiler: resolve compiler options", () => {
       const [options, diagnostics] = await resolveOptions("custom/myConfig.yaml");
       expectDiagnosticEmpty(diagnostics);
 
-      deepStrictEqual(options, {
+      assert.deepStrictEqual(options, {
         config: resolvePath(scenarioRoot, "custom/myConfig.yaml"),
         emit: ["openapi"],
         options: {},
@@ -43,7 +43,7 @@ describe("compiler: resolve compiler options", () => {
       const [options, diagnostics] = await resolveOptions("custom/myConfigNested.yaml");
       expectDiagnosticEmpty(diagnostics);
 
-      deepStrictEqual(options, {
+      assert.deepStrictEqual(options, {
         config: resolvePath(scenarioRoot, "custom/myConfigNested.yaml"),
         emit: ["openapi"],
         options: {

@@ -1,4 +1,3 @@
-import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { Model, Namespace, Type, Union } from "../../src/core/types.js";
 import {
@@ -7,6 +6,7 @@ import {
   expectDiagnosticEmpty,
   expectDiagnostics,
 } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: aliases", () => {
   let testHost: TestHost;
@@ -36,12 +36,12 @@ describe("compiler: aliases", () => {
     };
 
     const propType: Union = A.properties.get("prop")!.type as Union;
-    strictEqual(propType.kind, "Union");
-    strictEqual(propType.variants.size, 4);
-    strictEqual(getOptionAtIndex(propType, 0).kind, "Scalar");
-    strictEqual(getOptionAtIndex(propType, 1).kind, "Scalar");
-    strictEqual(getOptionAtIndex(propType, 2).kind, "String");
-    strictEqual(getOptionAtIndex(propType, 3).kind, "Number");
+    assert.strictEqual(propType.kind, "Union");
+    assert.strictEqual(propType.variants.size, 4);
+    assert.strictEqual(getOptionAtIndex(propType, 0).kind, "Scalar");
+    assert.strictEqual(getOptionAtIndex(propType, 1).kind, "Scalar");
+    assert.strictEqual(getOptionAtIndex(propType, 2).kind, "String");
+    assert.strictEqual(getOptionAtIndex(propType, 3).kind, "Number");
   });
 
   it("can alias a deep union expression", async () => {
@@ -63,13 +63,13 @@ describe("compiler: aliases", () => {
     };
 
     const propType: Union = A.properties.get("prop")!.type as Union;
-    strictEqual(propType.kind, "Union");
-    strictEqual(propType.variants.size, 5);
-    strictEqual(getOptionAtIndex(propType, 0).kind, "Scalar");
-    strictEqual(getOptionAtIndex(propType, 1).kind, "Scalar");
-    strictEqual(getOptionAtIndex(propType, 2).kind, "String");
-    strictEqual(getOptionAtIndex(propType, 3).kind, "Number");
-    strictEqual(getOptionAtIndex(propType, 4).kind, "String");
+    assert.strictEqual(propType.kind, "Union");
+    assert.strictEqual(propType.variants.size, 5);
+    assert.strictEqual(getOptionAtIndex(propType, 0).kind, "Scalar");
+    assert.strictEqual(getOptionAtIndex(propType, 1).kind, "Scalar");
+    assert.strictEqual(getOptionAtIndex(propType, 2).kind, "String");
+    assert.strictEqual(getOptionAtIndex(propType, 3).kind, "Number");
+    assert.strictEqual(getOptionAtIndex(propType, 4).kind, "String");
   });
 
   it("can alias a union expression with parameters", async () => {
@@ -89,10 +89,10 @@ describe("compiler: aliases", () => {
     };
 
     const propType: Union = A.properties.get("prop")!.type as Union;
-    strictEqual(propType.kind, "Union");
-    strictEqual(propType.variants.size, 2);
-    strictEqual(getOptionAtIndex(propType, 0).kind, "Scalar");
-    strictEqual(getOptionAtIndex(propType, 1).kind, "String");
+    assert.strictEqual(propType.kind, "Union");
+    assert.strictEqual(propType.variants.size, 2);
+    assert.strictEqual(getOptionAtIndex(propType, 0).kind, "Scalar");
+    assert.strictEqual(getOptionAtIndex(propType, 1).kind, "String");
   });
 
   it("can alias a deep union expression with parameters", async () => {
@@ -113,12 +113,12 @@ describe("compiler: aliases", () => {
     };
 
     const propType: Union = A.properties.get("prop")!.type as Union;
-    strictEqual(propType.kind, "Union");
-    strictEqual(propType.variants.size, 4);
-    strictEqual(getOptionAtIndex(propType, 0).kind, "Scalar");
-    strictEqual(getOptionAtIndex(propType, 1).kind, "String");
-    strictEqual(getOptionAtIndex(propType, 2).kind, "Scalar");
-    strictEqual(getOptionAtIndex(propType, 3).kind, "Number");
+    assert.strictEqual(propType.kind, "Union");
+    assert.strictEqual(propType.variants.size, 4);
+    assert.strictEqual(getOptionAtIndex(propType, 0).kind, "Scalar");
+    assert.strictEqual(getOptionAtIndex(propType, 1).kind, "String");
+    assert.strictEqual(getOptionAtIndex(propType, 2).kind, "Scalar");
+    assert.strictEqual(getOptionAtIndex(propType, 3).kind, "Number");
   });
 
   it("can alias an intersection expression", async () => {
@@ -139,12 +139,12 @@ describe("compiler: aliases", () => {
     };
 
     const propType: Model = A.properties.get("prop")!.type as Model;
-    strictEqual(propType.kind, "Model");
-    strictEqual(propType.properties.size, 4);
-    ok(propType.properties.has("a"));
-    ok(propType.properties.has("b"));
-    ok(propType.properties.has("c"));
-    ok(propType.properties.has("d"));
+    assert.strictEqual(propType.kind, "Model");
+    assert.strictEqual(propType.properties.size, 4);
+    assert.ok(propType.properties.has("a"));
+    assert.ok(propType.properties.has("b"));
+    assert.ok(propType.properties.has("c"));
+    assert.ok(propType.properties.has("d"));
   });
 
   it("can be used like any model", async () => {
@@ -167,9 +167,9 @@ describe("compiler: aliases", () => {
       C: Model;
     };
 
-    strictEqual(A.baseModel, Test);
-    ok(B.properties.has("a"));
-    strictEqual(C.properties.get("c")!.type, Test);
+    assert.strictEqual(A.baseModel, Test);
+    assert.ok(B.properties.has("a"));
+    assert.strictEqual(C.properties.get("c")!.type, Test);
   });
 
   it("can be used like any namespace", async () => {
@@ -191,7 +191,7 @@ describe("compiler: aliases", () => {
       Baz: Model;
     };
 
-    strictEqual(Baz.properties.get("x")!.type, Bar);
+    assert.strictEqual(Baz.properties.get("x")!.type, Bar);
   });
 
   it("model expression defined in alias use containing namespace", async () => {
@@ -213,7 +213,7 @@ describe("compiler: aliases", () => {
     };
 
     const expr = Test.properties.get("prop")!.type as Model;
-    strictEqual(expr.namespace, Foo);
+    assert.strictEqual(expr.namespace, Foo);
   });
 
   it("emit diagnostics if assign itself", async () => {

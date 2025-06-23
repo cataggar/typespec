@@ -1,7 +1,7 @@
-import { deepStrictEqual, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { Range } from "vscode-languageserver/node.js";
 import { extractCursor } from "../../src/testing/source-utils.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestServerHost, getTestIdentifiers } from "../../src/testing/test-server-host.js";
 
 describe("compiler: server: rename and find references", () => {
@@ -103,7 +103,7 @@ async function testFindReferences(sourceWithCursor: string) {
     context: { includeDeclaration: true },
   });
 
-  deepStrictEqual(
+  assert.deepStrictEqual(
     references.sort((x, y) => doc.offsetAt(x.range.start) - doc.offsetAt(y.range.start)),
     getTestIdentifiers(source).map((id) => ({
       uri: doc.uri,
@@ -124,12 +124,12 @@ async function testRename(sourceWithCursor: string) {
   });
 
   const entries = Object.entries(edit.changes ?? {});
-  strictEqual(entries.length, 1, "Expecting single document to be changed.");
+  assert.strictEqual(entries.length, 1, "Expecting single document to be changed.");
 
   const [uri, changes] = entries[0];
-  strictEqual(uri, doc.uri, "URI should match the single document.");
+  assert.strictEqual(uri, doc.uri, "URI should match the single document.");
 
-  deepStrictEqual(
+  assert.deepStrictEqual(
     changes.sort((x, y) => doc.offsetAt(x.range.start) - doc.offsetAt(y.range.start)),
     getTestIdentifiers(source).map((id) => ({
       newText: "NewName",

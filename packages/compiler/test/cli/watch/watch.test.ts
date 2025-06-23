@@ -1,9 +1,9 @@
-import { deepStrictEqual } from "assert";
 import { WatchEventType, mkdirSync } from "fs";
 import { appendFile, mkdir, rm } from "fs/promises";
 import { afterEach, beforeAll, describe, it } from "vitest";
 import { ProjectWatcher, createWatcher } from "../../../src/core/cli/actions/compile/watch.js";
 import { getDirectoryPath, resolvePath } from "../../../src/index.js";
+import { assert } from "../../../src/testing/system-assert.js";
 import { findTestPackageRoot } from "../../../src/testing/test-utils.js";
 
 const pkgRoot = await findTestPackageRoot(import.meta.url);
@@ -80,15 +80,15 @@ describe("compiler: watch", () => {
   it("should watch a single file and keep watching", async () => {
     const file1 = await fixtures.modify("single/file1.txt");
     watcher.updateWatchedFiles([file1]);
-    deepStrictEqual(changes, [], "Should not report change in initial load.");
+    assert.deepStrictEqual(changes, [], "Should not report change in initial load.");
     await fixtures.modify("single/file1.txt", 100);
 
     await delay(100);
-    deepStrictEqual(changes, [["change", file1]]);
+    assert.deepStrictEqual(changes, [["change", file1]]);
 
     await fixtures.modify("single/file1.txt", 100);
     await delay(100);
-    deepStrictEqual(changes, [
+    assert.deepStrictEqual(changes, [
       ["change", file1],
       ["change", file1],
     ]);
@@ -101,15 +101,15 @@ describe("compiler: watch", () => {
     watcher.updateWatchedFiles([file1, file2, file3]);
     await delay(100);
     changes = [];
-    deepStrictEqual(changes, [], "Should not report change in initial load.");
+    assert.deepStrictEqual(changes, [], "Should not report change in initial load.");
     await fixtures.modify("multiple/sub-folder1/file2.txt", 100);
 
     await delay(100);
-    deepStrictEqual(changes, [["change", file2]]);
+    assert.deepStrictEqual(changes, [["change", file2]]);
 
     await fixtures.modify("multiple/sub-folder2/file3.txt", 100);
     await delay(100);
-    deepStrictEqual(changes, [
+    assert.deepStrictEqual(changes, [
       ["change", file2],
       ["change", file3],
     ]);

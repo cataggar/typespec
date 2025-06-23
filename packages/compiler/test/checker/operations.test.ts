@@ -1,8 +1,8 @@
-import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { DecoratorContext, IntrinsicType, Operation, Type } from "../../src/core/types.js";
 import { getDoc } from "../../src/index.js";
 import { TestHost, createTestHost, expectDiagnostics } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: operations", () => {
   let testHost: TestHost;
@@ -20,8 +20,8 @@ describe("compiler: operations", () => {
     );
 
     const { foo } = (await testHost.compile("./main.tsp")) as { foo: Operation };
-    strictEqual(foo.returnType.kind, "Intrinsic");
-    strictEqual((foo.returnType as IntrinsicType).name, "void");
+    assert.strictEqual(foo.returnType.kind, "Intrinsic");
+    assert.strictEqual((foo.returnType as IntrinsicType).name, "void");
   });
 
   it("keeps reference to source operation", async () => {
@@ -33,7 +33,7 @@ describe("compiler: operations", () => {
       `,
     );
     const { a, b } = (await testHost.compile("main.tsp")) as { a: Operation; b: Operation };
-    strictEqual(b.sourceOperation, a);
+    assert.strictEqual(b.sourceOperation, a);
   });
 
   it("operation reference parameters are spread in target operation", async () => {
@@ -45,14 +45,14 @@ describe("compiler: operations", () => {
       `,
     );
     const { a, b } = (await testHost.compile("main.tsp")) as { a: Operation; b: Operation };
-    notStrictEqual(b.parameters, a.parameters);
-    notStrictEqual(b.parameters.properties.get("one"), a.parameters.properties.get("one"));
-    notStrictEqual(b.parameters.properties.get("two"), a.parameters.properties.get("two"));
-    strictEqual(
+    assert.notStrictEqual(b.parameters, a.parameters);
+    assert.notStrictEqual(b.parameters.properties.get("one"), a.parameters.properties.get("one"));
+    assert.notStrictEqual(b.parameters.properties.get("two"), a.parameters.properties.get("two"));
+    assert.strictEqual(
       b.parameters.properties.get("one")?.sourceProperty,
       a.parameters.properties.get("one"),
     );
-    strictEqual(
+    assert.strictEqual(
       b.parameters.properties.get("two")?.sourceProperty,
       a.parameters.properties.get("two"),
     );
@@ -67,7 +67,7 @@ describe("compiler: operations", () => {
         `,
       );
       const { a } = (await testHost.compile("main.tsp")) as { a: Operation };
-      ok(a.parameters.properties.has(name));
+      assert.ok(a.parameters.properties.has(name));
     });
   });
 
@@ -82,8 +82,11 @@ describe("compiler: operations", () => {
       `,
     );
     const { a, b } = (await testHost.compile("main.tsp")) as { a: Operation; b: Operation };
-    strictEqual(getDoc(testHost.program, b.parameters.properties.get("one")!), "override for b");
-    strictEqual(getDoc(testHost.program, a.parameters.properties.get("one")!), "base doc");
+    assert.strictEqual(
+      getDoc(testHost.program, b.parameters.properties.get("one")!),
+      "override for b",
+    );
+    assert.strictEqual(getDoc(testHost.program, a.parameters.properties.get("one")!), "base doc");
   });
 
   it("can decorate operation parameters independently from a template operation", async () => {
@@ -98,8 +101,11 @@ describe("compiler: operations", () => {
       `,
     );
     const { b, c } = (await testHost.compile("main.tsp")) as { b: Operation; c: Operation };
-    strictEqual(getDoc(testHost.program, b.parameters.properties.get("one")!), "override for b");
-    strictEqual(getDoc(testHost.program, c.parameters.properties.get("one")!), "base doc");
+    assert.strictEqual(
+      getDoc(testHost.program, b.parameters.properties.get("one")!),
+      "override for b",
+    );
+    assert.strictEqual(getDoc(testHost.program, c.parameters.properties.get("one")!), "base doc");
   });
 
   it("can be templated and referenced to define other operations", async () => {
@@ -115,13 +121,13 @@ describe("compiler: operations", () => {
     expectDiagnostics(diagnostics, []);
 
     const { newFoo } = result as { newFoo: Operation };
-    strictEqual(newFoo.parameters.properties.size, 2);
+    assert.strictEqual(newFoo.parameters.properties.size, 2);
     const props = Array.from(newFoo.parameters.properties.values());
 
-    strictEqual(props[0].name, "name");
-    strictEqual(props[0].type.kind, "Scalar");
-    strictEqual(props[1].name, "payload");
-    strictEqual(props[1].type.kind, "Scalar");
+    assert.strictEqual(props[0].name, "name");
+    assert.strictEqual(props[0].type.kind, "Scalar");
+    assert.strictEqual(props[1].name, "payload");
+    assert.strictEqual(props[1].type.kind, "Scalar");
   });
 
   it("can be defined based on other operation references", async () => {
@@ -138,13 +144,13 @@ describe("compiler: operations", () => {
     expectDiagnostics(diagnostics, []);
 
     const { newFoo } = result as { newFoo: Operation };
-    strictEqual(newFoo.parameters.properties.size, 2);
+    assert.strictEqual(newFoo.parameters.properties.size, 2);
     const props = Array.from(newFoo.parameters.properties.values());
 
-    strictEqual(props[0].name, "name");
-    strictEqual(props[0].type.kind, "Scalar");
-    strictEqual(props[1].name, "payload");
-    strictEqual(props[1].type.kind, "Scalar");
+    assert.strictEqual(props[0].name, "name");
+    assert.strictEqual(props[0].type.kind, "Scalar");
+    assert.strictEqual(props[1].name, "payload");
+    assert.strictEqual(props[1].type.kind, "Scalar");
   });
 
   it("can reference an operation when being defined in an interface", async () => {
@@ -159,13 +165,13 @@ describe("compiler: operations", () => {
     );
 
     const { newFoo } = (await testHost.compile("./main.tsp")) as { newFoo: Operation };
-    strictEqual(newFoo.parameters.properties.size, 2);
+    assert.strictEqual(newFoo.parameters.properties.size, 2);
     const props = Array.from(newFoo.parameters.properties.values());
 
-    strictEqual(props[0].name, "name");
-    strictEqual(props[0].type.kind, "Scalar");
-    strictEqual(props[1].name, "payload");
-    strictEqual(props[1].type.kind, "Scalar");
+    assert.strictEqual(props[0].name, "name");
+    assert.strictEqual(props[0].type.kind, "Scalar");
+    assert.strictEqual(props[1].name, "payload");
+    assert.strictEqual(props[1].type.kind, "Scalar");
   });
 
   it("can reference an operation defined inside an interface", async () => {
@@ -182,8 +188,8 @@ describe("compiler: operations", () => {
 
     const { newFoo } = (await testHost.compile("./main.tsp")) as { newFoo: Operation };
 
-    strictEqual(newFoo.returnType.kind, "Scalar" as const);
-    strictEqual(newFoo.returnType.name, "boolean");
+    assert.strictEqual(newFoo.returnType.kind, "Scalar" as const);
+    assert.strictEqual(newFoo.returnType.name, "boolean");
   });
 
   it("can reference an operation defined in the same interface", async () => {
@@ -199,8 +205,8 @@ describe("compiler: operations", () => {
 
     const { newFoo } = (await testHost.compile("./main.tsp")) as { newFoo: Operation };
 
-    strictEqual(newFoo.returnType.kind, "Scalar" as const);
-    strictEqual(newFoo.returnType.name, "boolean");
+    assert.strictEqual(newFoo.returnType.kind, "Scalar" as const);
+    assert.strictEqual(newFoo.returnType.name, "boolean");
   });
 
   it("doesn't apply operation decorators to referenced signature", async () => {
@@ -223,7 +229,7 @@ describe("compiler: operations", () => {
     );
 
     const { Foo } = (await testHost.compile("./main.tsp")) as { Foo: Operation };
-    deepStrictEqual(
+    assert.deepStrictEqual(
       Foo.decorators.map((x) => x.decorator.name),
       ["$test", "$alpha"],
     );
@@ -264,12 +270,12 @@ describe("compiler: operations", () => {
     );
 
     const { newFoo } = (await testHost.compile("./main.tsp")) as { newFoo: Operation };
-    strictEqual(newFoo.parameters.properties.size, 2);
+    assert.strictEqual(newFoo.parameters.properties.size, 2);
 
     // Check that the decorators were applied correctly to `newFoo`
-    strictEqual(alphaTargets.get(newFoo)?.kind, "Scalar");
-    ok(betaTargets.has(newFoo));
-    ok(gammaTargets.has(newFoo));
+    assert.strictEqual(alphaTargets.get(newFoo)?.kind, "Scalar");
+    assert.ok(betaTargets.has(newFoo));
+    assert.ok(gammaTargets.has(newFoo));
   });
 
   // Regression test for https://github.com/microsoft/typespec/issues/3199
@@ -296,11 +302,11 @@ describe("compiler: operations", () => {
         message: "Operation can only reuse the signature of another operation.",
       },
     ]);
-    strictEqual(test.kind, "Operation");
-    strictEqual(test.parameters.name, "");
-    strictEqual(test.parameters.properties.size, 0);
-    strictEqual(test.returnType.kind, "Intrinsic");
-    strictEqual((test.returnType as IntrinsicType).name, "void");
+    assert.strictEqual(test.kind, "Operation");
+    assert.strictEqual(test.parameters.name, "");
+    assert.strictEqual(test.parameters.properties.size, 0);
+    assert.strictEqual(test.returnType.kind, "Intrinsic");
+    assert.strictEqual((test.returnType as IntrinsicType).name, "void");
   });
 
   it("emit diagnostic when operation is referencing itself as signature", async () => {
@@ -409,7 +415,7 @@ describe("compiler: operations", () => {
       );
       const { foo } = await testHost.compile("main.tsp");
 
-      deepStrictEqual(tracked, [[foo, foo]]);
+      assert.deepStrictEqual(tracked, [[foo, foo]]);
     });
 
     it("operation can reference another operation which reference back to this one", async () => {
@@ -426,7 +432,7 @@ describe("compiler: operations", () => {
       );
       const { foo, bar } = await testHost.compile("main.tsp");
 
-      deepStrictEqual(tracked, [
+      assert.deepStrictEqual(tracked, [
         [foo, bar],
         [bar, foo],
       ]);

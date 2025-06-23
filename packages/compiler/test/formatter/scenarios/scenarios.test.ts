@@ -1,10 +1,10 @@
-import { strictEqual } from "assert";
 import { readdirSync } from "fs";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { join, resolve } from "path";
 import * as prettier from "prettier";
 import { describe, it } from "vitest";
 import * as plugin from "../../../src/formatter/index.js";
+import { assert } from "../../../src/testing/system-assert.js";
 import { findTestPackageRoot } from "../../../src/testing/test-utils.js";
 
 async function format(code: string): Promise<string> {
@@ -46,7 +46,7 @@ async function testScenario(name: string) {
       return await saveOutput(name, formatted);
     }
 
-    strictEqual(
+    assert.strictEqual(
       formatted,
       output,
       `Scenario ${name} does not match expected snapshot. Run with tests '--update-snapshots' option to update.`,

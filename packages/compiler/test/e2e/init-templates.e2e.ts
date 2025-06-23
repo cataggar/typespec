@@ -1,4 +1,3 @@
-import { ok } from "assert";
 import { SpawnOptions, spawn } from "child_process";
 import { rm } from "fs/promises";
 import { dirname, resolve } from "pathe";
@@ -7,6 +6,7 @@ import { beforeAll, describe, it } from "vitest";
 import { NodeHost } from "../../src/index.js";
 import { getTypeSpecCoreTemplates } from "../../src/init/core-templates.js";
 import { makeScaffoldingConfig, scaffoldNewProject } from "../../src/init/scaffold.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const testTempRoot = resolve(__dirname, "../../temp/scaffolded-template-tests");
@@ -65,7 +65,7 @@ describe("Init templates e2e tests", () => {
   async function scaffoldTemplateTo(name: string, targetFolder: string) {
     const typeSpecCoreTemplates = await getTypeSpecCoreTemplates(NodeHost);
     const template = typeSpecCoreTemplates.templates[name];
-    ok(template, `Template '${name}' not found`);
+    assert.ok(template, `Template '${name}' not found`);
     await scaffoldNewProject(
       NodeHost,
       makeScaffoldingConfig(template, {
@@ -93,7 +93,7 @@ describe("Init templates e2e tests", () => {
           ...options,
           cwd: targetFolder,
         });
-        ok(
+        assert.ok(
           result.exitCode === 0,
           [
             `Command '${command} ${args.join(" ")}' failed with exit code ${result.exitCode}`,

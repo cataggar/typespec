@@ -1,4 +1,3 @@
-import { deepStrictEqual, strictEqual } from "assert";
 import { join } from "path";
 import { describe, it } from "vitest";
 import { TypeSpecConfigJsonSchema } from "../../src/config/config-schema.js";
@@ -7,6 +6,7 @@ import { NodeHost } from "../../src/core/node-host.js";
 import { createJSONSchemaValidator } from "../../src/core/schema-validator.js";
 import { createSourceFile } from "../../src/core/source-file.js";
 import { resolvePath } from "../../src/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { findTestPackageRoot } from "../../src/testing/test-utils.js";
 
 const scenarioRoot = resolvePath(
@@ -34,7 +34,7 @@ describe("compiler: config file loading", () => {
     it("loads full path to custom config file", async () => {
       const lookup = false;
       const config = await loadTestConfig("custom/myConfig.yaml", lookup, true);
-      deepStrictEqual(config, {
+      assert.deepStrictEqual(config, {
         diagnostics: [],
         outputDir: "{cwd}/tsp-output",
         emit: ["openapi"],
@@ -44,7 +44,7 @@ describe("compiler: config file loading", () => {
     it("loads 'tspconfig.yaml' if --config {folder} is supplied and tspconfig.yaml is present", async () => {
       const lookup = false;
       const config = await loadTestConfig("custom", lookup, true);
-      deepStrictEqual(config, {
+      assert.deepStrictEqual(config, {
         diagnostics: [],
         outputDir: "{cwd}/tsp-output",
         emit: ["openapi"],
@@ -54,30 +54,30 @@ describe("compiler: config file loading", () => {
     it("emits diagnostic if --config {folder} is provided but 'tspconfig.yaml' is not found", async () => {
       const lookup = false;
       const config = await loadTestConfig("custom/otherfolder", lookup, true);
-      strictEqual(config.diagnostics.length, 1);
-      strictEqual(config.diagnostics[0].code, "config-path-not-found");
-      strictEqual(config.diagnostics[0].severity, "error");
+      assert.strictEqual(config.diagnostics.length, 1);
+      assert.strictEqual(config.diagnostics[0].code, "config-path-not-found");
+      assert.strictEqual(config.diagnostics[0].severity, "error");
     });
 
     it("emits diagnostic for bad custom config file path", async () => {
       const lookup = true;
       const config = await loadTestConfig("custom/myConfigY.yaml", lookup, true);
-      strictEqual(config.diagnostics.length, 1);
-      strictEqual(config.diagnostics[0].code, "config-path-not-found");
-      strictEqual(config.diagnostics[0].severity, "error");
+      assert.strictEqual(config.diagnostics.length, 1);
+      assert.strictEqual(config.diagnostics[0].code, "config-path-not-found");
+      assert.strictEqual(config.diagnostics[0].severity, "error");
     });
 
     it("emits diagnostic for invalid path", async () => {
       const lookup = false;
       const config = await loadTestConfig("invalid", lookup, true);
-      strictEqual(config.diagnostics.length, 1);
-      strictEqual(config.diagnostics[0].code, "config-path-not-found");
-      strictEqual(config.diagnostics[0].severity, "error");
+      assert.strictEqual(config.diagnostics.length, 1);
+      assert.strictEqual(config.diagnostics[0].code, "config-path-not-found");
+      assert.strictEqual(config.diagnostics[0].severity, "error");
     });
 
     it("loads yaml config file", async () => {
       const config = await loadTestConfig("simple");
-      deepStrictEqual(config, {
+      assert.deepStrictEqual(config, {
         diagnostics: [],
         outputDir: "{cwd}/tsp-output",
         emit: ["openapi"],
@@ -86,7 +86,7 @@ describe("compiler: config file loading", () => {
 
     it("loads config file with extends", async () => {
       const config = await loadTestConfig("extends");
-      deepStrictEqual(config, {
+      assert.deepStrictEqual(config, {
         diagnostics: [],
         extends: "./typespec-base.yaml",
         outputDir: "{cwd}/tsp-output",
@@ -96,7 +96,7 @@ describe("compiler: config file loading", () => {
 
     it("backcompat: loads tspconfig.yaml", async () => {
       const config = await loadTestConfig("backcompat/mixed");
-      deepStrictEqual(config, {
+      assert.deepStrictEqual(config, {
         diagnostics: [],
         outputDir: "{cwd}/tsp-output",
         emit: ["new-emitter"],
@@ -105,7 +105,7 @@ describe("compiler: config file loading", () => {
 
     it("loads empty config if it can't find any config files", async () => {
       const config = await loadTestConfig("empty", false, false);
-      deepStrictEqual(config, {
+      assert.deepStrictEqual(config, {
         diagnostics: [],
         outputDir: "{cwd}/tsp-output",
       });
@@ -114,7 +114,7 @@ describe("compiler: config file loading", () => {
     it("deep clones defaults when not found", async () => {
       let config = await loadTestConfig("empty", false, false);
       config = await loadTestConfig("empty", false, false);
-      deepStrictEqual(config, {
+      assert.deepStrictEqual(config, {
         diagnostics: [],
         outputDir: "{cwd}/tsp-output",
       });
@@ -124,7 +124,7 @@ describe("compiler: config file loading", () => {
       let config = await loadTestConfig("simple", false, false);
 
       config = await loadTestConfig("simple");
-      deepStrictEqual(config, {
+      assert.deepStrictEqual(config, {
         diagnostics: [],
         outputDir: "{cwd}/tsp-output",
         emit: ["openapi"],
@@ -141,7 +141,7 @@ describe("compiler: config file loading", () => {
     }
 
     it("does not allow additional properties", () => {
-      deepStrictEqual(validate({ someCustomProp: true } as any), [
+      assert.deepStrictEqual(validate({ someCustomProp: true } as any), [
         {
           code: "invalid-schema",
           target: { file, pos: 0, end: 0 },
@@ -153,7 +153,7 @@ describe("compiler: config file loading", () => {
     });
 
     it("fails if passing the wrong type", () => {
-      deepStrictEqual(validate({ emit: true } as any), [
+      assert.deepStrictEqual(validate({ emit: true } as any), [
         {
           code: "invalid-schema",
           target: { file, pos: 0, end: 0 },
@@ -164,7 +164,7 @@ describe("compiler: config file loading", () => {
     });
 
     it("succeeds if config is valid", () => {
-      deepStrictEqual(validate({ options: { openapi: {} } }), []);
+      assert.deepStrictEqual(validate({ options: { openapi: {} } }), []);
     });
   });
 });
