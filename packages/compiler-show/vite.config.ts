@@ -54,7 +54,7 @@ export default defineConfig({
     rollupOptions: {
       output: { manualChunks: undefined, entryFileNames: "[name].bundle.js" },
       external: (id) =>
-        ["@sindresorhus/merge-streams", "unicorn-magic", "url", "fs", "path"].includes(id) ||
+        ["unicorn-magic", "url", "fs", "path"].includes(id) ||
         /@typespec\/compiler\/node-.*\.js$/.test(id),
     },
   },
