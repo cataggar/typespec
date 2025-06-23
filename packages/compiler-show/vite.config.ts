@@ -10,7 +10,10 @@ export default defineConfig({
     lib: { entry: { index: "src/index.ts" }, formats: ["es"] },
     rollupOptions: {
       output: { manualChunks: undefined, entryFileNames: "[name].bundle.js" },
-      external: ["unicorn-magic", "url", "fs", "path"],
+      external: (id) =>
+        ["unicorn-magic", "url", "fs", "path"].includes(id) ||
+        /node-.*\.js$/.test(id) ||
+        /setup-node\.js$/.test(id),
     },
   },
   optimizeDeps: {},
