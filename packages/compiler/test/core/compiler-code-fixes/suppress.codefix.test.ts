@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { assert } from "../../../src/testing/system-assert.js";
 import { describe, it } from "vitest";
 import { SyntaxKind } from "../../../src/ast/index.js";
 import { createSuppressCodeFix } from "../../../src/core/compiler-code-fixes/suppress.codefix.js";
@@ -12,7 +12,7 @@ describe("CodeFix: suppress", () => {
       }
     `,
       (node) => {
-        strictEqual(node.kind, SyntaxKind.Identifier);
+        assert.strictEqual(node.kind, SyntaxKind.Identifier);
         return createSuppressCodeFix(node, "foo");
       },
     ).toChangeTo(`
@@ -30,7 +30,7 @@ describe("CodeFix: suppress", () => {
       }
     `,
       (node) => {
-        strictEqual(node.kind, SyntaxKind.Identifier);
+        assert.strictEqual(node.kind, SyntaxKind.Identifier);
         return createSuppressCodeFix(node, "foo");
       },
     ).toChangeTo(`
