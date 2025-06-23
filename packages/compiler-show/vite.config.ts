@@ -10,14 +10,7 @@ export default defineConfig({
     lib: { entry: { index: "src/index.ts" }, formats: ["es"] },
     rollupOptions: {
       output: { manualChunks: undefined, entryFileNames: "[name].bundle.js" },
-      external: [
-        "@sindresorhus/merge-streams",
-        "unicorn-magic",
-        "url",
-        "fs",
-        "fs/promises",
-        "path",
-      ],
+      external: ["@sindresorhus/merge-streams", "unicorn-magic", "url", "fs", "path"],
     },
   },
   optimizeDeps: {},

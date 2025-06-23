@@ -1,5 +1,5 @@
 import type { RmOptions } from "fs";
-import { readdir, readFile, stat } from "fs/promises";
+import { fsPromises } from "./system-fs-promises.js";
 import { globby } from "globby";
 import { join } from "path";
 import { fileURLToPath, pathToFileURL } from "url";
@@ -179,15 +179,15 @@ export async function createTestFileSystem(options?: TestHostOptions): Promise<T
   }
 
   async function addRealTypeSpecFile(path: string, existingPath: string) {
-    virtualFs.set(resolveVirtualPath(path), await readFile(existingPath, "utf8"));
+    virtualFs.set(resolveVirtualPath(path), await fsPromises.readFile(existingPath, "utf8"));
   }
 
   async function addRealFolder(folder: string, existingFolder: string) {
-    const entries = await readdir(existingFolder);
+    const entries = await fsPromises.readdir(existingFolder);
     for (const entry of entries) {
       const existingPath = join(existingFolder, entry);
       const virtualPath = join(folder, entry);
-      const s = await stat(existingPath);
+      const s = await fsPromises.stat(existingPath);
       if (s.isFile()) {
         if (existingPath.endsWith(".js")) {
           await addRealJsFile(virtualPath, existingPath);
@@ -219,7 +219,7 @@ export async function createTestFileSystem(options?: TestHostOptions): Promise<T
         switch (getAnyExtensionFromPath(fileRealPath)) {
           case ".tsp":
           case ".json":
-            const contents = await readFile(fileRealPath, "utf-8");
+            const contents = await fsPromises.readFile(fileRealPath, "utf-8");
             addTypeSpecFile(fileVirtualPath, contents);
             break;
           case ".js":
