@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it, vi } from "vitest";
 import {
   ClientConfigProvider,
@@ -15,11 +15,11 @@ beforeEach(() => {
 describe("configuration API", () => {
   it("should return undefined when configuration is not initialized", () => {
     const config = configProvider.config;
-    strictEqual(config, undefined);
+    assert.strictEqual(config, undefined);
   });
   it("should handle accessing config properties safely", () => {
     const config = configProvider.config;
-    strictEqual(config?.lsp?.emit, undefined);
+    assert.strictEqual(config?.lsp?.emit, undefined);
   });
 });
 
@@ -47,7 +47,7 @@ describe("initialization and VS Code integration", () => {
     await configProvider.initialize(mockConnection, mockHost);
 
     const config = configProvider.config;
-    strictEqual(config?.lsp?.emit?.[0], "openapi3");
+    assert.strictEqual(config?.lsp?.emit?.[0], "openapi3");
   });
 
   it("should completely replace configuration on change notifications", async () => {
@@ -69,7 +69,7 @@ describe("initialization and VS Code integration", () => {
 
     // Verify initial configuration
     const initialConfig = configProvider.config;
-    strictEqual(initialConfig?.lsp?.emit?.[0], "openapi3");
+    assert.strictEqual(initialConfig?.lsp?.emit?.[0], "openapi3");
 
     // Simulate a configuration change that only includes some settings
     const changeParams = {
@@ -84,6 +84,6 @@ describe("initialization and VS Code integration", () => {
 
     // Verify configuration was updated
     const updatedConfig = configProvider.config;
-    strictEqual(updatedConfig?.lsp?.emit?.[0], "swagger");
+    assert.strictEqual(updatedConfig?.lsp?.emit?.[0], "swagger");
   });
 });

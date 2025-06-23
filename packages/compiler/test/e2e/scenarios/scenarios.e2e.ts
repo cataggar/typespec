@@ -1,9 +1,9 @@
-import { rejects } from "assert";
 import { normalize, resolve } from "path";
 import { describe, it } from "vitest";
 import { CompilerOptions } from "../../../src/core/options.js";
 import { NodeHost, Program, compile, resolvePath } from "../../../src/index.js";
 import { expectDiagnosticEmpty, expectDiagnostics } from "../../../src/testing/expect.js";
+import { assert } from "../../../src/testing/system-assert.js";
 import { findTestPackageRoot } from "../../../src/testing/test-utils.js";
 
 const scenarioRoot = resolvePath(await findTestPackageRoot(import.meta.url), "test/e2e/scenarios");
@@ -92,7 +92,7 @@ describe("compiler: entrypoints", () => {
     });
 
     it("report error if emitter fail unexpectedly", async () => {
-      await rejects(
+      await assert.rejects(
         () =>
           compileScenario("emitter-throw-error", {
             emit: ["@typespec/my-emitter"],
@@ -109,7 +109,7 @@ describe("compiler: entrypoints", () => {
     });
 
     it("report error if onValidate fail unexpectedly", async () => {
-      await rejects(
+      await assert.rejects(
         () => compileScenario("validator-throw-error"),
         new RegExp(
           [
