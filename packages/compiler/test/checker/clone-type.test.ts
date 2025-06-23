@@ -1,4 +1,4 @@
-import { deepStrictEqual, ok, strictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import type { Program } from "../../src/core/program.js";
 import { DecoratorContext, Type } from "../../src/core/types.js";
@@ -41,8 +41,8 @@ describe("compiler: type cloning", () => {
         test: Type;
       };
       const clone = testHost.program.checker.cloneType(test);
-      ok(blues.has(clone!), "the clone is blue");
-      deepStrictEqual(test, clone!);
+      assert.ok(blues.has(clone!), "the clone is blue");
+      assert.deepStrictEqual(test, clone!);
 
       // Ensure that the cloned decorators list isn't reused directly
       if ("decorators" in test && "decorators" in clone) {
@@ -53,30 +53,30 @@ describe("compiler: type cloning", () => {
           args: [],
         });
 
-        strictEqual(test.decorators.length, 2);
-        strictEqual(clone.decorators.length, 3);
+        assert.strictEqual(test.decorators.length, 2);
+        assert.strictEqual(clone.decorators.length, 3);
       }
 
       // Ensure that cloned members are re-parented
       switch (clone.kind) {
         case "Model":
           for (const each of clone.properties.values()) {
-            strictEqual(each.model, clone, "model property not re-parented");
+            assert.strictEqual(each.model, clone, "model property not re-parented");
           }
           break;
         case "Enum":
           for (const each of clone.members.values()) {
-            strictEqual(each.enum, clone, "enum member not re-parented");
+            assert.strictEqual(each.enum, clone, "enum member not re-parented");
           }
           break;
         case "Interface":
           for (const each of clone.operations.values()) {
-            strictEqual(each.interface, clone, "interface operation not re-parented");
+            assert.strictEqual(each.interface, clone, "interface operation not re-parented");
           }
           break;
         case "Union":
           for (const each of clone.variants.values()) {
-            strictEqual(each.union, clone, "union variant not re-parented");
+            assert.strictEqual(each.union, clone, "union variant not re-parented");
           }
           break;
       }
@@ -87,29 +87,29 @@ describe("compiler: type cloning", () => {
           const newModel = testHost.program.checker.cloneType(test, {
             properties: createRekeyableMap(),
           });
-          ok(test.properties.size > 0, "no properties to change");
-          strictEqual(newModel.properties.size, 0, "properties not set.");
+          assert.ok(test.properties.size > 0, "no properties to change");
+          assert.strictEqual(newModel.properties.size, 0, "properties not set.");
           break;
         case "Enum":
           const newEnum = testHost.program.checker.cloneType(test, {
             members: createRekeyableMap(),
           });
-          ok(test.members.size > 0, "no members to change");
-          strictEqual(newEnum.members.size, 0, "members not set");
+          assert.ok(test.members.size > 0, "no members to change");
+          assert.strictEqual(newEnum.members.size, 0, "members not set");
           break;
         case "Interface":
           const newInterface = testHost.program.checker.cloneType(test, {
             operations: createRekeyableMap(),
           });
-          ok(test.operations.size > 0, "no operations to change");
-          strictEqual(newInterface.operations.size, 0, "operations not set");
+          assert.ok(test.operations.size > 0, "no operations to change");
+          assert.strictEqual(newInterface.operations.size, 0, "operations not set");
           break;
         case "Union":
           const newUnion = testHost.program.checker.cloneType(test, {
             variants: createRekeyableMap(),
           });
-          ok(test.variants.size > 0, "no variants to change");
-          strictEqual(newUnion.variants.size, 0, "variants not set");
+          assert.ok(test.variants.size > 0, "no variants to change");
+          assert.strictEqual(newUnion.variants.size, 0, "variants not set");
           break;
       }
     });
@@ -127,9 +127,9 @@ describe("compiler: type cloning", () => {
     );
 
     const { test } = await testHost.compile("./test.tsp");
-    strictEqual(test.kind, "ModelProperty" as const);
-    strictEqual(test.type.kind, "Model" as const);
+    assert.strictEqual(test.kind, "ModelProperty" as const);
+    assert.strictEqual(test.type.kind, "Model" as const);
     const clone = testHost.program.checker.cloneType(test.type);
-    deepStrictEqual(test.type.templateMapper, clone.templateMapper);
+    assert.deepStrictEqual(test.type.templateMapper, clone.templateMapper);
   });
 });
