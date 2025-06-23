@@ -1,4 +1,4 @@
-import { deepStrictEqual, fail, ok, strictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import { getSourceLocation } from "../../src/core/diagnostics.js";
 import { Diagnostic, Model, Operation, StringLiteral, Type } from "../../src/core/types.js";
@@ -25,7 +25,7 @@ describe("compiler: templates", () => {
   function getLineAndCharOfDiagnostic(diagnostic: Diagnostic) {
     const source = getSourceLocation(diagnostic.target);
     if (source === undefined) {
-      fail(`Couldn't resolve the source of diagnostic ${diagnostic}`);
+      assert.fail(`Couldn't resolve the source of diagnostic ${diagnostic}`);
     }
     return source.file.getLineAndCharacterOfPosition(source.pos);
   }
@@ -41,11 +41,11 @@ describe("compiler: templates", () => {
       `,
     );
     const diagnostics = await testHost.diagnose("main.tsp");
-    strictEqual(diagnostics.length, 1);
-    strictEqual(diagnostics[0].code, "invalid-template-args");
-    strictEqual(diagnostics[0].message, "Can't pass template arguments to non-templated type");
+    assert.strictEqual(diagnostics.length, 1);
+    assert.strictEqual(diagnostics[0].code, "invalid-template-args");
+    assert.strictEqual(diagnostics[0].message, "Can't pass template arguments to non-templated type");
     // Should point to the start of A<string>
-    deepStrictEqual(getLineAndCharOfDiagnostic(diagnostics[0]), {
+    assert.deepStrictEqual(getLineAndCharOfDiagnostic(diagnostics[0]), {
       line: 3,
       character: 15,
     });
@@ -62,11 +62,11 @@ describe("compiler: templates", () => {
       `,
     );
     const diagnostics = await testHost.diagnose("main.tsp");
-    strictEqual(diagnostics.length, 1);
-    strictEqual(diagnostics[0].code, "invalid-template-args");
-    strictEqual(diagnostics[0].message, "Template argument 'T' is required and not specified.");
+    assert.strictEqual(diagnostics.length, 1);
+    assert.strictEqual(diagnostics[0].code, "invalid-template-args");
+    assert.strictEqual(diagnostics[0].message, "Template argument 'T' is required and not specified.");
     // Should point to the start of A
-    deepStrictEqual(getLineAndCharOfDiagnostic(diagnostics[0]), {
+    assert.deepStrictEqual(getLineAndCharOfDiagnostic(diagnostics[0]), {
       line: 3,
       character: 15,
     });
@@ -83,12 +83,12 @@ describe("compiler: templates", () => {
       `,
     );
     const diagnostics = await testHost.diagnose("main.tsp");
-    strictEqual(diagnostics.length, 1);
-    strictEqual(diagnostics[0].code, "invalid-template-args");
-    strictEqual(diagnostics[0].message, "Too many template arguments provided.");
+    assert.strictEqual(diagnostics.length, 1);
+    assert.strictEqual(diagnostics[0].code, "invalid-template-args");
+    assert.strictEqual(diagnostics[0].message, "Too many template arguments provided.");
 
     // Should point to the start of A<string, string>
-    deepStrictEqual(getLineAndCharOfDiagnostic(diagnostics[0]), {
+    assert.deepStrictEqual(getLineAndCharOfDiagnostic(diagnostics[0]), {
       line: 3,
       character: 15,
     });
@@ -108,10 +108,10 @@ describe("compiler: templates", () => {
     const { A } = (await testHost.compile("main.tsp")) as { A: Model };
     const a = A.properties.get("a")!;
     const b = A.properties.get("b")!;
-    strictEqual(a.type.kind, "String");
-    strictEqual((a.type as StringLiteral).value, "bye");
-    strictEqual(b.type.kind, "String");
-    strictEqual((b.type as StringLiteral).value, "hi");
+    assert.strictEqual(a.type.kind, "String");
+    assert.strictEqual((a.type as StringLiteral).value, "bye");
+    assert.strictEqual(b.type.kind, "String");
+    assert.strictEqual((b.type as StringLiteral).value, "hi");
   });
 
   it("indeterminate defaults", async () => {
@@ -159,8 +159,8 @@ describe("compiler: templates", () => {
 
     const { A } = (await testHost.compile("main.tsp")) as { A: Model };
     const a = A.properties.get("a")!;
-    strictEqual(a.type.kind, "Scalar");
-    strictEqual(a.type.name, "string");
+    assert.strictEqual(a.type.kind, "Scalar");
+    assert.strictEqual(a.type.name, "string");
   });
 
   it("template instance should be the exact same when passing value that is the same as the default", async () => {
@@ -180,8 +180,8 @@ describe("compiler: templates", () => {
     const a = Test.properties.get("a")!;
     const b = Test.properties.get("b")!;
     const c = Test.properties.get("c")!;
-    strictEqual(a.type, b.type);
-    strictEqual(a.type, c.type);
+    assert.strictEqual(a.type, b.type);
+    assert.strictEqual(a.type, c.type);
   });
 
   it("emits diagnostics when using too few template parameters", async () => {
@@ -196,9 +196,9 @@ describe("compiler: templates", () => {
     );
 
     const diagnostics = await testHost.diagnose("main.tsp");
-    strictEqual(diagnostics.length, 1);
-    strictEqual(diagnostics[0].code, "invalid-template-args");
-    strictEqual(diagnostics[0].message, "Template argument 'U' is required and not specified.");
+    assert.strictEqual(diagnostics.length, 1);
+    assert.strictEqual(diagnostics[0].code, "invalid-template-args");
+    assert.strictEqual(diagnostics[0].message, "Template argument 'U' is required and not specified.");
   });
 
   it("emits diagnostics when non-defaulted template parameter comes after defaulted one", async () => {
@@ -317,8 +317,8 @@ describe("compiler: templates", () => {
         message: "Unknown identifier notExists",
       });
 
-      strictEqual(prop.kind, "ModelProperty");
-      ok(isUnknownType(prop.type), "Prop type should be unknown");
+      assert.strictEqual(prop.kind, "ModelProperty");
+      assert.ok(isUnknownType(prop.type), "Prop type should be unknown");
     });
 
     it("operation should still be able to be used(no extra diagnostic)", async () => {
@@ -352,10 +352,10 @@ describe("compiler: templates", () => {
     const { A } = (await testHost.compile("main.tsp")) as { A: Model };
     const a = A.properties.get("a")!;
     const b = A.properties.get("b")!;
-    strictEqual(a.type.kind, "String");
-    strictEqual((a.type as StringLiteral).value, "bye");
-    strictEqual(b.type.kind, "String");
-    strictEqual((b.type as StringLiteral).value, "bye");
+    assert.strictEqual(a.type.kind, "String");
+    assert.strictEqual((a.type as StringLiteral).value, "bye");
+    assert.strictEqual(b.type.kind, "String");
+    assert.strictEqual((b.type as StringLiteral).value, "bye");
   });
 
   it("can reference other parameters in default in a model expression", async () => {
@@ -371,10 +371,10 @@ describe("compiler: templates", () => {
 
     const { A } = (await testHost.compile("main.tsp")) as { A: Model };
     const b = A.properties.get("b")!;
-    strictEqual(b.type.kind, "Model" as const);
+    assert.strictEqual(b.type.kind, "Model" as const);
     const t = b.type.properties.get("t")!.type;
-    strictEqual(t.kind, "String" as const);
-    strictEqual(t.value, "bye");
+    assert.strictEqual(t.kind, "String" as const);
+    assert.strictEqual(t.value, "bye");
   });
 
   it("can reference other parameters in default via another template", async () => {
@@ -394,10 +394,10 @@ describe("compiler: templates", () => {
 
     const { A } = (await testHost.compile("main.tsp")) as { A: Model };
     const b = A.properties.get("b")!;
-    strictEqual(b.type.kind, "Model" as const);
+    assert.strictEqual(b.type.kind, "Model" as const);
     const t = b.type.properties.get("t")!.type;
-    strictEqual(t.kind, "String" as const);
-    strictEqual(t.value, "bye");
+    assert.strictEqual(t.kind, "String" as const);
+    assert.strictEqual(t.value, "bye");
   });
 
   it("can reference parent parameters in default", async () => {
@@ -413,11 +413,11 @@ describe("compiler: templates", () => {
     );
     const { MyOp } = (await testHost.compile("main.tsp")) as { MyOp: Operation };
     const params = MyOp.parameters.properties.get("params");
-    ok(params, "Expected params to be defined");
-    strictEqual(params.type.kind, "Scalar");
-    strictEqual(params.type.name, "string");
-    strictEqual(MyOp.returnType.kind, "Scalar");
-    strictEqual(MyOp.returnType.name, "string");
+    assert.ok(params, "Expected params to be defined");
+    assert.strictEqual(params.type.kind, "Scalar");
+    assert.strictEqual(params.type.name, "string");
+    assert.strictEqual(MyOp.returnType.kind, "Scalar");
+    assert.strictEqual(MyOp.returnType.name, "string");
   });
 
   it("can use parent parameters default in default", async () => {
@@ -433,11 +433,11 @@ describe("compiler: templates", () => {
     );
     const { MyOp } = (await testHost.compile("main.tsp")) as { MyOp: Operation };
     const params = MyOp.parameters.properties.get("params");
-    ok(params, "Expected params to be defined");
-    strictEqual(params.type.kind, "Scalar");
-    strictEqual(params.type.name, "string");
-    strictEqual(MyOp.returnType.kind, "Scalar");
-    strictEqual(MyOp.returnType.name, "string");
+    assert.ok(params, "Expected params to be defined");
+    assert.strictEqual(params.type.kind, "Scalar");
+    assert.strictEqual(params.type.name, "string");
+    assert.strictEqual(MyOp.returnType.kind, "Scalar");
+    assert.strictEqual(MyOp.returnType.name, "string");
   });
 
   it("can override default provided by parent parameters", async () => {
@@ -452,8 +452,8 @@ describe("compiler: templates", () => {
       `,
     );
     const { MyOp } = (await testHost.compile("main.tsp")) as { MyOp: Operation };
-    strictEqual(MyOp.returnType.kind, "Scalar");
-    strictEqual(MyOp.returnType.name, "bytes");
+    assert.strictEqual(MyOp.returnType.kind, "Scalar");
+    assert.strictEqual(MyOp.returnType.name, "bytes");
   });
 
   it("emit diagnostics if referencing itself", async () => {
@@ -627,7 +627,7 @@ describe("compiler: templates", () => {
   describe("doesn't run decorators when checking template declarations", () => {
     async function expectMarkDecoratorNotCalled(code: string) {
       testHost.addJsFile("mark.js", {
-        $mark: () => fail("Should not have called decorator"),
+        $mark: () => assert.fail("Should not have called decorator"),
       });
 
       testHost.addTypeSpecFile(
@@ -734,10 +734,10 @@ describe("compiler: templates", () => {
 
       const { B } = (await testHost.compile("main.tsp")) as { B: Model };
       const foo = B.properties.get("foo")!.type;
-      strictEqual(foo.kind, "Model");
+      assert.strictEqual(foo.kind, "Model");
       const a = foo.properties.get("a")!;
-      strictEqual(a.type.kind, "Scalar");
-      strictEqual(a.type.name, "string");
+      assert.strictEqual(a.type.kind, "Scalar");
+      assert.strictEqual(a.type.name, "string");
     });
 
     it("with named arguments out of order", async () => {
@@ -753,13 +753,13 @@ describe("compiler: templates", () => {
 
       const { B } = (await testHost.compile("main.tsp")) as { B: Model };
       const foo = B.properties.get("foo")!.type;
-      strictEqual(foo.kind, "Model");
+      assert.strictEqual(foo.kind, "Model");
       const a = foo.properties.get("a")!;
       const b = foo.properties.get("b")!;
-      strictEqual(a.type.kind, "Scalar");
-      strictEqual(a.type.name, "string");
-      strictEqual(b.type.kind, "Scalar");
-      strictEqual(b.type.name, "int32");
+      assert.strictEqual(a.type.kind, "Scalar");
+      assert.strictEqual(a.type.name, "string");
+      assert.strictEqual(b.type.kind, "Scalar");
+      assert.strictEqual(b.type.name, "int32");
     });
 
     it("with named arguments and defaults", async () => {
@@ -775,13 +775,13 @@ describe("compiler: templates", () => {
 
       const { B } = (await testHost.compile("main.tsp")) as { B: Model };
       const foo = B.properties.get("foo")!.type;
-      strictEqual(foo.kind, "Model");
+      assert.strictEqual(foo.kind, "Model");
       const a = foo.properties.get("a")!;
       const b = foo.properties.get("b")!;
-      strictEqual(a.type.kind, "Scalar");
-      strictEqual(a.type.name, "int32");
-      strictEqual(b.type.kind, "String");
-      strictEqual(b.type.value, "bar");
+      assert.strictEqual(a.type.kind, "Scalar");
+      assert.strictEqual(a.type.name, "int32");
+      assert.strictEqual(b.type.kind, "String");
+      assert.strictEqual(b.type.value, "bar");
     });
 
     it("with named arguments and defaults bound to other parameters", async () => {
@@ -797,13 +797,13 @@ describe("compiler: templates", () => {
 
       const { B } = (await testHost.compile("main.tsp")) as { B: Model };
       const foo = B.properties.get("foo")!.type;
-      strictEqual(foo.kind, "Model");
+      assert.strictEqual(foo.kind, "Model");
       const a = foo.properties.get("a")!;
       const b = foo.properties.get("b")!;
-      strictEqual(a.type.kind, "Scalar");
-      strictEqual(a.type.name, "string");
-      strictEqual(b.type.kind, "Scalar");
-      strictEqual(b.type.name, "string");
+      assert.strictEqual(a.type.kind, "Scalar");
+      assert.strictEqual(a.type.name, "string");
+      assert.strictEqual(b.type.kind, "Scalar");
+      assert.strictEqual(b.type.name, "string");
     });
 
     it("with named and positional arguments", async () => {
@@ -826,16 +826,16 @@ describe("compiler: templates", () => {
 
       for (const M of [B, C]) {
         const foo = M.properties.get("foo")!.type;
-        strictEqual(foo.kind, "Model");
+        assert.strictEqual(foo.kind, "Model");
         const a = foo.properties.get("a")!;
         const b = foo.properties.get("b")!;
         const c = foo.properties.get("c")!;
-        strictEqual(a.type.kind, "Scalar");
-        strictEqual(a.type.name, "boolean");
-        strictEqual(b.type.kind, "Scalar");
-        strictEqual(b.type.name, "int32");
-        strictEqual(c.type.kind, "String");
-        strictEqual(c.type.value, "bar");
+        assert.strictEqual(a.type.kind, "Scalar");
+        assert.strictEqual(a.type.name, "boolean");
+        assert.strictEqual(b.type.kind, "Scalar");
+        assert.strictEqual(b.type.name, "int32");
+        assert.strictEqual(c.type.kind, "String");
+        assert.strictEqual(c.type.value, "bar");
       }
     });
 
@@ -856,10 +856,10 @@ describe("compiler: templates", () => {
       ];
 
       const foo = B.properties.get("foo")!.type;
-      strictEqual(foo.kind, "Model");
+      assert.strictEqual(foo.kind, "Model");
       const a = foo.properties.get("a")!;
-      strictEqual(a.type.kind, "Scalar");
-      strictEqual(a.type.name, "string");
+      assert.strictEqual(a.type.kind, "Scalar");
+      assert.strictEqual(a.type.name, "string");
 
       expectDiagnostics(diagnostics, {
         code: "invalid-template-args",
@@ -886,10 +886,10 @@ describe("compiler: templates", () => {
       ];
 
       const foo = B.properties.get("foo")!.type;
-      strictEqual(foo.kind, "Model");
+      assert.strictEqual(foo.kind, "Model");
       const a = foo.properties.get("a")!;
-      strictEqual(a.type.kind, "Scalar");
-      strictEqual(a.type.name, "string");
+      assert.strictEqual(a.type.kind, "Scalar");
+      assert.strictEqual(a.type.name, "string");
 
       expectDiagnostics(diagnostics, {
         code: "invalid-template-args",
@@ -916,10 +916,10 @@ describe("compiler: templates", () => {
       ];
 
       const foo = B.properties.get("foo")!.type;
-      strictEqual(foo.kind, "Model");
+      assert.strictEqual(foo.kind, "Model");
       const a = foo.properties.get("a")!;
-      strictEqual(a.type.kind, "Scalar");
-      strictEqual(a.type.name, "string");
+      assert.strictEqual(a.type.kind, "Scalar");
+      assert.strictEqual(a.type.name, "string");
 
       expectDiagnostics(diagnostics, {
         code: "invalid-template-args",
@@ -946,16 +946,16 @@ describe("compiler: templates", () => {
       ];
 
       const foo = B.properties.get("foo")!.type;
-      strictEqual(foo.kind, "Model");
+      assert.strictEqual(foo.kind, "Model");
       const a = foo.properties.get("a")!;
       const b = foo.properties.get("b")!;
       const c = foo.properties.get("c")!;
-      strictEqual(a.type.kind, "Scalar");
-      strictEqual(a.type.name, "boolean");
-      strictEqual(b.type.kind, "Intrinsic");
-      strictEqual(b.type.name, "unknown");
-      strictEqual(c.type.kind, "String");
-      strictEqual(c.type.value, "bar");
+      assert.strictEqual(a.type.kind, "Scalar");
+      assert.strictEqual(a.type.name, "boolean");
+      assert.strictEqual(b.type.kind, "Intrinsic");
+      assert.strictEqual(b.type.name, "unknown");
+      assert.strictEqual(c.type.kind, "String");
+      assert.strictEqual(c.type.value, "bar");
 
       expectDiagnostics(diagnostics, [
         {
@@ -991,16 +991,16 @@ describe("compiler: templates", () => {
       ];
 
       const foo = B.properties.get("foo")!.type;
-      strictEqual(foo.kind, "Model");
+      assert.strictEqual(foo.kind, "Model");
       const a = foo.properties.get("a")!;
       const b = foo.properties.get("b")!;
       const c = foo.properties.get("c")!;
-      strictEqual(a.type.kind, "Scalar");
-      strictEqual(a.type.name, "boolean");
-      strictEqual(b.type.kind, "Scalar");
-      strictEqual(b.type.name, "int32");
-      strictEqual(c.type.kind, "String");
-      strictEqual(c.type.value, "bar");
+      assert.strictEqual(a.type.kind, "Scalar");
+      assert.strictEqual(a.type.name, "boolean");
+      assert.strictEqual(b.type.kind, "Scalar");
+      assert.strictEqual(b.type.name, "int32");
+      assert.strictEqual(c.type.kind, "String");
+      assert.strictEqual(c.type.value, "bar");
 
       expectDiagnostics(diagnostics, {
         code: "invalid-template-args",
@@ -1059,23 +1059,23 @@ describe("compiler: templates", () => {
 
       const { B } = (await testHost.compile("main.tsp")) as { B: Model };
       const bar = B.properties.get("bar")!.type;
-      strictEqual(bar.kind, "Model");
+      assert.strictEqual(bar.kind, "Model");
       const a = bar.properties.get("a")!;
       const b = bar.properties.get("b")!;
-      strictEqual(a.type.kind, "Model");
-      strictEqual(a.type.name, "Dec");
-      strictEqual(b.type.kind, "Model");
-      strictEqual(b.type.name, "Dec");
+      assert.strictEqual(a.type.kind, "Model");
+      assert.strictEqual(a.type.name, "Dec");
+      assert.strictEqual(b.type.kind, "Model");
+      assert.strictEqual(b.type.name, "Dec");
 
       // Assert that the members are added (decorators executed) in _declaration_ order
       // rather than in the order they appear in the template instantiation.
-      strictEqual(members.length, 2);
-      strictEqual(members[0][0], a.type);
-      strictEqual(members[0][1].kind, "Scalar");
-      strictEqual(members[0][1].name, "int32");
-      strictEqual(members[1][0], b.type);
-      strictEqual(members[1][1].kind, "Scalar");
-      strictEqual(members[1][1].name, "string");
+      assert.strictEqual(members.length, 2);
+      assert.strictEqual(members[0][0], a.type);
+      assert.strictEqual(members[0][1].kind, "Scalar");
+      assert.strictEqual(members[0][1].name, "int32");
+      assert.strictEqual(members[1][0], b.type);
+      assert.strictEqual(members[1][1].kind, "Scalar");
+      assert.strictEqual(members[1][1].name, "string");
     });
   });
 
