@@ -1,4 +1,3 @@
-import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import type { FunctionParameterNode } from "../../src/ast/index.js";
 import { Diagnostic, Model, Type, definePackageFlags } from "../../src/index.js";
@@ -13,6 +12,7 @@ import {
   extractCursor,
   extractSquiggles,
 } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 interface RelatedTypeOptions {
   source: string;
@@ -80,19 +80,19 @@ describe("compiler: checker: type relations", () => {
   async function expectTypeAssignable(options: RelatedTypeOptions) {
     const { related, diagnostics } = await checkTypeAssignable(options);
     expectDiagnosticEmpty(diagnostics);
-    ok(related, `Type ${options.source} should be assignable to ${options.target}`);
+    assert.ok(related, `Type ${options.source} should be assignable to ${options.target}`);
   }
 
   async function expectTypeNotAssignable(options: RelatedTypeOptions, match: DiagnosticMatch) {
     const { related, diagnostics, expectedDiagnosticPos } = await checkTypeAssignable(options);
-    ok(!related, `Type ${options.source} should NOT be assignable to ${options.target}`);
+    assert.ok(!related, `Type ${options.source} should NOT be assignable to ${options.target}`);
     expectDiagnostics(diagnostics, { ...match, pos: expectedDiagnosticPos });
   }
 
   async function expectValueAssignableToConstraint(options: RelatedTypeOptions) {
     const { related, diagnostics } = await checkValueAssignableToConstraint(options);
     expectDiagnosticEmpty(diagnostics);
-    ok(related, `Value ${options.source} should be assignable to ${options.target}`);
+    assert.ok(related, `Value ${options.source} should be assignable to ${options.target}`);
   }
 
   async function expectValueNotAssignableToConstraint(
@@ -101,7 +101,7 @@ describe("compiler: checker: type relations", () => {
   ) {
     const { related, diagnostics, expectedDiagnosticPos } =
       await checkValueAssignableToConstraint(options);
-    ok(!related, `Value ${options.source} should NOT be assignable to ${options.target}`);
+    assert.ok(!related, `Value ${options.source} should NOT be assignable to ${options.target}`);
     expectDiagnostics(diagnostics, { ...match, pos: expectedDiagnosticPos });
   }
 
@@ -149,10 +149,10 @@ describe("compiler: checker: type relations", () => {
         @test model Bar {foo: Foo}
       `)) as { Bar: Model };
       const Foo = Bar.properties.get("foo")!.type as Model;
-      ok(Foo.indexer);
+      assert.ok(Foo.indexer);
       const indexValue = Foo.indexer.value;
-      strictEqual(indexValue.kind, "Model" as const);
-      deepStrictEqual([...indexValue.properties.keys()], ["foo", "bar"]);
+      assert.strictEqual(indexValue.kind, "Model" as const);
+      assert.deepStrictEqual([...indexValue.properties.keys()], ["foo", "bar"]);
     });
 
     it("cannot intersect model with property incompatible with record", async () => {
@@ -958,7 +958,7 @@ describe("compiler: checker: type relations", () => {
         model B { a: B, b: B }
       `,
         });
-        ok(!related);
+        assert.ok(!related);
         expectDiagnostics(diagnostics, {
           code: "unassignable",
           message: [

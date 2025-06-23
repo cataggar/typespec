@@ -1,8 +1,8 @@
-import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import { Model, Operation } from "../../src/index.js";
 import { getDoc, getErrorsDoc, getReturnsDoc } from "../../src/lib/decorators.js";
 import { BasicTestRunner, createTestRunner } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 let runner: BasicTestRunner;
 beforeEach(async () => {
@@ -487,7 +487,13 @@ describe("@prop", () => {
     `)) as { Base: Model };
 
     assert.strictEqual(getDoc(runner.program, Base), "This is the model doc.");
-    assert.strictEqual(getDoc(runner.program, Base.properties.get("name")!), "This is the name prop doc.");
-    assert.strictEqual(getDoc(runner.program, Base.properties.get("age")!), "This is the age prop doc.");
+    assert.strictEqual(
+      getDoc(runner.program, Base.properties.get("name")!),
+      "This is the name prop doc.",
+    );
+    assert.strictEqual(
+      getDoc(runner.program, Base.properties.get("age")!),
+      "This is the age prop doc.",
+    );
   });
 });

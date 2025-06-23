@@ -1,8 +1,8 @@
-import { assert } from "../../../src/testing/system-assert.js";
 import { describe, it } from "vitest";
 import { SyntaxKind } from "../../../src/ast/index.js";
 import { createSuppressCodeFix } from "../../../src/core/compiler-code-fixes/suppress.codefix.js";
 import { expectCodeFixOnAst } from "../../../src/testing/code-fix-testing.js";
+import { assert } from "../../../src/testing/system-assert.js";
 
 describe("CodeFix: suppress", () => {
   it("it suppress in previous line", async () => {

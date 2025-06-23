@@ -1,6 +1,6 @@
-import { assert } from "../../src/testing/system-assert.js";
 import { describe, it } from "vitest";
 import { parseMimeType } from "../../src/core/mime-type.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: mime-type utils", () => {
   it("return undefined if invalid mime type", () => {
@@ -8,7 +8,10 @@ describe("compiler: mime-type utils", () => {
   });
 
   it("parse simple mime types", () => {
-    assert.deepStrictEqual(parseMimeType("application/json"), { type: "application", subtype: "json" });
+    assert.deepStrictEqual(parseMimeType("application/json"), {
+      type: "application",
+      subtype: "json",
+    });
   });
 
   it("parse mime types with suffix", () => {
