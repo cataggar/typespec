@@ -1,4 +1,3 @@
-import { ok } from "assert";
 import { describe, expect, it } from "vitest";
 import { applyCodeFix } from "../../src/core/code-fixes.js";
 import {
@@ -8,6 +7,7 @@ import {
   createSourceFile,
   defineCodeFix,
 } from "../../src/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestHost } from "../../src/testing/test-host.js";
 
 describe("Codefixes", () => {
@@ -33,7 +33,7 @@ describe("Codefixes", () => {
           fix: (context) => fix(context, fakeFile),
         }),
       );
-      ok(result);
+      assert.ok(result);
       return result;
     }
 

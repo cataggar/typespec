@@ -1,10 +1,10 @@
-import { deepStrictEqual, ok, strictEqual, throws } from "assert";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { getCommentAtPosition, getPositionBeforeTrivia } from "../../src/core/parser-utils.js";
 import { parse } from "../../src/core/parser.js";
 import { TypeSpecScriptNode } from "../../src/core/types.js";
 import { Comment } from "../../src/index.js";
 import { extractCursor } from "../../src/testing/source-utils.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { dumpAST } from "../ast-test-utils.js";
 
 describe("compiler: parser-utils", () => {
@@ -30,8 +30,8 @@ describe("compiler: parser-utils", () => {
          * Third comment ┆
          */
       `);
-      ok(comment);
-      deepStrictEqual(comment, root.comments[2]);
+      assert.ok(comment);
+      assert.deepStrictEqual(comment, root.comments[2]);
     });
 
     it("does not find outside comment", () => {
@@ -41,7 +41,7 @@ describe("compiler: parser-utils", () => {
         /* Second comment */
         /* Third comment */
       `);
-      ok(!comment);
+      assert.ok(!comment);
     });
 
     it("handles adjacent comments", () => {
@@ -50,12 +50,12 @@ describe("compiler: parser-utils", () => {
       const { root, comment } = getCommentAtCursor(`
         /* First comment */┆/*Second comment */
       `);
-      ok(comment);
-      deepStrictEqual(comment, root.comments[1]);
+      assert.ok(comment);
+      assert.deepStrictEqual(comment, root.comments[1]);
     });
 
     it("throws if comments are not enabled", () => {
-      throws(() => getCommentAtCursor(`┆`, false));
+      expect(() => getCommentAtCursor(`┆`, false)).toThrow();
     });
   });
 
@@ -77,17 +77,17 @@ describe("compiler: parser-utils", () => {
 
     it("returns position unchanged with no trivia", () => {
       const { pos } = getPositionBeforeTriviaAtCursor(`${testSourceWithoutTrailingTrivia}┆`);
-      strictEqual(pos, testSourceWithoutTrailingTrivia.length);
+      assert.strictEqual(pos, testSourceWithoutTrailingTrivia.length);
     });
 
     it("returns correct position before whitespace", () => {
       const { pos } = getPositionBeforeTriviaAtCursor(`${testSourceWithoutTrailingTrivia} ┆`);
-      strictEqual(pos, testSourceWithoutTrailingTrivia.length);
+      assert.strictEqual(pos, testSourceWithoutTrailingTrivia.length);
     });
 
     it("returns correct position before trivia with cursor exactly at the end of comment", () => {
       const { pos } = getPositionBeforeTriviaAtCursor(`model Test {} /* Test */┆`);
-      strictEqual(pos, testSourceWithoutTrailingTrivia.length);
+      assert.strictEqual(pos, testSourceWithoutTrailingTrivia.length);
     });
 
     it("returns correct position before lots of trivia with cursor in the middle of comment", () => {
@@ -103,11 +103,11 @@ describe("compiler: parser-utils", () => {
          * Inside the last comment ┆ over here
          */`,
       );
-      strictEqual(pos, testSourceWithoutTrailingTrivia.length);
+      assert.strictEqual(pos, testSourceWithoutTrailingTrivia.length);
     });
 
     it("throws if comments are not enabled", () => {
-      throws(() => getPositionBeforeTriviaAtCursor(`┆`, false));
+      expect(() => getPositionBeforeTriviaAtCursor(`┆`, false)).toThrow();
     });
   });
 });

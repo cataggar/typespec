@@ -1,4 +1,3 @@
-import { ok } from "assert";
 import { Diagnostic, Model, Type, Value, definePackageFlags } from "../../../src/index.js";
 import {
   createTestHost,
@@ -6,6 +5,7 @@ import {
   expectDiagnosticEmpty,
   extractCursor,
 } from "../../../src/testing/index.js";
+import { assert } from "../../../src/testing/system-assert.js";
 
 export async function diagnoseUsage(
   code: string,
@@ -52,7 +52,7 @@ export async function compileAndDiagnoseValue(
 export async function compileValue(code: string, other?: string): Promise<Value> {
   const [called, diagnostics] = await compileAndDiagnoseValue(code, other);
   expectDiagnosticEmpty(diagnostics);
-  ok(called, "Decorator was not called");
+  assert.ok(called, "Decorator was not called");
 
   return called;
 }
@@ -92,7 +92,7 @@ export async function compileAndDiagnoseValueOrType(
     Diagnostic[],
   ];
   const dec = Test.decorators.find((x) => x.definition?.name === "@collect");
-  ok(dec);
+  assert.ok(dec);
 
   return [dec.args[0].value, diagnostics];
 }
@@ -104,7 +104,7 @@ export async function compileValueOrType(
 ): Promise<Value | Type> {
   const [called, diagnostics] = await compileAndDiagnoseValueOrType(constraint, code, { other });
   expectDiagnosticEmpty(diagnostics);
-  ok(called, "Decorator was not called");
+  assert.ok(called, "Decorator was not called");
 
   return called;
 }

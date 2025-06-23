@@ -1,7 +1,7 @@
-import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SourceLocationOptions, getSourceLocation } from "../../src/index.js";
 import { extractSquiggles } from "../../src/testing/source-utils.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestRunner } from "../../src/testing/test-host.js";
 import { BasicTestRunner } from "../../src/testing/types.js";
 
@@ -16,8 +16,8 @@ describe("compiler: diagnostics", () => {
     const { pos, end, source } = extractSquiggles(code);
     const { target } = await runner.compile(source);
     const location = getSourceLocation(target, options);
-    strictEqual(location.pos, pos);
-    strictEqual(location.end, end);
+    assert.strictEqual(location.pos, pos);
+    assert.strictEqual(location.end, end);
   }
 
   describe("getSourceLocation", () => {

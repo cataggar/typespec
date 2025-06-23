@@ -1,4 +1,4 @@
-import { deepStrictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { describe, it } from "vitest";
 import {
   ExpandConfigOptions,
@@ -30,7 +30,7 @@ describe("compiler: config interpolation", () => {
         two: "two",
       });
 
-      deepStrictEqual(resolved, {
+      assert.deepStrictEqual(resolved, {
         one: "one",
         two: "two",
       });
@@ -41,7 +41,7 @@ describe("compiler: config interpolation", () => {
         one: "{not-defined}/output",
       });
 
-      deepStrictEqual(resolved, {
+      assert.deepStrictEqual(resolved, {
         one: "{not-defined}/output",
       });
     });
@@ -51,7 +51,7 @@ describe("compiler: config interpolation", () => {
         one: "{output-dir}/custom",
       });
 
-      deepStrictEqual(resolved, {
+      assert.deepStrictEqual(resolved, {
         one: "/test/output/custom",
       });
     });
@@ -61,7 +61,7 @@ describe("compiler: config interpolation", () => {
         one: "{env.GITHUB_DIR}/custom",
       });
 
-      deepStrictEqual(resolved, {
+      assert.deepStrictEqual(resolved, {
         one: "/github/custom",
       });
     });
@@ -72,7 +72,7 @@ describe("compiler: config interpolation", () => {
         two: "/two",
       });
 
-      deepStrictEqual(resolved, {
+      assert.deepStrictEqual(resolved, {
         one: "/two/one",
         two: "/two",
       });
@@ -85,7 +85,7 @@ describe("compiler: config interpolation", () => {
         two: "{three}/two",
       });
 
-      deepStrictEqual(resolved, {
+      assert.deepStrictEqual(resolved, {
         one: "/three/two/one",
         two: "/three/two",
         three: "/three",
@@ -120,7 +120,7 @@ describe("compiler: config interpolation", () => {
         outputDir: "{cwd}/my-output",
       };
       const resolved = expectExpandConfigVariables(config, { cwd: "/dev/wd" });
-      deepStrictEqual(resolved, {
+      assert.deepStrictEqual(resolved, {
         ...config,
         outputDir: "/dev/wd/my-output",
       });
@@ -133,7 +133,7 @@ describe("compiler: config interpolation", () => {
         outputDir: "{project-root}/my-output",
       };
       const resolved = expectExpandConfigVariables(config, { cwd: "/dev/wd" });
-      deepStrictEqual(resolved, {
+      assert.deepStrictEqual(resolved, {
         ...config,
         outputDir: "/dev/ws/my-output",
       });
@@ -154,7 +154,7 @@ describe("compiler: config interpolation", () => {
         },
       };
       const resolved = expectExpandConfigVariables(config, { cwd: "/dev/wd" });
-      deepStrictEqual(resolved, {
+      assert.deepStrictEqual(resolved, {
         ...config,
         outputDir: "nested/test/my-output",
       });
@@ -176,7 +176,7 @@ describe("compiler: config interpolation", () => {
         },
       };
       const resolved = expectExpandConfigVariables(config, { cwd: "/dev/wd" });
-      deepStrictEqual(resolved, {
+      assert.deepStrictEqual(resolved, {
         ...config,
         outputDir: "nested/default/my-output",
       });
@@ -198,7 +198,7 @@ describe("compiler: config interpolation", () => {
         const resolved = expectExpandConfigVariables(config, {
           cwd: "/dev/wd",
         });
-        deepStrictEqual(resolved, {
+        assert.deepStrictEqual(resolved, {
           ...config,
           outputDir: "/dev/wd/my-output",
         });
@@ -209,7 +209,7 @@ describe("compiler: config interpolation", () => {
           cwd: "/dev/wd",
           args: { "repo-dir": "/github-dir" },
         });
-        deepStrictEqual(resolved, {
+        assert.deepStrictEqual(resolved, {
           ...config,
           outputDir: "/github-dir/my-output",
         });
@@ -220,7 +220,7 @@ describe("compiler: config interpolation", () => {
           cwd: "/dev/wd",
           args: { "repo-dir": "{cwd}/github-dir" },
         });
-        deepStrictEqual(resolved, {
+        assert.deepStrictEqual(resolved, {
           ...config,
           outputDir: "/dev/wd/github-dir/my-output",
         });
@@ -243,7 +243,7 @@ describe("compiler: config interpolation", () => {
         const resolved = expectExpandConfigVariables(config, {
           cwd: "/dev/wd",
         });
-        deepStrictEqual(resolved, {
+        assert.deepStrictEqual(resolved, {
           ...config,
           outputDir: "/dev/wd/my-output",
         });
@@ -254,7 +254,7 @@ describe("compiler: config interpolation", () => {
           cwd: "/dev/wd",
           env: { REPO_DIR: "/github-dir" },
         });
-        deepStrictEqual(resolved, {
+        assert.deepStrictEqual(resolved, {
           ...config,
           outputDir: "/github-dir/my-output",
         });
@@ -273,7 +273,7 @@ describe("compiler: config interpolation", () => {
         },
       };
       const resolved = expectExpandConfigVariables(config, { cwd: "/dev/wd" });
-      deepStrictEqual(resolved, {
+      assert.deepStrictEqual(resolved, {
         ...config,
         options: {
           emitter1: {
@@ -296,7 +296,7 @@ describe("compiler: config interpolation", () => {
         },
       };
       const resolved = expectExpandConfigVariables(config, { cwd: "/dev/wd" });
-      deepStrictEqual(resolved, {
+      assert.deepStrictEqual(resolved, {
         ...config,
         options: {
           emitter1: {
