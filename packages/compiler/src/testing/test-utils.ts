@@ -1,4 +1,3 @@
-import { fail, ok } from "assert";
 import { fileURLToPath } from "url";
 import { getTypeName } from "../core/helpers/type-name-utils.js";
 import { NodeHost } from "../core/node-host.js";
@@ -6,6 +5,7 @@ import { CompilerOptions } from "../core/options.js";
 import { resolvePath } from "../core/path-utils.js";
 import type { Type } from "../core/types.js";
 import { findProjectRoot } from "../utils/io.js";
+import { assert } from "./system-assert.js";
 import {
   BasicTestRunner,
   TestHost,
@@ -146,7 +146,7 @@ export function trimBlankLines(code: string) {
 export function expectTypeEquals(actual: Type | undefined, expected: Type) {
   if (actual === expected) return;
 
-  ok(actual, "Expected value to be defined");
+  assert.ok(actual, "Expected value to be defined");
 
   const message = [`Expected type ${getTypeName(actual)} to be ${getTypeName(expected)}:`];
   if (actual.kind !== expected.kind) {
@@ -155,5 +155,5 @@ export function expectTypeEquals(actual: Type | undefined, expected: Type) {
   if ("symbol" in actual && "symbol" in expected) {
     message.push(`symbol: ${expected && actual.symbol === expected.symbol}`);
   }
-  fail(message.join("\n"));
+  assert.fail(message.join("\n"));
 }

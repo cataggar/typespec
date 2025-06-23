@@ -1,4 +1,3 @@
-import assert from "assert";
 import type { RmOptions } from "fs";
 import { readdir, readFile, stat } from "fs/promises";
 import { globby } from "globby";
@@ -14,6 +13,7 @@ import type { CompilerHost, Diagnostic, StringLiteral, Type } from "../core/type
 import { createSourceFile, getSourceFileKindFromExt } from "../index.js";
 import { createStringMap } from "../utils/misc.js";
 import { expectDiagnosticEmpty } from "./expect.js";
+import { assert } from "./system-assert.js";
 import { createTestWrapper, findTestPackageRoot, resolveVirtualPath } from "./test-utils.js";
 import {
   BasicTestRunner,
@@ -305,7 +305,7 @@ async function createTestHostInternal(): Promise<TestHost> {
     testTypes,
     libraries,
     get program() {
-      assert(
+      assert.ok(
         program,
         "Program cannot be accessed without calling compile, diagnose, or compileAndDiagnose.",
       );

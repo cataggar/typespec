@@ -1,4 +1,3 @@
-import { typespecBundlePlugin } from "@typespec/bundler/vite";
 import { defineConfig } from "vite";
 import checker from "vite-plugin-checker";
 import dts from "vite-plugin-dts";
@@ -13,7 +12,6 @@ export default defineConfig({
   },
   optimizeDeps: {},
   plugins: [
-    typespecBundlePlugin({ folderName: "libs", libraries: ["@typespec/compiler"] }),
     dts({
       logLevel: "silent", // checker reports the errors
     }),

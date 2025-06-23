@@ -1,9 +1,9 @@
-import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it, vi } from "vitest";
 import {
   ClientConfigProvider,
   createClientConfigProvider,
 } from "../../src/server/client-config-provider.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 let configProvider: ClientConfigProvider;
 

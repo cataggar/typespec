@@ -1,4 +1,3 @@
-import { ok, strictEqual } from "assert";
 import { applyCodeFix as applyCodeFixReal } from "../core/code-fixes.js";
 import { createDiagnosticCollector } from "../core/diagnostics.js";
 import { createLinterRuleContext } from "../core/linter.js";
@@ -10,6 +9,7 @@ import {
   LinterRuleDefinition,
 } from "../core/types.js";
 import { DiagnosticMatch, expectDiagnosticEmpty, expectDiagnostics } from "./expect.js";
+import { assert } from "./system-assert.js";
 import { resolveVirtualPath, trimBlankLines } from "./test-utils.js";
 import { BasicTestRunner } from "./types.js";
 
@@ -59,7 +59,7 @@ export function createLinterRuleTester(
       async function toEqual(expectedCode: string) {
         const diagnostics = await diagnose(code);
         const codefix = diagnostics[0].codefixes?.find((x) => x.id === fixId);
-        ok(codefix, `Codefix with id "${fixId}" not found.`);
+        assert.ok(codefix, `Codefix with id "${fixId}" not found.`);
         let content: string | undefined;
         const host: CompilerHost = {
           ...runner.program.host,
@@ -70,9 +70,9 @@ export function createLinterRuleTester(
         };
         await applyCodeFixReal(host, codefix);
 
-        ok(content, "No content was written to the host.");
+        assert.ok(content, "No content was written to the host.");
         const offset = runner.fs.get(resolveVirtualPath("./main.tsp"))?.indexOf(code);
-        strictEqual(trimBlankLines(content.slice(offset)), trimBlankLines(expectedCode));
+        assert.strictEqual(trimBlankLines(content.slice(offset)), trimBlankLines(expectedCode));
       }
     }
   }
