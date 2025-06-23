@@ -1,6 +1,4 @@
 import type { RmOptions } from "fs";
-import { fsPromises } from "./system-fs-promises.js";
-import { globby } from "globby";
 import { join } from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 import { logDiagnostics, logVerboseTestOutput } from "../core/diagnostics.js";
@@ -14,6 +12,8 @@ import { createSourceFile, getSourceFileKindFromExt } from "../index.js";
 import { createStringMap } from "../utils/misc.js";
 import { expectDiagnosticEmpty } from "./expect.js";
 import { assert } from "./system-assert.js";
+import { fsPromises } from "./system-fs-promises.js";
+import { systemGlobby } from "./system-globby.js";
 import { createTestWrapper, findTestPackageRoot, resolveVirtualPath } from "./test-utils.js";
 import {
   BasicTestRunner,
@@ -338,7 +338,7 @@ async function createTestHostInternal(): Promise<TestHost> {
 }
 
 export async function findFilesFromPattern(directory: string, pattern: string): Promise<string[]> {
-  return globby(pattern, {
+  return systemGlobby.globby(pattern, {
     cwd: directory,
     onlyFiles: true,
   });

@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "fs/promises";
-import { globby } from "globby";
 import { resolveConfig } from "prettier";
 import { PrettierParserError } from "../formatter/parser.js";
+import { systemGlobby } from "../testing/system-globby.js";
 import { checkFormat, format, getFormatterFromFilename } from "./formatter.js";
 import { createDiagnostic } from "./messages.js";
 import { normalizePath } from "./path-utils.js";
@@ -182,5 +182,5 @@ async function findFiles(include: string[], ignore: string[] = []): Promise<stri
     "!**/node_modules",
     ...ignore.map((x) => `!${normalizePath(x)}`),
   ];
-  return globby(patterns);
+  return systemGlobby.globby(patterns);
 }
