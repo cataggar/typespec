@@ -1,4 +1,3 @@
-import { assert } from "../../src/testing/system-assert.js";
 import { describe, it } from "vitest";
 import {
   ExpandConfigOptions,
@@ -8,6 +7,7 @@ import {
 import { defaultConfig, validateConfigPathsAbsolute } from "../../src/config/config-loader.js";
 import { TypeSpecConfig } from "../../src/config/types.js";
 import { expectDiagnosticEmpty, expectDiagnostics } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: config interpolation", () => {
   describe("resolveValues", () => {
