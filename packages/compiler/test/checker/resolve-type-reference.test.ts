@@ -1,4 +1,4 @@
-import { ok, strictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import {
   BasicTestRunner,
@@ -21,13 +21,13 @@ describe("compiler: resolveTypeReference", () => {
     }
     const [resolved, diagnostics] = runner.program.resolveTypeReference(reference);
     expectDiagnosticEmpty(diagnostics);
-    ok(resolved === target, `Exected to resolve ${reference} to same type as ${code}`);
+    assert.ok(resolved === target, `Exected to resolve ${reference} to same type as ${code}`);
   }
 
   async function diagnoseResolution(reference: string, code: string) {
     await runner.compile(code);
     const [resolved, diagnostics] = runner.program.resolveTypeReference(reference);
-    strictEqual(resolved, undefined);
+    assert.strictEqual(resolved, undefined);
     return diagnostics;
   }
 
@@ -51,7 +51,7 @@ describe("compiler: resolveTypeReference", () => {
     }
     const [resolved, diagnostics] = runner.program.resolveTypeReference("MyModel");
     expectDiagnostics(diagnostics, { severity: "warning", code: "deprecated" });
-    strictEqual(resolved, target);
+    assert.strictEqual(resolved, target);
   });
 
   it("resolve nested namespace", async () => {
