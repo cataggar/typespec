@@ -1,4 +1,4 @@
-import { ok, strictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { it } from "vitest";
 import { isType, isValue } from "../../src/index.js";
 import { expectDiagnostics } from "../../src/testing/expect.js";
@@ -6,32 +6,32 @@ import { compileValueOrType, diagnoseValueOrType } from "./values/utils.js";
 
 it("extends valueof string returns a string value", async () => {
   const entity = await compileValueOrType("valueof string", `"hello"`);
-  ok(isValue(entity));
-  strictEqual(entity.valueKind, "StringValue");
+  assert.ok(isValue(entity));
+  assert.strictEqual(entity.valueKind, "StringValue");
 });
 
 it("extends valueof int32 returns a numeric value", async () => {
   const entity = await compileValueOrType("valueof int32", `123`);
-  ok(isValue(entity));
-  strictEqual(entity.valueKind, "NumericValue");
+  assert.ok(isValue(entity));
+  assert.strictEqual(entity.valueKind, "NumericValue");
 });
 
 it("extends string returns a string literal type", async () => {
   const entity = await compileValueOrType("string", `"hello"`);
-  ok(isType(entity));
-  strictEqual(entity.kind, "String");
+  assert.ok(isType(entity));
+  assert.strictEqual(entity.kind, "String");
 });
 
 it("extends int32 returns a numeric literal type", async () => {
   const entity = await compileValueOrType("int32", `123`);
-  ok(isType(entity));
-  strictEqual(entity.kind, "Number");
+  assert.ok(isType(entity));
+  assert.strictEqual(entity.kind, "Number");
 });
 
 it("value wins over type if both are accepted", async () => {
   const entity = await compileValueOrType("(valueof string) | string", `"hello"`);
-  ok(isValue(entity));
-  strictEqual(entity.valueKind, "StringValue");
+  assert.ok(isValue(entity));
+  assert.strictEqual(entity.valueKind, "StringValue");
 });
 
 it("ambiguous valueof with type option still emit ambiguous error", async () => {
@@ -49,6 +49,6 @@ it("passing an enum member to 'EnumMember | valueof string' pass the type", asyn
     `A.a`,
     `enum A { a }`,
   );
-  ok(isType(entity));
-  strictEqual(entity.kind, "EnumMember");
+  assert.ok(isType(entity));
+  assert.strictEqual(entity.kind, "EnumMember");
 });

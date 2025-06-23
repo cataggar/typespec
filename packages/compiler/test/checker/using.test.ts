@@ -1,4 +1,4 @@
-import { rejects, strictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import { Model } from "../../src/core/types.js";
 import {
@@ -42,7 +42,7 @@ describe("compiler: using statements", () => {
       Y: Model;
     };
 
-    strictEqual(Y.properties.size, 1);
+    assert.strictEqual(Y.properties.size, 1);
   });
 
   it("works in namespaces", async () => {
@@ -73,7 +73,7 @@ describe("compiler: using statements", () => {
       Y: Model;
     };
 
-    strictEqual(Y.properties.size, 1);
+    assert.strictEqual(Y.properties.size, 1);
   });
 
   it("works with dotted namespaces", async () => {
@@ -103,7 +103,7 @@ describe("compiler: using statements", () => {
       Y: Model;
     };
 
-    strictEqual(Y.properties.size, 1);
+    assert.strictEqual(Y.properties.size, 1);
   });
 
   // This is checking a case where when using a namespace it would start linking its content
@@ -156,7 +156,7 @@ describe("compiler: using statements", () => {
       Y: Model;
     };
 
-    strictEqual(Y.properties.size, 1);
+    assert.strictEqual(Y.properties.size, 1);
   });
 
   it("can use 2 namespace with the same last name", async () => {
@@ -496,8 +496,8 @@ describe("compiler: using statements", () => {
     const { B } = (await testHost.compile("./")) as {
       B: Model;
     };
-    strictEqual(B.properties.size, 1);
-    strictEqual(B.properties.get("a")!.type.kind, "Union");
+    assert.strictEqual(B.properties.size, 1);
+    assert.strictEqual(B.properties.get("a")!.type.kind, "Union");
   });
 
   it("usings are local to a file", async () => {
@@ -529,7 +529,7 @@ describe("compiler: using statements", () => {
       `,
     );
 
-    await rejects(testHost.compile("./"));
+    await assert.rejects(testHost.compile("./"));
   });
   it("TypeSpec namespace is automatically using'd", async () => {
     testHost.addTypeSpecFile(

@@ -1,4 +1,4 @@
-import { ok, strictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import { Model, Union, UnionVariant } from "../../src/core/types.js";
 import { TestHost, createTestHost } from "../../src/testing/index.js";
@@ -26,20 +26,20 @@ describe("compiler: union declarations", () => {
     );
 
     const { Foo } = (await testHost.compile("./")) as { Foo: Union };
-    ok(Foo);
-    ok(blues.has(Foo));
-    strictEqual(Foo.variants.size, 2);
+    assert.ok(Foo);
+    assert.ok(blues.has(Foo));
+    assert.strictEqual(Foo.variants.size, 2);
     const varX = Foo.variants.get("x")!;
-    ok(blues.has(varX));
+    assert.ok(blues.has(varX));
     const varY = Foo.variants.get("y")!;
     const varXType = (varX as UnionVariant).type;
     const varYType = (varY as UnionVariant).type;
 
-    strictEqual(varX.kind, "UnionVariant");
-    strictEqual(varY.kind, "UnionVariant");
+    assert.strictEqual(varX.kind, "UnionVariant");
+    assert.strictEqual(varY.kind, "UnionVariant");
 
-    strictEqual(varXType.kind, "Scalar");
-    strictEqual(varYType.kind, "Scalar");
+    assert.strictEqual(varXType.kind, "Scalar");
+    assert.strictEqual(varYType.kind, "Scalar");
   });
 
   it("can omit union variant names", async () => {
@@ -65,13 +65,13 @@ describe("compiler: union declarations", () => {
 
     const { Foo } = (await testHost.compile("./")) as { Foo: Union };
     const variants = Array.from(Foo.variants.values());
-    ok(blues.has(variants[0]));
-    ok(blues.has(variants[1]));
-    ok(blues.has(variants[2]));
+    assert.ok(blues.has(variants[0]));
+    assert.ok(blues.has(variants[1]));
+    assert.ok(blues.has(variants[2]));
 
-    strictEqual(variants[0].name, "x");
-    ok(typeof variants[1].name === "symbol");
-    ok(typeof variants[2].name === "symbol");
+    assert.strictEqual(variants[0].name, "x");
+    assert.ok(typeof variants[1].name === "symbol");
+    assert.ok(typeof variants[2].name === "symbol");
   });
 
   it("can be templated", async () => {
@@ -88,9 +88,9 @@ describe("compiler: union declarations", () => {
     const varX = Foo.variants.get("x")!;
     const varXType = (varX as UnionVariant).type as Model;
 
-    strictEqual(varX.kind, "UnionVariant");
-    strictEqual(varXType.kind, "Scalar");
-    strictEqual(varXType.name, "int32");
+    assert.strictEqual(varX.kind, "UnionVariant");
+    assert.strictEqual(varXType.kind, "Scalar");
+    assert.strictEqual(varXType.name, "int32");
   });
 
   it("reduces union expressions and gives them symbol keys", async () => {
@@ -104,9 +104,9 @@ describe("compiler: union declarations", () => {
 
     const { Foo } = (await testHost.compile("./")) as { Foo: Model };
     const type = Foo.properties.get("x")!.type as Union;
-    strictEqual(type.variants.size, 4);
+    assert.strictEqual(type.variants.size, 4);
     for (const key of type.variants.keys()) {
-      strictEqual(typeof key, "symbol");
+      assert.strictEqual(typeof key, "symbol");
     }
   });
 
@@ -122,9 +122,9 @@ describe("compiler: union declarations", () => {
 
     const { Foo } = (await testHost.compile("./")) as { Foo: Model };
     const type = Foo.properties.get("x")!.type as Union;
-    strictEqual(type.variants.size, 3);
+    assert.strictEqual(type.variants.size, 3);
     for (const key of type.variants.keys()) {
-      strictEqual(typeof key, "symbol");
+      assert.strictEqual(typeof key, "symbol");
     }
   });
 
@@ -138,6 +138,6 @@ describe("compiler: union declarations", () => {
 
     const { Foo } = (await testHost.compile("./")) as { Foo: Model };
     const type = Foo.properties.get("x")!.type as Union;
-    strictEqual(type.variants.size, 1);
+    assert.strictEqual(type.variants.size, 1);
   });
 });
