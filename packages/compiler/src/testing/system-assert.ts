@@ -18,10 +18,6 @@ export interface SystemAssert {
   ): Promise<void>;
   rejects(
     block: (() => Promise<unknown>) | Promise<unknown>,
-    message?: string | Error,
-  ): Promise<void>;
-  rejects(
-    block: (() => Promise<unknown>) | Promise<unknown>,
     error: AssertPredicate,
     message?: string | Error,
   ): Promise<void>;
