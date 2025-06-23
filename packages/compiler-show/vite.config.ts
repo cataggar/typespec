@@ -8,7 +8,17 @@ export default defineConfig({
     minify: false,
     chunkSizeWarningLimit: 3000,
     lib: { entry: { index: "src/index.ts" }, formats: ["es"] },
-    rollupOptions: { output: { manualChunks: undefined, entryFileNames: "[name].bundle.js" } },
+    rollupOptions: {
+      output: { manualChunks: undefined, entryFileNames: "[name].bundle.js" },
+      external: [
+        "@sindresorhus/merge-streams",
+        "unicorn-magic",
+        "url",
+        "fs",
+        "fs/promises",
+        "path",
+      ],
+    },
   },
   optimizeDeps: {},
   plugins: [
