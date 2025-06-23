@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import { Model, StringTemplate } from "../../src/index.js";
 import {
@@ -31,50 +31,50 @@ async function compileStringTemplate(
 
   const prop = Test.properties.get("test")!.type;
 
-  strictEqual(prop.kind, "StringTemplate");
+  assert.strictEqual(prop.kind, "StringTemplate");
   return prop;
 }
 
 it("simple", async () => {
   const template = await compileStringTemplate(`"Start \${123} end"`);
-  strictEqual(template.spans.length, 3);
-  strictEqual(template.spans[0].isInterpolated, false);
-  strictEqual(template.spans[0].type.value, "Start ");
+  assert.strictEqual(template.spans.length, 3);
+  assert.strictEqual(template.spans[0].isInterpolated, false);
+  assert.strictEqual(template.spans[0].type.value, "Start ");
 
-  strictEqual(template.spans[1].isInterpolated, true);
-  strictEqual(template.spans[1].type.kind, "Number");
-  strictEqual(template.spans[1].type.value, 123);
+  assert.strictEqual(template.spans[1].isInterpolated, true);
+  assert.strictEqual(template.spans[1].type.kind, "Number");
+  assert.strictEqual(template.spans[1].type.value, 123);
 
-  strictEqual(template.spans[2].isInterpolated, false);
-  strictEqual(template.spans[2].type.value, " end");
+  assert.strictEqual(template.spans[2].isInterpolated, false);
+  assert.strictEqual(template.spans[2].type.value, " end");
 });
 
 it("string interpolated are marked with isInterpolated", async () => {
   const template = await compileStringTemplate(`"Start \${"interpolate"} end"`);
-  strictEqual(template.spans.length, 3);
-  strictEqual(template.spans[0].isInterpolated, false);
-  strictEqual(template.spans[0].type.value, "Start ");
+  assert.strictEqual(template.spans.length, 3);
+  assert.strictEqual(template.spans[0].isInterpolated, false);
+  assert.strictEqual(template.spans[0].type.value, "Start ");
 
-  strictEqual(template.spans[1].isInterpolated, true);
-  strictEqual(template.spans[1].type.kind, "String");
-  strictEqual(template.spans[1].type.value, "interpolate");
+  assert.strictEqual(template.spans[1].isInterpolated, true);
+  assert.strictEqual(template.spans[1].type.kind, "String");
+  assert.strictEqual(template.spans[1].type.value, "interpolate");
 
-  strictEqual(template.spans[2].isInterpolated, false);
-  strictEqual(template.spans[2].type.value, " end");
+  assert.strictEqual(template.spans[2].isInterpolated, false);
+  assert.strictEqual(template.spans[2].type.value, " end");
 });
 
 it("can interpolate a model", async () => {
   const template = await compileStringTemplate(`"Start \${TestModel} end"`, "model TestModel {}");
-  strictEqual(template.spans.length, 3);
-  strictEqual(template.spans[0].isInterpolated, false);
-  strictEqual(template.spans[0].type.value, "Start ");
+  assert.strictEqual(template.spans.length, 3);
+  assert.strictEqual(template.spans[0].isInterpolated, false);
+  assert.strictEqual(template.spans[0].type.value, "Start ");
 
-  strictEqual(template.spans[1].isInterpolated, true);
-  strictEqual(template.spans[1].type.kind, "Model");
-  strictEqual(template.spans[1].type.name, "TestModel");
+  assert.strictEqual(template.spans[1].isInterpolated, true);
+  assert.strictEqual(template.spans[1].type.kind, "Model");
+  assert.strictEqual(template.spans[1].type.name, "TestModel");
 
-  strictEqual(template.spans[2].isInterpolated, false);
-  strictEqual(template.spans[2].type.value, " end");
+  assert.strictEqual(template.spans[2].isInterpolated, false);
+  assert.strictEqual(template.spans[2].type.value, " end");
 });
 
 // Regression test for https://github.com/microsoft/typespec/issues/7401
