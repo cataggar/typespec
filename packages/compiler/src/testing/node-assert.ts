@@ -3,25 +3,25 @@ import type { SystemAssert } from "./system-assert.js";
 
 // Node.js implementation using built-in 'assert' module
 export const NodeAssert: SystemAssert = {
-  fail(message?: string): never {
+  fail(message) {
     assert.fail(message);
   },
-  strictEqual(actual: any, expected: any, message?: string) {
+  strictEqual(actual, expected, message) {
     assert.strictEqual(actual, expected, message);
   },
-  notStrictEqual(actual: any, expected: any, message?: string) {
+  notStrictEqual(actual, expected, message) {
     assert.notStrictEqual(actual, expected, message);
   },
-  deepStrictEqual(actual: any, expected: any, message?: string) {
+  deepStrictEqual(actual, expected, message) {
     assert.deepStrictEqual(actual, expected, message);
   },
-  match(value: string, regex: RegExp, message?: string) {
-    assert.match(value, regex, message);
+  match(value, regExp, message) {
+    assert.match(value, regExp, message);
   },
-  ok(value: any, message?: string) {
+  ok(value, message) {
     assert.ok(value, message);
   },
-  async rejects(block, message?) {
+  async rejects(block, message) {
     await assert.rejects(block, message);
   },
 };
