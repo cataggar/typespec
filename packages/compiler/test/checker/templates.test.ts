@@ -1,4 +1,3 @@
-import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import { getSourceLocation } from "../../src/core/diagnostics.js";
 import { Diagnostic, Model, Operation, StringLiteral, Type } from "../../src/core/types.js";
@@ -14,6 +13,7 @@ import {
   extractCursor,
   extractSquiggles,
 } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: templates", () => {
   let testHost: TestHost;
@@ -43,7 +43,10 @@ describe("compiler: templates", () => {
     const diagnostics = await testHost.diagnose("main.tsp");
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].code, "invalid-template-args");
-    assert.strictEqual(diagnostics[0].message, "Can't pass template arguments to non-templated type");
+    assert.strictEqual(
+      diagnostics[0].message,
+      "Can't pass template arguments to non-templated type",
+    );
     // Should point to the start of A<string>
     assert.deepStrictEqual(getLineAndCharOfDiagnostic(diagnostics[0]), {
       line: 3,
@@ -64,7 +67,10 @@ describe("compiler: templates", () => {
     const diagnostics = await testHost.diagnose("main.tsp");
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].code, "invalid-template-args");
-    assert.strictEqual(diagnostics[0].message, "Template argument 'T' is required and not specified.");
+    assert.strictEqual(
+      diagnostics[0].message,
+      "Template argument 'T' is required and not specified.",
+    );
     // Should point to the start of A
     assert.deepStrictEqual(getLineAndCharOfDiagnostic(diagnostics[0]), {
       line: 3,
@@ -198,7 +204,10 @@ describe("compiler: templates", () => {
     const diagnostics = await testHost.diagnose("main.tsp");
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].code, "invalid-template-args");
-    assert.strictEqual(diagnostics[0].message, "Template argument 'U' is required and not specified.");
+    assert.strictEqual(
+      diagnostics[0].message,
+      "Template argument 'U' is required and not specified.",
+    );
   });
 
   it("emits diagnostics when non-defaulted template parameter comes after defaulted one", async () => {
