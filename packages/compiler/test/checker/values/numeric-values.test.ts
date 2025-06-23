@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { assert } from "../../../src/testing/system-assert.js";
 import { describe, it } from "vitest";
 import { expectDiagnosticEmpty, expectDiagnostics } from "../../../src/testing/expect.js";
 import { compileValue, diagnoseUsage, diagnoseValue } from "./utils.js";
@@ -28,11 +28,11 @@ const numericScalars = [
 describe("instantiate with constructor", () => {
   it.each(numericScalars)("%s", async (scalarName) => {
     const value = await compileValue(`${scalarName}(123)`);
-    strictEqual(value.valueKind, "NumericValue");
-    strictEqual(value.type.kind, "Scalar");
-    strictEqual(value.type.name, scalarName);
-    strictEqual(value.scalar?.name, scalarName);
-    strictEqual(value.value.asNumber(), 123);
+    assert.strictEqual(value.valueKind, "NumericValue");
+    assert.strictEqual(value.type.kind, "Scalar");
+    assert.strictEqual(value.type.name, scalarName);
+    assert.strictEqual(value.scalar?.name, scalarName);
+    assert.strictEqual(value.value.asNumber(), 123);
   });
 });
 
@@ -40,29 +40,29 @@ describe("implicit type", () => {
   describe("instantiate when type is scalar", () => {
     it.each(numericScalars)("%s", async (scalarName) => {
       const value = await compileValue(`a`, `const a:${scalarName} = 123;`);
-      strictEqual(value.valueKind, "NumericValue");
-      strictEqual(value.type.kind, "Scalar");
-      strictEqual(value.type.name, scalarName);
-      strictEqual(value.scalar?.name, scalarName);
-      strictEqual(value.value.asNumber(), 123);
+      assert.strictEqual(value.valueKind, "NumericValue");
+      assert.strictEqual(value.type.kind, "Scalar");
+      assert.strictEqual(value.type.name, scalarName);
+      assert.strictEqual(value.scalar?.name, scalarName);
+      assert.strictEqual(value.value.asNumber(), 123);
     });
   });
 
   it("doesn't pick scalar if const has no type", async () => {
     const value = await compileValue(`a`, `const a = 123;`);
-    strictEqual(value.valueKind, "NumericValue");
-    strictEqual(value.type.kind, "Number");
-    strictEqual(value.type.valueAsString, "123");
-    strictEqual(value.scalar, undefined);
-    strictEqual(value.value.asNumber(), 123);
+    assert.strictEqual(value.valueKind, "NumericValue");
+    assert.strictEqual(value.type.kind, "Number");
+    assert.strictEqual(value.type.valueAsString, "123");
+    assert.strictEqual(value.scalar, undefined);
+    assert.strictEqual(value.value.asNumber(), 123);
   });
 
   it("instantiate if there is a single numeric option", async () => {
     const value = await compileValue(`a`, `const a: int32 | string = 123;`);
-    strictEqual(value.valueKind, "NumericValue");
-    strictEqual(value.type.kind, "Union");
-    strictEqual(value.scalar?.name, "int32");
-    strictEqual(value.value.asNumber(), 123);
+    assert.strictEqual(value.valueKind, "NumericValue");
+    assert.strictEqual(value.type.kind, "Union");
+    assert.strictEqual(value.scalar?.name, "int32");
+    assert.strictEqual(value.value.asNumber(), 123);
   });
 
   it("emit diagnostics if there is multiple numeric choices", async () => {
@@ -282,11 +282,11 @@ describe("instantiate from another smaller numeric type", () => {
     ["uint32", "numeric"],
   ])("%s → %s", async (a, b) => {
     const value = await compileValue(`${b}(${a}(123))`);
-    strictEqual(value.valueKind, "NumericValue");
-    strictEqual(value.scalar?.name, b);
-    strictEqual(value.type.kind, "Scalar");
-    strictEqual(value.type.name, b);
-    strictEqual(value.value.asNumber(), 123);
+    assert.strictEqual(value.valueKind, "NumericValue");
+    assert.strictEqual(value.scalar?.name, b);
+    assert.strictEqual(value.type.kind, "Scalar");
+    assert.strictEqual(value.type.name, b);
+    assert.strictEqual(value.value.asNumber(), 123);
   });
 });
 
@@ -338,20 +338,20 @@ describe("cannot instantiate from a larger numeric type", () => {
 describe("custom numeric scalars", () => {
   it("instantiates a custom scalar", async () => {
     const value = await compileValue(`int4(2)`, "scalar int4 extends integer;");
-    strictEqual(value.valueKind, "NumericValue");
-    strictEqual(value.type.kind, "Scalar");
-    strictEqual(value.type.name, "int4");
-    strictEqual(value.scalar?.name, "int4");
-    strictEqual(value.value.asNumber(), 2);
+    assert.strictEqual(value.valueKind, "NumericValue");
+    assert.strictEqual(value.type.kind, "Scalar");
+    assert.strictEqual(value.type.name, "int4");
+    assert.strictEqual(value.scalar?.name, "int4");
+    assert.strictEqual(value.value.asNumber(), 2);
   });
 
   describe("using custom min/max values", () => {
     const type = `@minValue(0) @maxValue(15) scalar uint4 extends integer;`;
     it("accept if value within range", async () => {
       const value = await compileValue(`uint4(2)`, type);
-      strictEqual(value.valueKind, "NumericValue");
-      strictEqual(value.scalar?.name, "uint4");
-      strictEqual(value.value.asNumber(), 2);
+      assert.strictEqual(value.valueKind, "NumericValue");
+      assert.strictEqual(value.scalar?.name, "uint4");
+      assert.strictEqual(value.value.asNumber(), 2);
     });
 
     it("emit diagnostic if value is out of range", async () => {

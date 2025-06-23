@@ -1,50 +1,50 @@
-import { strictEqual } from "assert";
+import { assert } from "../../../src/testing/system-assert.js";
 import { describe, it } from "vitest";
 import { expectDiagnostics } from "../../../src/testing/index.js";
 import { compileValue, diagnoseUsage, diagnoseValue } from "./utils.js";
 
 it("no properties", async () => {
   const object = await compileValue(`#{}`);
-  strictEqual(object.valueKind, "ObjectValue");
-  strictEqual(object.properties.size, 0);
+  assert.strictEqual(object.valueKind, "ObjectValue");
+  assert.strictEqual(object.properties.size, 0);
 });
 
 it("single property", async () => {
   const object = await compileValue(`#{name: "John"}`);
-  strictEqual(object.valueKind, "ObjectValue");
-  strictEqual(object.properties.size, 1);
+  assert.strictEqual(object.valueKind, "ObjectValue");
+  assert.strictEqual(object.properties.size, 1);
   const nameProp = object.properties.get("name")?.value;
-  strictEqual(nameProp?.valueKind, "StringValue");
-  strictEqual(nameProp.value, "John");
+  assert.strictEqual(nameProp?.valueKind, "StringValue");
+  assert.strictEqual(nameProp.value, "John");
 });
 
 it("multiple property", async () => {
   const object = await compileValue(`#{name: "John", age: 21}`);
-  strictEqual(object.valueKind, "ObjectValue");
-  strictEqual(object.properties.size, 2);
+  assert.strictEqual(object.valueKind, "ObjectValue");
+  assert.strictEqual(object.properties.size, 2);
 
   const nameProp = object.properties.get("name")?.value;
-  strictEqual(nameProp?.valueKind, "StringValue");
-  strictEqual(nameProp.value, "John");
+  assert.strictEqual(nameProp?.valueKind, "StringValue");
+  assert.strictEqual(nameProp.value, "John");
 
   const ageProp = object.properties.get("age")?.value;
-  strictEqual(ageProp?.valueKind, "NumericValue");
-  strictEqual(ageProp.value.asNumber(), 21);
+  assert.strictEqual(ageProp?.valueKind, "NumericValue");
+  assert.strictEqual(ageProp.value.asNumber(), 21);
 });
 
 describe("spreading", () => {
   it("add the properties", async () => {
     const object = await compileValue(`#{...Common, age: 21}`, `const Common = #{ name: "John" };`);
-    strictEqual(object.valueKind, "ObjectValue");
-    strictEqual(object.properties.size, 2);
+    assert.strictEqual(object.valueKind, "ObjectValue");
+    assert.strictEqual(object.properties.size, 2);
 
     const nameProp = object.properties.get("name")?.value;
-    strictEqual(nameProp?.valueKind, "StringValue");
-    strictEqual(nameProp.value, "John");
+    assert.strictEqual(nameProp?.valueKind, "StringValue");
+    assert.strictEqual(nameProp.value, "John");
 
     const ageProp = object.properties.get("age")?.value;
-    strictEqual(ageProp?.valueKind, "NumericValue");
-    strictEqual(ageProp.value.asNumber(), 21);
+    assert.strictEqual(ageProp?.valueKind, "NumericValue");
+    assert.strictEqual(ageProp.value.asNumber(), 21);
   });
 
   it("override properties defined before if there is a name conflict", async () => {
@@ -52,11 +52,11 @@ describe("spreading", () => {
       `#{name: "John", age: 21, ...Common, }`,
       `const Common = #{ name: "Common" };`,
     );
-    strictEqual(object.valueKind, "ObjectValue");
+    assert.strictEqual(object.valueKind, "ObjectValue");
 
     const nameProp = object.properties.get("name")?.value;
-    strictEqual(nameProp?.valueKind, "StringValue");
-    strictEqual(nameProp.value, "Common");
+    assert.strictEqual(nameProp?.valueKind, "StringValue");
+    assert.strictEqual(nameProp.value, "Common");
   });
 
   it("override properties spread before", async () => {
@@ -64,11 +64,11 @@ describe("spreading", () => {
       `#{...Common, name: "John", age: 21 }`,
       `const Common = #{ name: "John" };`,
     );
-    strictEqual(object.valueKind, "ObjectValue");
+    assert.strictEqual(object.valueKind, "ObjectValue");
 
     const nameProp = object.properties.get("name")?.value;
-    strictEqual(nameProp?.valueKind, "StringValue");
-    strictEqual(nameProp.value, "John");
+    assert.strictEqual(nameProp?.valueKind, "StringValue");
+    assert.strictEqual(nameProp.value, "John");
   });
 
   it("emit diagnostic is spreading a model", async () => {
@@ -102,9 +102,9 @@ describe("valid property types", () => {
     ["ArrayValue", `#["foo"]`],
   ])("%s", async (kind, type, other?) => {
     const object = await compileValue(`#{prop: ${type}}`, other);
-    strictEqual(object.valueKind, "ObjectValue");
+    assert.strictEqual(object.valueKind, "ObjectValue");
     const nameProp = object.properties.get("prop")?.value;
-    strictEqual(nameProp?.valueKind, kind);
+    assert.strictEqual(nameProp?.valueKind, kind);
   });
 });
 

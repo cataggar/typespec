@@ -1,7 +1,7 @@
-import { assert } from "../../src/testing/system-assert.js";
 import { it } from "vitest";
 import { isType, isValue } from "../../src/index.js";
 import { expectDiagnostics } from "../../src/testing/expect.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { compileValueOrType, diagnoseValueOrType } from "./values/utils.js";
 
 it("extends valueof string returns a string value", async () => {

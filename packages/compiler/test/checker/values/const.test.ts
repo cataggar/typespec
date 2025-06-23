@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { assert } from "../../../src/testing/system-assert.js";
 import { describe, it } from "vitest";
 import { NumericValue } from "../../../src/index.js";
 import { expectDiagnostics } from "../../../src/testing/expect.js";
@@ -13,25 +13,25 @@ describe("without type it use the most precise type", () => {
     [`#["abc"]`, "Tuple"],
   ])("%s => %s", async (input, kind) => {
     const value = await compileValue("a", `const a = ${input};`);
-    strictEqual(value.type.kind, kind);
+    assert.strictEqual(value.type.kind, kind);
   });
 });
 
 it("when assigning another const a primitive value that didn't figure out the scalar it resolved it then", async () => {
   const value = (await compileValue("b", `const a = 123;const b: int64 = a;`)) as NumericValue;
-  strictEqual(value.scalar?.kind, "Scalar");
-  strictEqual(value.scalar.name, "int64");
+  assert.strictEqual(value.scalar?.kind, "Scalar");
+  assert.strictEqual(value.scalar.name, "int64");
 });
 
 it("when assigning another const it change the type", async () => {
   const value = await compileValue("b", `const a: int32 = 123;const b: int64 = a;`);
-  strictEqual(value.type.kind, "Scalar");
-  strictEqual(value.type.name, "int64");
+  assert.strictEqual(value.type.kind, "Scalar");
+  assert.strictEqual(value.type.name, "int64");
 });
 
 it("declare const in namespace", async () => {
   const value = (await compileValue("Data.a", `namespace Data {const a = 123;}`)) as NumericValue;
-  strictEqual(value.value.asNumber(), 123);
+  assert.strictEqual(value.value.asNumber(), 123);
 });
 
 describe("invalid assignment", () => {

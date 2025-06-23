@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { assert } from "../../../src/testing/system-assert.js";
 import { describe, expect, it } from "vitest";
 import { expectDiagnostics } from "../../../src/testing/expect.js";
 import { compileValue, diagnoseValue } from "./utils.js";
@@ -13,11 +13,11 @@ describe("instantiate with named constructor", () => {
 
   it("with single arg", async () => {
     const value = await compileValue(`ipv4.fromString("0.0.1.1")`, ipv4Code);
-    strictEqual(value.valueKind, "ScalarValue");
-    strictEqual(value.type.kind, "Scalar");
-    strictEqual(value.type.name, "ipv4");
-    strictEqual(value.scalar?.name, "ipv4");
-    strictEqual(value.value.name, "fromString");
+    assert.strictEqual(value.valueKind, "ScalarValue");
+    assert.strictEqual(value.type.kind, "Scalar");
+    assert.strictEqual(value.type.name, "ipv4");
+    assert.strictEqual(value.scalar?.name, "ipv4");
+    assert.strictEqual(value.value.name, "fromString");
     expect(value.value.args).toEqual([
       expect.objectContaining({
         value: "0.0.1.1",
@@ -28,11 +28,11 @@ describe("instantiate with named constructor", () => {
 
   it("with multiple args", async () => {
     const value = await compileValue(`ipv4.fromBytes(0, 0, 1, 1)`, ipv4Code);
-    strictEqual(value.valueKind, "ScalarValue");
-    strictEqual(value.type.kind, "Scalar");
-    strictEqual(value.type.name, "ipv4");
-    strictEqual(value.scalar?.name, "ipv4");
-    strictEqual(value.value.name, "fromBytes");
+    assert.strictEqual(value.valueKind, "ScalarValue");
+    assert.strictEqual(value.type.kind, "Scalar");
+    assert.strictEqual(value.type.name, "ipv4");
+    assert.strictEqual(value.scalar?.name, "ipv4");
+    assert.strictEqual(value.value.name, "fromBytes");
     expect(value.value.args).toEqual([
       expect.objectContaining({
         valueKind: "NumericValue",
@@ -57,11 +57,11 @@ describe("instantiate with named constructor", () => {
       scalar b extends a { }
     `,
     );
-    strictEqual(value.valueKind, "ScalarValue");
-    strictEqual(value.type.kind, "Scalar");
-    strictEqual(value.type.name, "b");
-    strictEqual(value.scalar?.name, "b");
-    strictEqual(value.value.name, "fromString");
+    assert.strictEqual(value.valueKind, "ScalarValue");
+    assert.strictEqual(value.type.kind, "Scalar");
+    assert.strictEqual(value.type.name, "b");
+    assert.strictEqual(value.scalar?.name, "b");
+    assert.strictEqual(value.value.name, "fromString");
   });
 
   it("instantiate from another scalar", async () => {
@@ -72,16 +72,16 @@ describe("instantiate with named constructor", () => {
       scalar b { init fromA(val: a);}
     `,
     );
-    strictEqual(value.valueKind, "ScalarValue");
-    strictEqual(value.type.kind, "Scalar");
-    strictEqual(value.type.name, "b");
-    strictEqual(value.scalar?.name, "b");
-    strictEqual(value.value.name, "fromA");
+    assert.strictEqual(value.valueKind, "ScalarValue");
+    assert.strictEqual(value.type.kind, "Scalar");
+    assert.strictEqual(value.type.name, "b");
+    assert.strictEqual(value.scalar?.name, "b");
+    assert.strictEqual(value.value.name, "fromA");
     expect(value.value.args).toHaveLength(1);
     const arg = value.value.args[0];
-    strictEqual(arg.valueKind, "ScalarValue");
-    strictEqual(arg.type.kind, "Scalar");
-    strictEqual(arg.type.name, "a");
+    assert.strictEqual(arg.valueKind, "ScalarValue");
+    assert.strictEqual(arg.type.kind, "Scalar");
+    assert.strictEqual(arg.type.name, "a");
   });
 
   it("emit warning if passing wrong type to constructor", async () => {
@@ -118,8 +118,8 @@ describe("instantiate with named constructor", () => {
           }
         `,
       );
-      strictEqual(value.valueKind, "ScalarValue");
-      strictEqual(value.value.name, "fromItems");
+      assert.strictEqual(value.valueKind, "ScalarValue");
+      assert.strictEqual(value.value.name, "fromItems");
       expect(value.value.args).toHaveLength(1);
     });
     it("allow providing it", async () => {
@@ -131,8 +131,8 @@ describe("instantiate with named constructor", () => {
           }
         `,
       );
-      strictEqual(value.valueKind, "ScalarValue");
-      strictEqual(value.value.name, "fromItems");
+      assert.strictEqual(value.valueKind, "ScalarValue");
+      assert.strictEqual(value.value.name, "fromItems");
       expect(value.value.args).toHaveLength(2);
     });
 
@@ -161,8 +161,8 @@ describe("instantiate with named constructor", () => {
           }
         `,
       );
-      strictEqual(value.valueKind, "ScalarValue");
-      strictEqual(value.value.name, "fromItems");
+      assert.strictEqual(value.valueKind, "ScalarValue");
+      assert.strictEqual(value.value.name, "fromItems");
       expect(value.value.args).toHaveLength(3);
     });
 
@@ -175,8 +175,8 @@ describe("instantiate with named constructor", () => {
           }
         `,
       );
-      strictEqual(value.valueKind, "ScalarValue");
-      strictEqual(value.value.name, "fromItems");
+      assert.strictEqual(value.valueKind, "ScalarValue");
+      assert.strictEqual(value.value.name, "fromItems");
       expect(value.value.args).toHaveLength(3);
     });
 
