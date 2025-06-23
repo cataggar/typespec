@@ -1,4 +1,3 @@
-import { ok, strictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
 import { Model, ModelProperty } from "../../src/index.js";
 import {
@@ -8,6 +7,7 @@ import {
   expectDiagnostics,
   extractSquiggles,
 } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: intersections", () => {
   let runner: BasicTestRunner;
@@ -25,10 +25,10 @@ describe("compiler: intersections", () => {
     `)) as { prop: ModelProperty };
 
     const propType = prop.type;
-    strictEqual(propType.kind, "Model");
-    strictEqual(propType.properties.size, 2);
-    ok(propType.properties.has("a"));
-    ok(propType.properties.has("b"));
+    assert.strictEqual(propType.kind, "Model");
+    assert.strictEqual(propType.properties.size, 2);
+    assert.ok(propType.properties.has("a"));
+    assert.ok(propType.properties.has("b"));
   });
 
   it("keeps reference to source model in sourceModels", async () => {
@@ -44,12 +44,12 @@ describe("compiler: intersections", () => {
       prop: ModelProperty;
     };
     const intersection = prop.type;
-    strictEqual(intersection.kind, "Model");
+    assert.strictEqual(intersection.kind, "Model");
     expect(intersection.sourceModels).toHaveLength(2);
-    strictEqual(intersection.sourceModels[0].model, A);
-    strictEqual(intersection.sourceModels[0].usage, "intersection");
-    strictEqual(intersection.sourceModels[1].model, B);
-    strictEqual(intersection.sourceModels[1].usage, "intersection");
+    assert.strictEqual(intersection.sourceModels[0].model, A);
+    assert.strictEqual(intersection.sourceModels[0].usage, "intersection");
+    assert.strictEqual(intersection.sourceModels[1].model, B);
+    assert.strictEqual(intersection.sourceModels[1].usage, "intersection");
   });
 
   it("intersection type belong to namespace it is declared in", async () => {
@@ -68,9 +68,9 @@ describe("compiler: intersections", () => {
     `)) as { Foo: Model };
 
     const prop = Foo.properties.get("prop")!.type as Model;
-    strictEqual(prop.kind, "Model");
-    ok(prop.namespace);
-    strictEqual(prop.namespace.name, "C");
+    assert.strictEqual(prop.kind, "Model");
+    assert.ok(prop.namespace);
+    assert.strictEqual(prop.namespace.name, "C");
   });
 
   it("allow intersections of template params", async () => {
@@ -85,10 +85,10 @@ describe("compiler: intersections", () => {
 
     const Bar = Foo.properties.get("prop")!.type as Model;
     const prop = Bar.properties.get("prop")!.type as Model;
-    strictEqual(prop.kind, "Model");
-    strictEqual(prop.properties.size, 2);
-    ok(prop.properties.has("a"));
-    ok(prop.properties.has("b"));
+    assert.strictEqual(prop.kind, "Model");
+    assert.strictEqual(prop.properties.size, 2);
+    assert.ok(prop.properties.has("a"));
+    assert.ok(prop.properties.has("b"));
   });
 
   it("emit diagnostic if one of the intersected type is not a model", async () => {
