@@ -1,7 +1,7 @@
-import assert, { notStrictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { Model } from "../../src/core/types.js";
 import { TestHost, createTestHost } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: global namespace", () => {
   let testHost: TestHost;
@@ -17,7 +17,7 @@ describe("compiler: global namespace", () => {
       await testHost.compile("./");
 
       const globalNamespaceType = testHost.program.checker.getGlobalNamespaceType();
-      assert(
+      assert.ok(
         globalNamespaceType?.namespaces.get("Foo"),
         "Namespace Foo was added to global namespace type",
       );
@@ -29,7 +29,7 @@ describe("compiler: global namespace", () => {
       await testHost.compile("./");
 
       const globalNamespaceType = testHost.program.checker.getGlobalNamespaceType();
-      assert(
+      assert.ok(
         globalNamespaceType?.models.get("MyModel"),
         "model MyModel was added to global namespace type",
       );
@@ -41,7 +41,7 @@ describe("compiler: global namespace", () => {
       await testHost.compile("./");
 
       const globalNamespaceType = testHost.program.checker.getGlobalNamespaceType();
-      assert(
+      assert.ok(
         globalNamespaceType?.operations.get("myOperation"),
         "operation myOperation was added to global namespace type",
       );
@@ -66,11 +66,11 @@ describe("compiler: global namespace", () => {
       await testHost.compile("./");
 
       const globalNamespaceType = testHost.program.checker.getGlobalNamespaceType();
-      assert(
+      assert.ok(
         globalNamespaceType?.namespaces.get("Foo"),
         "Namespace Foo was added to global namespace type",
       );
-      assert(
+      assert.ok(
         globalNamespaceType?.models.get("Base"),
         "Should still reference main file top-level entities",
       );
@@ -82,7 +82,7 @@ describe("compiler: global namespace", () => {
       await testHost.compile("./");
 
       const globalNamespaceType = testHost.program.checker.getGlobalNamespaceType();
-      assert(
+      assert.ok(
         globalNamespaceType?.models.get("MyModel"),
         "model MyModel was added to global namespace type",
       );
@@ -94,7 +94,7 @@ describe("compiler: global namespace", () => {
       await testHost.compile("./");
 
       const globalNamespaceType = testHost.program.checker.getGlobalNamespaceType();
-      assert(
+      assert.ok(
         globalNamespaceType?.operations.get("myOperation"),
         "operation myOperation was added to global namespace type",
       );
@@ -105,6 +105,6 @@ describe("compiler: global namespace", () => {
     testHost.addTypeSpecFile("./main.tsp", `@test model int32 { x: TypeSpec.int32 }`);
 
     const { int32 } = (await testHost.compile("./")) as { int32: Model };
-    notStrictEqual(int32, int32.properties.get("x")!.type);
+    assert.notStrictEqual(int32, int32.properties.get("x")!.type);
   });
 });
