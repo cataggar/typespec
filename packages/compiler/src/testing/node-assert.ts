@@ -24,4 +24,7 @@ export const NodeAssert: SystemAssert = {
   async rejects(block, message) {
     await assert.rejects(block, message);
   },
+  equal(actual, expected, message) {
+    assert.equal(actual, expected, message);
+  },
 };

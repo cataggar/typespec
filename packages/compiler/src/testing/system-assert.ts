@@ -9,6 +9,7 @@ export interface SystemAssert {
     block: (() => Promise<unknown>) | Promise<unknown>,
     message?: string | Error,
   ): Promise<void>;
+  equal(actual: unknown, expected: unknown, message?: string | Error): void;
 }
 
 let assert: SystemAssert;
