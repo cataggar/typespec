@@ -1,8 +1,8 @@
-import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { DecoratorContext, Enum, EnumMember, Model, Type } from "../../src/core/types.js";
 import { getDoc } from "../../src/index.js";
 import { TestHost, createTestHost, expectDiagnostics } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: enums", () => {
   let testHost: TestHost;
@@ -25,10 +25,10 @@ describe("compiler: enums", () => {
       E: Enum;
     };
 
-    ok(E);
-    ok(!E.members.get("A")!.value);
-    ok(!E.members.get("B")!.value);
-    ok(!E.members.get("C")!.value);
+    assert.ok(E);
+    assert.ok(!E.members.get("A")!.value);
+    assert.ok(!E.members.get("B")!.value);
+    assert.ok(!E.members.get("C")!.value);
   });
 
   it("can have values", async () => {
@@ -50,10 +50,10 @@ describe("compiler: enums", () => {
       C: EnumMember;
     };
 
-    ok(E);
-    strictEqual(A.value, "a");
-    strictEqual(B.value, "b");
-    strictEqual(C.value, "c");
+    assert.ok(E);
+    assert.strictEqual(A.value, "a");
+    assert.strictEqual(B.value, "b");
+    assert.strictEqual(C.value, "c");
   });
 
   it("can be a model property", async () => {
@@ -72,8 +72,8 @@ describe("compiler: enums", () => {
       Foo: Model;
     };
 
-    ok(Foo);
-    strictEqual(Foo.properties.get("prop")!.type.kind, "Enum");
+    assert.ok(Foo);
+    assert.strictEqual(Foo.properties.get("prop")!.type.kind, "Enum");
   });
 
   it("can't have duplicate variants", async () => {
@@ -109,17 +109,17 @@ describe("compiler: enums", () => {
       Foo: Enum;
       Bar: Enum;
     };
-    ok(Foo);
-    ok(Bar);
+    assert.ok(Foo);
+    assert.ok(Bar);
 
-    strictEqual(Foo.members.size, 3);
-    strictEqual(Foo.members.get("One")!.name, "One");
-    strictEqual(Foo.members.get("One")!.enum, Foo);
-    strictEqual(Foo.members.get("One")!.sourceMember, Bar.members.get("One"));
+    assert.strictEqual(Foo.members.size, 3);
+    assert.strictEqual(Foo.members.get("One")!.name, "One");
+    assert.strictEqual(Foo.members.get("One")!.enum, Foo);
+    assert.strictEqual(Foo.members.get("One")!.sourceMember, Bar.members.get("One"));
 
-    strictEqual(Bar.members.size, 2);
-    strictEqual(Bar.members.get("One")!.name, "One");
-    strictEqual(Bar.members.get("One")!.enum, Bar);
+    assert.strictEqual(Bar.members.size, 2);
+    assert.strictEqual(Bar.members.get("One")!.name, "One");
+    assert.strictEqual(Bar.members.get("One")!.enum, Bar);
   });
 
   // Issue here was the same EnumType was create twice for each decorator on different namespaces causing equality issues when comparing the enum or enum member
@@ -153,9 +153,9 @@ describe("compiler: enums", () => {
 
     await testHost.compile("./");
 
-    ok(refViaMyService);
-    ok(refViaMyLib);
-    strictEqual(refViaMyService, refViaMyLib);
+    assert.ok(refViaMyService);
+    assert.ok(refViaMyLib);
+    assert.strictEqual(refViaMyService, refViaMyLib);
   });
 
   it("can decorate spread member independently", async () => {
@@ -172,7 +172,7 @@ describe("compiler: enums", () => {
       Base: Enum;
       Spread: Enum;
     };
-    strictEqual(getDoc(testHost.program, Spread.members.get("one")!), "override for spread");
-    strictEqual(getDoc(testHost.program, Base.members.get("one")!), "base doc");
+    assert.strictEqual(getDoc(testHost.program, Spread.members.get("one")!), "override for spread");
+    assert.strictEqual(getDoc(testHost.program, Base.members.get("one")!), "base doc");
   });
 });
