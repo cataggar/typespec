@@ -1,4 +1,3 @@
-import { assert } from "../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import {
   Enum,
@@ -12,6 +11,7 @@ import {
   isTemplateInstance,
 } from "../src/index.js";
 import { BasicTestRunner, createTestRunner } from "../src/testing/index.js";
+import { assert } from "../src/testing/system-assert.js";
 
 describe("compiler: type-utils", () => {
   let runner: BasicTestRunner;
@@ -128,7 +128,10 @@ describe("compiler: type-utils", () => {
       ];
 
       for (const [name, type] of candidates) {
-        assert.ok(isDeclaredInNamespace(type, Alpha), `${name} was not found recursively under Alpha`);
+        assert.ok(
+          isDeclaredInNamespace(type, Alpha),
+          `${name} was not found recursively under Alpha`,
+        );
         assert.ok(isDeclaredInNamespace(type, SubAlpha), `${name} was not found under SubAlpha`);
         assert.ok(
           !isDeclaredInNamespace(type, Alpha, { recursive: false }),
