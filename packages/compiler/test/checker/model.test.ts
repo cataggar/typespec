@@ -1,4 +1,3 @@
-import { deepStrictEqual, match, ok, strictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
 import { isTemplateDeclaration } from "../../src/core/type-utils.js";
 import { Model, ModelProperty, Type } from "../../src/core/types.js";
@@ -16,6 +15,7 @@ import {
   expectDiagnostics,
   extractCursor,
 } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: models", () => {
   let testHost: TestHost;
@@ -52,8 +52,8 @@ describe("compiler: models", () => {
       C: Model;
     };
 
-    strictEqual(t1, B);
-    strictEqual(t2, C);
+    assert.strictEqual(t1, B);
+    assert.strictEqual(t2, C);
   });
 
   it("doesn't allow duplicate properties", async () => {
@@ -64,8 +64,8 @@ describe("compiler: models", () => {
       `,
     );
     const diagnostics = await testHost.diagnose("main.tsp");
-    strictEqual(diagnostics.length, 1);
-    match(diagnostics[0].message, /Model already has a property/);
+    assert.strictEqual(diagnostics.length, 1);
+    assert.match(diagnostics[0].message, /Model already has a property/);
   });
 
   it("emit single error when there is an invalid ref in a templated type", async () => {
@@ -107,7 +107,7 @@ describe("compiler: models", () => {
           `,
         );
         const { foo } = (await testHost.compile("main.tsp")) as { foo: ModelProperty };
-        strictEqual(foo.defaultValue?.valueKind, expectedValue.kind);
+        assert.strictEqual(foo.defaultValue?.valueKind, expectedValue.kind);
         expect((foo.defaultValue as any).value).toMatchObject(expectedValue.value);
       });
 
@@ -119,7 +119,7 @@ describe("compiler: models", () => {
         `,
         );
         const { foo } = (await testHost.compile("main.tsp")) as { foo: ModelProperty };
-        strictEqual(foo.defaultValue?.valueKind, "ArrayValue");
+        assert.strictEqual(foo.defaultValue?.valueKind, "ArrayValue");
       });
 
       it(`foo?: {name: string} = #{name: "abc"}`, async () => {
@@ -130,7 +130,7 @@ describe("compiler: models", () => {
         `,
         );
         const { foo } = (await testHost.compile("main.tsp")) as { foo: ModelProperty };
-        strictEqual(foo.defaultValue?.valueKind, "ObjectValue");
+        assert.strictEqual(foo.defaultValue?.valueKind, "ObjectValue");
       });
 
       it(`assign scalar for primitive types if not yet`, async () => {
@@ -142,9 +142,9 @@ describe("compiler: models", () => {
         `,
         );
         const { foo } = (await testHost.compile("main.tsp")) as { foo: ModelProperty };
-        strictEqual(foo.defaultValue?.valueKind, "NumericValue");
-        strictEqual(foo.defaultValue.scalar?.kind, "Scalar");
-        strictEqual(foo.defaultValue.scalar?.name, "int32");
+        assert.strictEqual(foo.defaultValue?.valueKind, "NumericValue");
+        assert.strictEqual(foo.defaultValue.scalar?.kind, "Scalar");
+        assert.strictEqual(foo.defaultValue.scalar?.name, "int32");
       });
 
       it(`foo?: Enum = Enum.up`, async () => {
@@ -156,9 +156,9 @@ describe("compiler: models", () => {
         `,
         );
         const { foo } = (await testHost.compile("main.tsp")) as { foo: ModelProperty };
-        strictEqual(foo.defaultValue?.valueKind, "EnumValue");
-        deepStrictEqual(foo.defaultValue?.value.kind, "EnumMember");
-        deepStrictEqual(foo.defaultValue?.value.name, "up");
+        assert.strictEqual(foo.defaultValue?.valueKind, "EnumValue");
+        assert.deepStrictEqual(foo.defaultValue?.value.kind, "EnumMember");
+        assert.deepStrictEqual(foo.defaultValue?.value.name, "up");
       });
 
       it(`foo?: Union = Union.up`, async () => {
@@ -170,8 +170,8 @@ describe("compiler: models", () => {
         `,
         );
         const { foo } = (await testHost.compile("main.tsp")) as { foo: ModelProperty };
-        strictEqual(foo.defaultValue?.valueKind, "StringValue");
-        deepStrictEqual(foo.defaultValue?.value, "up-value");
+        assert.strictEqual(foo.defaultValue?.valueKind, "StringValue");
+        assert.deepStrictEqual(foo.defaultValue?.value, "up-value");
       });
     });
 
@@ -185,7 +185,7 @@ describe("compiler: models", () => {
         `,
         );
         const { foo } = (await testHost.compile("main.tsp")) as { foo: ModelProperty };
-        strictEqual(foo.defaultValue?.valueKind, "StringValue");
+        assert.strictEqual(foo.defaultValue?.valueKind, "StringValue");
       });
 
       it(`error if constraint is not compatible with property type`, async () => {
@@ -276,8 +276,8 @@ describe("compiler: models", () => {
 
       const { A, B } = (await testHost.compile("./")) as { A: Model; B: Model };
 
-      strictEqual(A.properties.get("pA")?.model, A);
-      strictEqual(B.properties.get("pB")?.model, B);
+      assert.strictEqual(A.properties.get("pA")?.model, A);
+      assert.strictEqual(B.properties.get("pB")?.model, B);
     });
 
     it("property merged via intersection", async () => {
@@ -297,9 +297,9 @@ describe("compiler: models", () => {
       const { Test } = (await testHost.compile("main.tsp")) as { Test: Model };
       const AB = Test.properties.get("prop")?.type;
 
-      strictEqual(AB?.kind, "Model" as const);
-      strictEqual(AB.properties.get("a")?.model, AB);
-      strictEqual(AB.properties.get("b")?.model, AB);
+      assert.strictEqual(AB?.kind, "Model" as const);
+      assert.strictEqual(AB.properties.get("a")?.model, AB);
+      assert.strictEqual(AB.properties.get("b")?.model, AB);
     });
 
     it("property copied via spread", async () => {
@@ -314,7 +314,7 @@ describe("compiler: models", () => {
       `,
       );
       const { Test } = (await testHost.compile("main.tsp")) as { Test: Model };
-      strictEqual(Test.properties.get("prop")?.model, Test);
+      assert.strictEqual(Test.properties.get("prop")?.model, Test);
     });
 
     it("property copied via `is`", async () => {
@@ -329,7 +329,7 @@ describe("compiler: models", () => {
       `,
       );
       const { Test } = (await testHost.compile("main.tsp")) as { Test: Model };
-      strictEqual(Test.properties.get("prop")?.model, Test);
+      assert.strictEqual(Test.properties.get("prop")?.model, Test);
     });
   });
 
@@ -512,8 +512,8 @@ describe("compiler: models", () => {
         `,
       );
       const { Widget } = (await testHost.compile("main.tsp")) as { Widget: Model };
-      strictEqual(Widget.decorators.length, 1);
-      strictEqual((Widget.properties.get("h")!.type as any)!.value, "test");
+      assert.strictEqual(Widget.decorators.length, 1);
+      assert.strictEqual((Widget.properties.get("h")!.type as any)!.value, "test");
     });
 
     it("allow intersection of model with overridden property", async () => {
@@ -526,7 +526,10 @@ describe("compiler: models", () => {
         `,
       );
       const { foo } = (await testHost.compile("main.tsp")) as { foo: Operation };
-      strictEqual(((foo.returnType as Model).properties.get("prop")!.type as any)!.value, "test");
+      assert.strictEqual(
+        ((foo.returnType as Model).properties.get("prop")!.type as any)!.value,
+        "test",
+      );
     });
 
     it("allow spreading of model with overridden property", async () => {
@@ -539,7 +542,7 @@ describe("compiler: models", () => {
         `,
       );
       const { Spread } = (await testHost.compile("main.tsp")) as { Spread: Model };
-      strictEqual((Spread.properties.get("h1")!.type as any)!.value, "test");
+      assert.strictEqual((Spread.properties.get("h1")!.type as any)!.value, "test");
     });
 
     it("keeps reference of children", async () => {
@@ -564,10 +567,10 @@ describe("compiler: models", () => {
         Dog: Model;
         Cat: Model;
       };
-      ok(Pet.derivedModels);
-      strictEqual(Pet.derivedModels.length, 2);
-      strictEqual(Pet.derivedModels[0], Cat);
-      strictEqual(Pet.derivedModels[1], Dog);
+      assert.ok(Pet.derivedModels);
+      assert.strictEqual(Pet.derivedModels.length, 2);
+      assert.strictEqual(Pet.derivedModels[0], Cat);
+      assert.strictEqual(Pet.derivedModels[1], Dog);
     });
 
     it("keeps reference of children with templates", async () => {
@@ -596,18 +599,18 @@ describe("compiler: models", () => {
         Dog: Model;
         Cat: Model;
       };
-      strictEqual(Pet.derivedModels.length, 4);
-      strictEqual(Pet.derivedModels[0].name, "TPet");
-      ok(isTemplateDeclaration(Pet.derivedModels[0]));
+      assert.strictEqual(Pet.derivedModels.length, 4);
+      assert.strictEqual(Pet.derivedModels[0].name, "TPet");
+      assert.ok(isTemplateDeclaration(Pet.derivedModels[0]));
 
-      strictEqual(Pet.derivedModels[1].name, "TPet");
-      ok(Pet.derivedModels[1].templateMapper?.args);
-      ok("kind" in Pet.derivedModels[1].templateMapper!.args[0]);
-      strictEqual(Pet.derivedModels[1].templateMapper.args[0].kind, "Scalar");
-      strictEqual(Pet.derivedModels[1].templateMapper.args[0].name, "string");
+      assert.strictEqual(Pet.derivedModels[1].name, "TPet");
+      assert.ok(Pet.derivedModels[1].templateMapper?.args);
+      assert.ok("kind" in Pet.derivedModels[1].templateMapper!.args[0]);
+      assert.strictEqual(Pet.derivedModels[1].templateMapper.args[0].kind, "Scalar");
+      assert.strictEqual(Pet.derivedModels[1].templateMapper.args[0].name, "string");
 
-      strictEqual(Pet.derivedModels[2], Cat);
-      strictEqual(Pet.derivedModels[3], Dog);
+      assert.strictEqual(Pet.derivedModels[2], Cat);
+      assert.strictEqual(Pet.derivedModels[3], Dog);
     });
 
     it("emit error when extends non model", async () => {
@@ -661,8 +664,11 @@ describe("compiler: models", () => {
         `,
       );
       const diagnostics = await testHost.diagnose("main.tsp");
-      strictEqual(diagnostics.length, 1);
-      strictEqual(diagnostics[0].message, "Type 'A' recursively references itself as a base type.");
+      assert.strictEqual(diagnostics.length, 1);
+      assert.strictEqual(
+        diagnostics[0].message,
+        "Type 'A' recursively references itself as a base type.",
+      );
     });
 
     it("emit error when extends circular reference", async () => {
@@ -674,8 +680,11 @@ describe("compiler: models", () => {
         `,
       );
       const diagnostics = await testHost.diagnose("main.tsp");
-      strictEqual(diagnostics.length, 1);
-      strictEqual(diagnostics[0].message, "Type 'A' recursively references itself as a base type.");
+      assert.strictEqual(diagnostics.length, 1);
+      assert.strictEqual(
+        diagnostics[0].message,
+        "Type 'A' recursively references itself as a base type.",
+      );
     });
 
     it("emit error when extends circular reference with alias - case 1", async () => {
@@ -779,7 +788,7 @@ describe("compiler: models", () => {
         `,
       );
       const { A, B } = (await testHost.compile("main.tsp")) as { A: Model; B: Model };
-      strictEqual(B.sourceModel, A);
+      assert.strictEqual(B.sourceModel, A);
     });
 
     it("keeps reference to source model in sourceModels", async () => {
@@ -792,8 +801,8 @@ describe("compiler: models", () => {
       );
       const { A, B } = (await testHost.compile("main.tsp")) as { A: Model; B: Model };
       expect(B.sourceModels).toHaveLength(1);
-      strictEqual(B.sourceModels[0].model, A);
-      strictEqual(B.sourceModels[0].usage, "is");
+      assert.strictEqual(B.sourceModels[0].model, A);
+      assert.strictEqual(B.sourceModels[0].usage, "is");
     });
 
     it("copies decorators", async () => {
@@ -806,8 +815,8 @@ describe("compiler: models", () => {
         `,
       );
       const { B } = (await testHost.compile("main.tsp")) as { B: Model };
-      ok(blues.has(B));
-      ok(reds.has(B));
+      assert.ok(blues.has(B));
+      assert.ok(reds.has(B));
     });
 
     it("copies properties", async () => {
@@ -819,8 +828,8 @@ describe("compiler: models", () => {
         `,
       );
       const { B } = (await testHost.compile("main.tsp")) as { B: Model };
-      ok(B.properties.has("x"));
-      ok(B.properties.has("y"));
+      assert.ok(B.properties.has("x"));
+      assert.ok(B.properties.has("y"));
     });
 
     it("copies heritage", async () => {
@@ -834,8 +843,8 @@ describe("compiler: models", () => {
         `,
       );
       const { A, C } = (await testHost.compile("main.tsp")) as { A: Model; C: Model };
-      strictEqual(C.baseModel, A);
-      strictEqual(A.derivedModels[1], C);
+      assert.strictEqual(C.baseModel, A);
+      assert.strictEqual(A.derivedModels[1], C);
     });
 
     it("model is accept array expression", async () => {
@@ -847,7 +856,7 @@ describe("compiler: models", () => {
         `,
       );
       const { A } = (await testHost.compile("main.tsp")) as { A: Model };
-      ok(isArrayModelType(testHost.program, A));
+      assert.ok(isArrayModelType(testHost.program, A));
     });
 
     it("model is accept array expression of complex type", async () => {
@@ -859,8 +868,8 @@ describe("compiler: models", () => {
         `,
       );
       const { A } = (await testHost.compile("main.tsp")) as { A: Model };
-      ok(isArrayModelType(testHost.program, A));
-      strictEqual(A.indexer.value.kind, "Union");
+      assert.ok(isArrayModelType(testHost.program, A));
+      assert.strictEqual(A.indexer.value.kind, "Union");
     });
 
     it("model is array cannot have properties", async () => {
@@ -905,8 +914,8 @@ describe("compiler: models", () => {
         `,
       );
       const diagnostics = await testHost.diagnose("main.tsp");
-      strictEqual(diagnostics.length, 1);
-      match(diagnostics[0].message, /Model already has a property/);
+      assert.strictEqual(diagnostics.length, 1);
+      assert.match(diagnostics[0].message, /Model already has a property/);
     });
 
     it("emit error when is non model or array", async () => {
@@ -960,8 +969,11 @@ describe("compiler: models", () => {
         `,
       );
       const diagnostics = await testHost.diagnose("main.tsp");
-      strictEqual(diagnostics.length, 1);
-      strictEqual(diagnostics[0].message, "Type 'A' recursively references itself as a base type.");
+      assert.strictEqual(diagnostics.length, 1);
+      assert.strictEqual(
+        diagnostics[0].message,
+        "Type 'A' recursively references itself as a base type.",
+      );
     });
 
     it("emit single error when is itself as a templated with multiple instantiations", async () => {
@@ -994,8 +1006,11 @@ describe("compiler: models", () => {
         `,
       );
       const diagnostics = await testHost.diagnose("main.tsp");
-      strictEqual(diagnostics.length, 1);
-      strictEqual(diagnostics[0].message, "Type 'A' recursively references itself as a base type.");
+      assert.strictEqual(diagnostics.length, 1);
+      assert.strictEqual(
+        diagnostics[0].message,
+        "Type 'A' recursively references itself as a base type.",
+      );
     });
 
     it("emit error when 'is' circular reference via extends", async () => {
@@ -1007,8 +1022,11 @@ describe("compiler: models", () => {
         `,
       );
       const diagnostics = await testHost.diagnose("main.tsp");
-      strictEqual(diagnostics.length, 1);
-      strictEqual(diagnostics[0].message, "Type 'A' recursively references itself as a base type.");
+      assert.strictEqual(diagnostics.length, 1);
+      assert.strictEqual(
+        diagnostics[0].message,
+        "Type 'A' recursively references itself as a base type.",
+      );
     });
 
     it("emit no error when extends has property to base model", async () => {
@@ -1040,13 +1058,13 @@ describe("compiler: models", () => {
         `,
       );
       const { B, C } = await testHost.compile("main.tsp");
-      strictEqual((B as Model).properties.size, 2);
-      strictEqual(((B as Model).properties.get("c")?.type as any).name, "string");
-      strictEqual(((B as Model).properties.get("b")?.type as any).name, "B");
+      assert.strictEqual((B as Model).properties.size, 2);
+      assert.strictEqual(((B as Model).properties.get("c")?.type as any).name, "string");
+      assert.strictEqual(((B as Model).properties.get("b")?.type as any).name, "B");
 
-      strictEqual((C as Model).properties.size, 2);
-      strictEqual(((C as Model).properties.get("c")?.type as any).name, "int32");
-      strictEqual(((C as Model).properties.get("b")?.type as any).name, "B");
+      assert.strictEqual((C as Model).properties.size, 2);
+      assert.strictEqual(((C as Model).properties.get("c")?.type as any).name, "int32");
+      assert.strictEqual(((C as Model).properties.get("b")?.type as any).name, "B");
     });
   });
 
@@ -1065,8 +1083,11 @@ describe("compiler: models", () => {
         Base: Model;
         Spread: Model;
       };
-      strictEqual(getDoc(testHost.program, Spread.properties.get("one")!), "override for spread");
-      strictEqual(getDoc(testHost.program, Base.properties.get("one")!), "base doc");
+      assert.strictEqual(
+        getDoc(testHost.program, Spread.properties.get("one")!),
+        "override for spread",
+      );
+      assert.strictEqual(getDoc(testHost.program, Base.properties.get("one")!), "base doc");
     });
 
     it("keeps reference to source model in sourceModels", async () => {
@@ -1080,10 +1101,10 @@ describe("compiler: models", () => {
       );
       const { A, B, C } = (await testHost.compile("main.tsp")) as { A: Model; B: Model; C: Model };
       expect(C.sourceModels).toHaveLength(2);
-      strictEqual(C.sourceModels[0].model, A);
-      strictEqual(C.sourceModels[0].usage, "spread");
-      strictEqual(C.sourceModels[1].model, B);
-      strictEqual(C.sourceModels[1].usage, "spread");
+      assert.strictEqual(C.sourceModels[0].model, A);
+      assert.strictEqual(C.sourceModels[0].usage, "spread");
+      assert.strictEqual(C.sourceModels[1].model, B);
+      assert.strictEqual(C.sourceModels[1].usage, "spread");
     });
 
     it("can spread a Record<T>", async () => {
@@ -1096,10 +1117,10 @@ describe("compiler: models", () => {
       const { Test } = (await testHost.compile("main.tsp")) as {
         Test: Model;
       };
-      ok(isRecordModelType(testHost.program, Test));
-      strictEqual(Test.indexer?.key.name, "string");
-      strictEqual(Test.indexer?.value.kind, "Scalar");
-      strictEqual(Test.indexer?.value.name, "int32");
+      assert.ok(isRecordModelType(testHost.program, Test));
+      assert.strictEqual(Test.indexer?.key.name, "string");
+      assert.strictEqual(Test.indexer?.value.kind, "Scalar");
+      assert.strictEqual(Test.indexer?.value.name, "int32");
     });
 
     it("can spread a Record<T> with different value than existing props", async () => {
@@ -1115,13 +1136,13 @@ describe("compiler: models", () => {
       const { Test } = (await testHost.compile("main.tsp")) as {
         Test: Model;
       };
-      ok(isRecordModelType(testHost.program, Test));
+      assert.ok(isRecordModelType(testHost.program, Test));
       const nameProp = Test.properties.get("name");
-      strictEqual(nameProp?.type.kind, "Scalar");
-      strictEqual(nameProp?.type.name, "string");
-      strictEqual(Test.indexer?.key.name, "string");
-      strictEqual(Test.indexer?.value.kind, "Scalar");
-      strictEqual(Test.indexer?.value.name, "int32");
+      assert.strictEqual(nameProp?.type.kind, "Scalar");
+      assert.strictEqual(nameProp?.type.name, "string");
+      assert.strictEqual(Test.indexer?.key.name, "string");
+      assert.strictEqual(Test.indexer?.value.kind, "Scalar");
+      assert.strictEqual(Test.indexer?.value.name, "int32");
     });
 
     it("can spread different records", async () => {
@@ -1137,15 +1158,15 @@ describe("compiler: models", () => {
       const { Test } = (await testHost.compile("main.tsp")) as {
         Test: Model;
       };
-      ok(isRecordModelType(testHost.program, Test));
-      strictEqual(Test.indexer?.key.name, "string");
+      assert.ok(isRecordModelType(testHost.program, Test));
+      assert.strictEqual(Test.indexer?.key.name, "string");
       const indexerValue = Test.indexer?.value;
-      strictEqual(indexerValue.kind, "Union");
+      assert.strictEqual(indexerValue.kind, "Union");
       const options = [...indexerValue.variants.values()].map((x) => x.type);
-      strictEqual(options[0].kind, "Scalar");
-      strictEqual(options[0].name, "int32");
-      strictEqual(options[1].kind, "Scalar");
-      strictEqual(options[1].name, "string");
+      assert.strictEqual(options[0].kind, "Scalar");
+      assert.strictEqual(options[0].name, "int32");
+      assert.strictEqual(options[1].kind, "Scalar");
+      assert.strictEqual(options[1].name, "string");
     });
 
     it("emit diagnostic if spreading an T[]", async () => {
