@@ -1,13 +1,13 @@
-import { assert } from "../../src/testing/system-assert.js";
 import { readFile } from "fs/promises";
 import { createRequire } from "module";
-import { dirname, resolve } from "path";
 import { describe, it } from "vitest";
 import vscode_oniguruma from "vscode-oniguruma";
 import vscode_textmate, { IOnigLib, StateStack } from "vscode-textmate";
 import { createSourceFile } from "../../src/core/source-file.js";
 import { TypeSpecScope } from "../../src/server/tmlanguage.js";
 import { SemanticToken, SemanticTokenKind } from "../../src/server/types.js";
+import { assert } from "../../src/testing/system-assert.js";
+import { systemPath } from "../../src/testing/system-path.js";
 import { createTestServerHost } from "../../src/testing/test-server-host.js";
 import { findTestPackageRoot } from "../../src/testing/test-utils.js";
 import { deepEquals } from "../../src/utils/index.js";
@@ -371,7 +371,10 @@ function testColorization(description: string, tokenize: Tokenize) {
       it("fully qualified decorator name", async () => {
         const tokens = await tokenize("@Foo.bar");
         if (tokenize === tokenizeTMLanguage) {
-          assert.deepStrictEqual(tokens, [Token.identifiers.tag("@"), Token.identifiers.tag("Foo.bar")]);
+          assert.deepStrictEqual(tokens, [
+            Token.identifiers.tag("@"),
+            Token.identifiers.tag("Foo.bar"),
+          ]);
         } else {
           assert.deepStrictEqual(tokens, [
             Token.identifiers.tag("@"),
@@ -1226,7 +1229,10 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("object literals", () => {
       it("empty", async () => {
         const tokens = await tokenizeWithConst("#{}");
-        assert.deepStrictEqual(tokens, [Token.punctuation.openHashBrace, Token.punctuation.closeBrace]);
+        assert.deepStrictEqual(tokens, [
+          Token.punctuation.openHashBrace,
+          Token.punctuation.closeBrace,
+        ]);
       });
 
       it("single prop", async () => {
@@ -1488,7 +1494,12 @@ function testColorization(description: string, tokenize: Tokenize) {
           alias A = 1;`,
         );
 
-        assert.deepStrictEqual(tokens, [Token.tspdoc.tag("@"), Token.tspdoc.tag("param"), Token.identifiers.variable("foo"), ...common]);
+        assert.deepStrictEqual(tokens, [
+          Token.tspdoc.tag("@"),
+          Token.tspdoc.tag("param"),
+          Token.identifiers.variable("foo"),
+          ...common,
+        ]);
       });
 
       it("tokenize @template", async () => {
@@ -1500,7 +1511,12 @@ function testColorization(description: string, tokenize: Tokenize) {
           alias A = 1;`,
         );
 
-        assert.deepStrictEqual(tokens, [Token.tspdoc.tag("@"), Token.tspdoc.tag("template"), Token.identifiers.variable("foo"), ...common]);
+        assert.deepStrictEqual(tokens, [
+          Token.tspdoc.tag("@"),
+          Token.tspdoc.tag("template"),
+          Token.identifiers.variable("foo"),
+          ...common,
+        ]);
       });
 
       it("tokenize @prop", async () => {
@@ -1512,7 +1528,12 @@ function testColorization(description: string, tokenize: Tokenize) {
           alias A = 1;`,
         );
 
-        assert.deepStrictEqual(tokens, [Token.tspdoc.tag("@"), Token.tspdoc.tag("prop"), Token.identifiers.variable("foo"), ...common]);
+        assert.deepStrictEqual(tokens, [
+          Token.tspdoc.tag("@"),
+          Token.tspdoc.tag("prop"),
+          Token.identifiers.variable("foo"),
+          ...common,
+        ]);
       });
 
       it("tokenize @returns", async () => {
@@ -1524,7 +1545,11 @@ function testColorization(description: string, tokenize: Tokenize) {
           alias A = 1;`,
         );
 
-        assert.deepStrictEqual(tokens, [Token.tspdoc.tag("@"), Token.tspdoc.tag("returns"), ...common]);
+        assert.deepStrictEqual(tokens, [
+          Token.tspdoc.tag("@"),
+          Token.tspdoc.tag("returns"),
+          ...common,
+        ]);
       });
       it("tokenize @custom", async () => {
         const tokens = await tokenizeDocComment(
@@ -1535,7 +1560,11 @@ function testColorization(description: string, tokenize: Tokenize) {
           alias A = 1;`,
         );
 
-        assert.deepStrictEqual(tokens, [Token.identifiers.tag("@"), Token.identifiers.tag("custom"), ...common]);
+        assert.deepStrictEqual(tokens, [
+          Token.identifiers.tag("@"),
+          Token.identifiers.tag("custom"),
+          ...common,
+        ]);
       });
     });
   });
@@ -1632,7 +1661,9 @@ export async function tokenizeSemantic(input: string): Promise<Token[]> {
 
 async function createOnigLib(): Promise<IOnigLib> {
   const require = createRequire(import.meta.url);
-  const onigWasm = await readFile(`${dirname(require.resolve("vscode-oniguruma"))}/onig.wasm`);
+  const onigWasm = await readFile(
+    `${systemPath.dirname(require.resolve("vscode-oniguruma"))}/onig.wasm`,
+  );
 
   await loadWASM(onigWasm.buffer as any);
 
@@ -1646,7 +1677,7 @@ const registry = new Registry({
   onigLib: createOnigLib(),
   loadGrammar: async () => {
     const data = await readFile(
-      resolve(await findTestPackageRoot(import.meta.url), "dist/typespec.tmLanguage"),
+      systemPath.resolve(await findTestPackageRoot(import.meta.url), "dist/typespec.tmLanguage"),
       "utf-8",
     );
     return parseRawGrammar(data);

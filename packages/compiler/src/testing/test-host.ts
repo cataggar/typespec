@@ -1,5 +1,4 @@
 import type { RmOptions } from "fs";
-import { join } from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 import { logDiagnostics, logVerboseTestOutput } from "../core/diagnostics.js";
 import { createLogger } from "../core/logger/logger.js";
@@ -14,6 +13,7 @@ import { expectDiagnosticEmpty } from "./expect.js";
 import { assert } from "./system-assert.js";
 import { fsPromises } from "./system-fs-promises.js";
 import { systemGlobby } from "./system-globby.js";
+import { systemPath } from "./system-path.js";
 import { createTestWrapper, findTestPackageRoot, resolveVirtualPath } from "./test-utils.js";
 import {
   BasicTestRunner,
@@ -185,8 +185,8 @@ export async function createTestFileSystem(options?: TestHostOptions): Promise<T
   async function addRealFolder(folder: string, existingFolder: string) {
     const entries = await fsPromises.readdir(existingFolder);
     for (const entry of entries) {
-      const existingPath = join(existingFolder, entry);
-      const virtualPath = join(folder, entry);
+      const existingPath = systemPath.join(existingFolder, entry);
+      const virtualPath = systemPath.join(folder, entry);
       const s = await fsPromises.stat(existingPath);
       if (s.isFile()) {
         if (existingPath.endsWith(".js")) {

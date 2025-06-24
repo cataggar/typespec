@@ -1,7 +1,6 @@
 import { Console } from "console";
 import { mkdir, writeFile } from "fs/promises";
 import inspector from "inspector";
-import { join } from "path";
 import { fileURLToPath } from "url";
 import { inspect } from "util";
 import { TextDocument } from "vscode-languageserver-textdocument";
@@ -15,6 +14,7 @@ import {
 } from "vscode-languageserver/node.js";
 import { NodeHost } from "../core/node-host.js";
 import { typespecVersion } from "../manifest.js";
+import { systemPath } from "../testing/system-path.js";
 import { createClientConfigProvider } from "./client-config-provider.js";
 import { createServer } from "./serverlib.js";
 import { CustomRequestName, Server, ServerHost, ServerLog } from "./types.js";
@@ -181,7 +181,10 @@ function profile<T extends (...args: any) => any>(func: T): T {
         profileSession!.post("Profiler.stop", async (err, args) => {
           if (!err && args.profile) {
             await mkdir(profileDir!, { recursive: true });
-            await writeFile(join(profileDir!, name + ".cpuprofile"), JSON.stringify(args.profile));
+            await writeFile(
+              systemPath.join(profileDir!, name + ".cpuprofile"),
+              JSON.stringify(args.profile),
+            );
           }
         });
         return ret;

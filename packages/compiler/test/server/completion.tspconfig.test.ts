@@ -1,7 +1,7 @@
-import { join } from "path";
 import { describe, expect, it } from "vitest";
 import { CompletionList } from "vscode-languageserver/node.js";
 import { extractCursor } from "../../src/testing/source-utils.js";
+import { systemPath } from "../../src/testing/system-path.js";
 import { createTestServerHost } from "../../src/testing/test-server-host.js";
 import { resolveVirtualPath } from "../../src/testing/test-utils.js";
 
@@ -653,7 +653,7 @@ describe("Test package cache cleared properly", () => {
   it("should clear the cache when the file is updated", async () => {
     const { source, pos } = extractCursor(`emit:\n  - ┆`);
     const testHost = await createTestServerHost(undefined);
-    const workspaceFolder = join(__dirname, "./workspace");
+    const workspaceFolder = systemPath.join(__dirname, "./workspace");
     await testHost.addRealFolder("./workspace", workspaceFolder);
     const textDocument = testHost.addOrUpdateDocument("./workspace/tspconfig.yaml", source);
     const { items } = await testHost.server.complete({
@@ -705,11 +705,11 @@ async function complete(
   const { source, pos } = extractCursor(sourceWithCursor);
   const testHost = await createTestServerHost(undefined);
   if (includeWorkspace) {
-    const workspaceFolder = join(__dirname, "./workspace");
+    const workspaceFolder = systemPath.join(__dirname, "./workspace");
     await testHost.addRealFolder("./workspace", workspaceFolder);
   }
   const textDocument = testHost.addOrUpdateDocument(
-    join("./workspace", tspconfigPathUnderWorkspace),
+    systemPath.join("./workspace", tspconfigPathUnderWorkspace),
     source,
   );
   return await testHost.server.complete({

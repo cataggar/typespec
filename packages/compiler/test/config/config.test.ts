@@ -1,4 +1,3 @@
-import { join } from "path";
 import { describe, it } from "vitest";
 import { TypeSpecConfigJsonSchema } from "../../src/config/config-schema.js";
 import { TypeSpecRawConfig, loadTypeSpecConfigForPath } from "../../src/config/index.js";
@@ -7,6 +6,7 @@ import { createJSONSchemaValidator } from "../../src/core/schema-validator.js";
 import { createSourceFile } from "../../src/core/source-file.js";
 import { resolvePath } from "../../src/index.js";
 import { assert } from "../../src/testing/system-assert.js";
+import { systemPath } from "../../src/testing/system-path.js";
 import { findTestPackageRoot } from "../../src/testing/test-utils.js";
 
 const scenarioRoot = resolvePath(
@@ -21,7 +21,7 @@ describe("compiler: config file loading", () => {
       lookup: boolean = true,
       errorIfNotFound: boolean = true,
     ) => {
-      const fullPath = join(scenarioRoot, path);
+      const fullPath = systemPath.join(scenarioRoot, path);
       const { filename, projectRoot, file, ...config } = await loadTypeSpecConfigForPath(
         NodeHost,
         fullPath,
