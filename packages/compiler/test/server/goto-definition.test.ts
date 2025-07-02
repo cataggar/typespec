@@ -1,11 +1,11 @@
-import { pathToFileURL } from "url";
 import { describe, expect, it } from "vitest";
 import { Location } from "vscode-languageserver";
+import { systemUrl } from "../../src/core/system-url.js";
 import { extractCursor, resolveVirtualPath } from "../../src/testing/index.js";
 import { createTestServerHost } from "../../src/testing/test-server-host.js";
 
 function resolveVirtualPathUri(path: string): string {
-  return pathToFileURL(resolveVirtualPath(path)).href;
+  return systemUrl.pathToFileURL(resolveVirtualPath(path)).href;
 }
 
 async function goToDefinitionAtCursor(

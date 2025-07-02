@@ -54,8 +54,7 @@ export default defineConfig({
     rollupOptions: {
       output: { manualChunks: undefined, entryFileNames: "[name].bundle.js" },
       external: (id) =>
-        ["unicorn-magic", "url", "fs", "path"].includes(id) ||
-        /@typespec\/compiler\/node-.*\.js$/.test(id),
+        ["unicorn-magic"].includes(id) || /@typespec\/compiler\/node-.*\.js$/.test(id),
     },
   },
   optimizeDeps: {},

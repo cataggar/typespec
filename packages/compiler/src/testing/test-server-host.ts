@@ -1,8 +1,8 @@
-import { pathToFileURL } from "url";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { Diagnostic, FileChangeType } from "vscode-languageserver/node.js";
 import { parse, visitChildren } from "../core/parser.js";
 import { resolvePath } from "../core/path-utils.js";
+import { systemUrl } from "../core/system-url.js";
 import { IdentifierNode, SyntaxKind } from "../core/types.js";
 import { createClientConfigProvider } from "../server/client-config-provider.js";
 import { Server, ServerHost, createServer } from "../server/index.js";
@@ -76,7 +76,7 @@ export async function createTestServerHost(options?: TestHostOptions & { workspa
       if (path.startsWith("untitled:")) {
         return path;
       }
-      return pathToFileURL(resolveVirtualPath(path)).href;
+      return systemUrl.pathToFileURL(resolveVirtualPath(path)).href;
     },
     async applyEdit(paramOrEdit) {
       if ("changes" in paramOrEdit) {

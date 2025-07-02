@@ -1,5 +1,5 @@
 import { access, readFile, realpath, stat } from "fs/promises";
-import { fileURLToPath, pathToFileURL } from "url";
+import { systemUrl } from "./core/system-url.js";
 import { ResolveModuleHost, resolveModule } from "./module-resolver/module-resolver.js";
 import { systemPath } from "./testing/system-path.js";
 
@@ -18,7 +18,7 @@ export async function runScript(relativePath: string, backupPath: string): Promi
     if (!(await checkFileExists(script)) && backupPath) {
       script = systemPath.join(packageRoot, backupPath);
     }
-    const scriptUrl = pathToFileURL(script).toString();
+    const scriptUrl = systemUrl.pathToFileURL(script).toString();
     await import(scriptUrl);
   } else {
     throw new Error(
@@ -64,5 +64,5 @@ async function resolvePackageRoot(): Promise<string> {
 }
 
 async function getThisPackageRoot() {
-  return systemPath.resolve(await realpath(fileURLToPath(import.meta.url)), "../../..");
+  return systemPath.resolve(await realpath(systemUrl.fileURLToPath(import.meta.url)), "../../..");
 }

@@ -1,7 +1,6 @@
 import { Console } from "console";
 import { mkdir, writeFile } from "fs/promises";
 import inspector from "inspector";
-import { fileURLToPath } from "url";
 import { inspect } from "util";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
@@ -13,6 +12,7 @@ import {
   createConnection,
 } from "vscode-languageserver/node.js";
 import { NodeHost } from "../core/node-host.js";
+import { systemUrl } from "../core/system-url.js";
 import { typespecVersion } from "../manifest.js";
 import { systemPath } from "../testing/system-path.js";
 import { createClientConfigProvider } from "./client-config-provider.js";
@@ -91,7 +91,7 @@ function main() {
   const s = createServer(host, clientConfigProvider);
   server = s;
   s.log({ level: `info`, message: `TypeSpec language server v${typespecVersion}` });
-  s.log({ level: `info`, message: `Module: ${fileURLToPath(import.meta.url)}` });
+  s.log({ level: `info`, message: `Module: ${systemUrl.fileURLToPath(import.meta.url)}` });
   s.log({ level: `info`, message: `Process ID: ${process.pid}` });
   s.log({ level: `info`, message: `Command Line`, detail: process.argv });
 

@@ -1,5 +1,4 @@
 import { readFile } from "fs/promises";
-import { URL } from "url";
 import { describe, it } from "vitest";
 import { isIdentifierContinue, isIdentifierStart } from "../src/core/charcode.js";
 import { DiagnosticHandler } from "../src/core/diagnostics.js";
@@ -15,6 +14,7 @@ import {
   isReservedKeyword,
   isStatementKeyword,
 } from "../src/core/scanner.js";
+import { systemUrl } from "../src/core/system-url.js";
 import { DiagnosticMatch, expectDiagnostics } from "../src/testing/expect.js";
 import { extractSquiggles } from "../src/testing/source-utils.js";
 import { assert } from "../src/testing/system-assert.js";
@@ -522,7 +522,7 @@ describe("compiler: scanner", () => {
   });
 
   it("scans this file", async () => {
-    const text = await readFile(new URL(import.meta.url), "utf-8");
+    const text = await readFile(systemUrl.pathToFileURL(import.meta.url), "utf-8");
     tokens(text, function () {
       /* ignore errors */
     });

@@ -1,4 +1,4 @@
-import { fileURLToPath } from "url";
+import { systemUrl } from "../core/system-url.js";
 import { getTypeName } from "../core/helpers/type-name-utils.js";
 import { NodeHost } from "../core/node-host.js";
 import { CompilerOptions } from "../core/options.js";
@@ -23,7 +23,7 @@ export function resolveVirtualPath(path: string, ...paths: string[]) {
 
 /** Find the package root from the provided file */
 export function findTestPackageRoot(fileUrl: string): Promise<string> {
-  return findProjectRoot(NodeHost.stat, fileURLToPath(fileUrl)) as Promise<string>;
+  return findProjectRoot(NodeHost.stat, systemUrl.fileURLToPath(fileUrl)) as Promise<string>;
 }
 /**
  * Define a test library defaulting to the most common library structure.

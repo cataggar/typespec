@@ -1,13 +1,13 @@
 import { mkdir, readFile, rm, writeFile } from "fs/promises";
-import { fileURLToPath } from "url";
 import { beforeAll, describe, it } from "vitest";
 import { NodeHost } from "../../../src/core/node-host.js";
 import { InvalidEncodingError } from "../../../src/core/node-system-host.js";
+import { systemUrl } from "../../../src/core/system-url.js";
 import { getDirectoryPath, resolvePath } from "../../../src/index.js";
 import { assert } from "../../../src/testing/system-assert.js";
 import { systemPath } from "../../../src/testing/system-path.js";
 
-const __dirname = systemPath.dirname(fileURLToPath(import.meta.url));
+const __dirname = systemPath.dirname(systemUrl.fileURLToPath(import.meta.url));
 
 describe("compiler: node host", () => {
   const fixtureRoot = resolvePath(__dirname, "../../../../temp/test/node-host");

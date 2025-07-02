@@ -1,11 +1,11 @@
 import type { RmOptions } from "fs";
-import { fileURLToPath, pathToFileURL } from "url";
 import { logDiagnostics, logVerboseTestOutput } from "../core/diagnostics.js";
 import { createLogger } from "../core/logger/logger.js";
 import { NodeHost } from "../core/node-host.js";
 import { CompilerOptions } from "../core/options.js";
 import { getAnyExtensionFromPath, resolvePath } from "../core/path-utils.js";
 import { compile as compileProgram, Program } from "../core/program.js";
+import { systemUrl } from "../core/system-url.js";
 import type { CompilerHost, Diagnostic, StringLiteral, Type } from "../core/types.js";
 import { createSourceFile, getSourceFileKindFromExt } from "../index.js";
 import { createStringMap } from "../utils/misc.js";
@@ -143,9 +143,9 @@ function createTestCompilerHost(
 
     logSink: { log: NodeHost.logSink.log },
     mkdirp: async (path: string) => path,
-    fileURLToPath,
+    fileURLToPath: systemUrl.fileURLToPath,
     pathToFileURL(path: string) {
-      return pathToFileURL(path).href;
+      return systemUrl.pathToFileURL(path).href;
     },
 
     ...options?.compilerHostOverrides,
@@ -203,7 +203,7 @@ export async function createTestFileSystem(options?: TestHostOptions): Promise<T
 
   async function addRealJsFile(path: string, existingPath: string) {
     const key = resolveVirtualPath(path);
-    const exports = await import(pathToFileURL(existingPath).href);
+    const exports = await import(systemUrl.pathToFileURL(existingPath).href);
 
     virtualFs.set(key, "");
     jsImports.set(key, exports);

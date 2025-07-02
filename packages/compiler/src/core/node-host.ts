@@ -1,13 +1,16 @@
 import { mkdir, stat } from "fs/promises";
-import { fileURLToPath, pathToFileURL } from "url";
 import { findProjectRoot } from "../utils/io.js";
 import { createConsoleSink } from "./logger/index.js";
 import { NodeSystemHost } from "./node-system-host.js";
 import { joinPaths } from "./path-utils.js";
 import { getSourceFileKindFromExt } from "./source-file.js";
+import { systemUrl } from "./system-url.js";
 import { CompilerHost } from "./types.js";
 
-export const CompilerPackageRoot = (await findProjectRoot(stat, fileURLToPath(import.meta.url)))!;
+export const CompilerPackageRoot = (await findProjectRoot(
+  stat,
+  systemUrl.fileURLToPath(import.meta.url),
+))!;
 
 /**
  * Implementation of the @see CompilerHost using the real file system.
@@ -16,7 +19,7 @@ export const CompilerPackageRoot = (await findProjectRoot(stat, fileURLToPath(im
 export const NodeHost: CompilerHost = {
   ...NodeSystemHost,
   getExecutionRoot: () => CompilerPackageRoot,
-  getJsImport: (path: string) => import(pathToFileURL(path).href),
+  getJsImport: (path: string) => import(systemUrl.pathToFileURL(path).href),
   getLibDirs() {
     const rootDir = this.getExecutionRoot();
     return [joinPaths(rootDir, "lib/std")];
@@ -24,8 +27,8 @@ export const NodeHost: CompilerHost = {
   getSourceFileKind: getSourceFileKindFromExt,
   mkdirp: (path: string) => mkdir(path, { recursive: true }),
   logSink: createConsoleSink(),
-  fileURLToPath,
+  fileURLToPath: systemUrl.fileURLToPath,
   pathToFileURL(path: string) {
-    return pathToFileURL(path).href;
+    return systemUrl.pathToFileURL(path).href;
   },
 };
