@@ -50,9 +50,17 @@ export default defineConfig({
     target: "esnext",
     minify: false,
     chunkSizeWarningLimit: 3000,
-    lib: { entry: { index: "src/index.ts" }, formats: ["es"] },
     rollupOptions: {
-      output: { manualChunks: undefined, entryFileNames: "[name].bundle.js" },
+      input: "src/index.ts",
+      output: {
+        dir: "dist",
+        format: "es",
+        exports: "named",
+        inlineDynamicImports: true,
+        manualChunks: undefined,
+        entryFileNames: "index.js",
+        preserveModules: false,
+      },
       external: (id) =>
         ["unicorn-magic"].includes(id) || /@typespec\/compiler\/node-.*\.js$/.test(id),
     },
@@ -67,7 +75,7 @@ export default defineConfig({
       typescript: true,
     }),
     logBundledFiles(),
-    logBundledSources(),
+    // logBundledSources(),
     logInputFiles(),
   ],
   server: { fs: { strict: false } },
