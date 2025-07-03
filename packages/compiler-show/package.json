@@ -15,9 +15,15 @@
     "@typespec/compiler": "workspace:^"
   },
   "devDependencies": {
-    "typescript": "~5.8.2",
     "@bytecodealliance/jco": "*",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-typescript": "^12.1.4",
     "@typespec/bundler": "workspace:^",
+    "rollup": "^4.44.1",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "typescript": "~5.8.2",
     "vite": "^6.2.7",
     "vite-plugin-checker": "^0.9.1",
     "vite-plugin-dts": "4.5.4"

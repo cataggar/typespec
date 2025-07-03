@@ -56,7 +56,7 @@ export default defineConfig({
         dir: "dist",
         format: "es",
         exports: "named",
-        inlineDynamicImports: true,
+        inlineDynamicImports: false,
         manualChunks: undefined,
         entryFileNames: "index.js",
         preserveModules: false,

@@ -5,16 +5,18 @@ function version(): string {
   return MANIFEST.version;
 }
 
-export async function test() {
+async function test() {
   console.log(`TypeSpec Compiler ${version()}`);
   const runner = await createTestRunner();
   const diagnostics = await runner.compile("model Bar {}");
   console.log(diagnostics);
 }
 
-export const compilerShow = { version, test };
+const compilerShow = { version, test };
 
 // Use top-level await for ESM entrypoint
-if (process.argv[1] && process.argv[1].endsWith("index.js")) {
-  await test();
-}
+// if (process.argv[1] && process.argv[1].endsWith("index.js")) {
+//   await test();
+// }
+
+export { compilerShow, test };
