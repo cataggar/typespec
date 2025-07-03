@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Showcase utilities for @typespec/compiler.",
   "type": "module",
-  "main": "dist/index.js",
+  "browser": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "vite build",
