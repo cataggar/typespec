@@ -9,7 +9,7 @@
     "build": "vite build",
     "build1": "tsc -p .",
     "test": "node dist/index.js",
-    "componentize": "pnpm exec jco componentize dist/index.js --wit wit -o dist/b.wasm -d clocks -d random -d http"
+    "componentize": "pnpm exec jco componentize dist/index.js --wit wit -o dist/compiler-show.wasm -d clocks -d random -d http"
   },
   "dependencies": {
     "@typespec/compiler": "workspace:^"
