@@ -1,0 +1,5 @@
+package test:app;
+
+world app {
+    import ts:compiler-show/compiler-show@0.1.0;
+}

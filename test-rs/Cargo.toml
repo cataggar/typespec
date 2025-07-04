@@ -1,0 +1,33 @@
+[package]
+name = "test-rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0"
+wit-bindgen-rt = { version = "0.36.0", features = ["bitflags"] }
+
+[profile.release]
+codegen-units = 1
+opt-level = "s"
+debug = false
+strip = true
+lto = true
+
+[package.metadata.component]
+package = "test:app"
+
+[package.metadata.component.dependencies]
+
+[package.metadata.component.target.dependencies]
+"ts:typescript" = { path = "../typescript/wit" }
+"ts:typescript-system" = { path = "../typescript-system/wit" }
+
+"wasi:cli" = { path = "../typescript-system/wit/deps/wasi-cli-0.2.0/package.wit" }
+"wasi:io" = { path = "../typescript-system/wit/deps/wasi-io-0.2.0/package.wit" }
+"wasi:clocks" = { path = "../typescript-system/wit/deps/wasi-clocks-0.2.0/package.wit" }
+"wasi:filesystem" = { path = "../typescript-system/wit/deps/wasi-filesystem-0.2.0/package.wit" }
+"wasi:sockets" = { path = "../typescript-system/wit/deps/wasi-sockets-0.2.0/package.wit" }
+"wasi:random" = { path = "../typescript-system/wit/deps/wasi-random-0.2.0/package.wit" }
+
+# "wasi:http" = { path = "../typescript/wit/deps/wasi-http-0.2.0/package.wit" }
