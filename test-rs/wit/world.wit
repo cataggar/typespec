@@ -1,5 +1,5 @@
 package test:app;
 
 world app {
-    import ts:compiler-show/compiler-show@0.1.0;
+    import ts:compiler-show/api@0.1.0;
 }

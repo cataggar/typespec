@@ -17,7 +17,10 @@ export default {
     nodeBuiltins({ preferBuiltins: false }),
     resolve({ browser: true, preferBuiltins: false }),
     commonjs(),
-    typescript({ tsconfig: "./tsconfig.json" }),
+    typescript({
+      tsconfig: "./tsconfig.json",
+      exclude: ["vite.config.ts"],
+    }),
     json(),
   ],
   // Do not mark built-ins as external; let the plugin error if referenced

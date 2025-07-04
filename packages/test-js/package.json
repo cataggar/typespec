@@ -1,0 +1,16 @@
+{
+  "name": "test-js",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Test project for importing and running dist/compiler-show.wasm as an ES module.",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

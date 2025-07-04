@@ -9,13 +9,16 @@
     "build": "vite build",
     "build1": "tsc -p .",
     "test": "node dist/index.js",
-    "componentize": "pnpm exec jco componentize dist/index.js --wit wit -o dist/compiler-show.wasm -d clocks -d random -d http"
+    "bundle": "rollup -c",
+    "component": "pnpm exec jco componentize dist/index.js --wit wit -o dist/compiler-show.wasm -d clocks -d random -d http",
+    "component2": "pnpm exec jco componentize dist/index.js --wit wit -o dist/compiler-show.wasm",
+    "component3": "pnpm exec jco componentize dist/index.js --wit wit -o dist/compiler-show.wasm -d http"
   },
   "dependencies": {
     "@typespec/compiler": "workspace:^"
   },
   "devDependencies": {
-    "@bytecodealliance/jco": "*",
+    "@bytecodealliance/jco": "^1.11.3",
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.1",

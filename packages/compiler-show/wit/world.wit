@@ -1,11 +1,10 @@
 package ts:compiler-show@0.1.0;
 
-interface compiler-show {
-    version: func() -> string;
-    test: func();
+interface api {
+  version: func() -> string;
+  test: func();
 }
 
 world root {
-  // import ts:typescript-system/types@0.1.0;
-  export compiler-show;
+  export api;
 }
