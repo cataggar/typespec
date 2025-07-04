@@ -1,4 +1,3 @@
-// @ts-ignore
 import { api } from "../../packages/compiler-show/dist/index.js";
 
 async function main() {

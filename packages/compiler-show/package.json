@@ -25,6 +25,7 @@
     "@rollup/plugin-typescript": "^12.1.4",
     "@typespec/bundler": "workspace:^",
     "rollup": "^4.44.1",
+    "rollup-plugin-dts": "^6.2.1",
     "rollup-plugin-node-builtins": "^2.1.2",
     "typescript": "~5.8.2",
     "vite": "^6.2.7",
