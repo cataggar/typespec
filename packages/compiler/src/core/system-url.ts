@@ -3,8 +3,13 @@ export interface SystemUrl {
   pathToFileURL(path: string): URL;
 }
 
-let systemUrl: SystemUrl;
+let systemUrl: SystemUrl | undefined;
 export function setSystemUrl(impl: SystemUrl) {
   systemUrl = impl;
 }
-export { systemUrl };
+export function getSystemUrl(): SystemUrl {
+  if (!systemUrl) {
+    throw new Error("SystemUrl has not been set.");
+  }
+  return systemUrl;
+}

@@ -1,7 +1,7 @@
 import { getTypeName } from "../core/helpers/type-name-utils.js";
 import { CompilerOptions } from "../core/options.js";
 import { resolvePath } from "../core/path-utils.js";
-import { systemUrl } from "../core/system-url.js";
+import { getSystemUrl } from "../core/system-url.js";
 import type { Type } from "../core/types.js";
 import { getCompilerHost } from "../core/types.js";
 import { findProjectRoot } from "../utils/io.js";
@@ -25,7 +25,7 @@ export function resolveVirtualPath(path: string, ...paths: string[]) {
 export function findTestPackageRoot(fileUrl: string): Promise<string> {
   return findProjectRoot(
     getCompilerHost().stat,
-    systemUrl.fileURLToPath(fileUrl),
+    getSystemUrl().fileURLToPath(fileUrl),
   ) as Promise<string>;
 }
 /**

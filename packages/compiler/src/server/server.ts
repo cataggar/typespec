@@ -11,7 +11,7 @@ import {
   WorkspaceEdit,
   createConnection,
 } from "vscode-languageserver/node.js";
-import { systemUrl } from "../core/system-url.js";
+import { getSystemUrl } from "../core/system-url.js";
 import { getCompilerHost } from "../core/types.js";
 import { typespecVersion } from "../manifest.js";
 import { systemPath } from "../testing/system-path.js";
@@ -91,7 +91,7 @@ function main() {
   const s = createServer(host, clientConfigProvider);
   server = s;
   s.log({ level: `info`, message: `TypeSpec language server v${typespecVersion}` });
-  s.log({ level: `info`, message: `Module: ${systemUrl.fileURLToPath(import.meta.url)}` });
+  s.log({ level: `info`, message: `Module: ${getSystemUrl().fileURLToPath(import.meta.url)}` });
   s.log({ level: `info`, message: `Process ID: ${process.pid}` });
   s.log({ level: `info`, message: `Command Line`, detail: process.argv });
 

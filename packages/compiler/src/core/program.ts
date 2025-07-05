@@ -43,7 +43,7 @@ import {
 } from "./source-loader.js";
 import { createStateAccessors } from "./state-accessors.js";
 import { ComplexityStats, RuntimeStats, Stats, startTimer, time, timeAsync } from "./stats.js";
-import { systemUrl } from "./system-url.js";
+import { getSystemUrl } from "./system-url.js";
 import {
   CompilerHost,
   Diagnostic,
@@ -336,7 +336,7 @@ async function createProgram(
     // Check all the files that were loaded
     for (const fileUrl of getLibraryUrlsLoaded()) {
       if (fileUrl.startsWith("file:")) {
-        const root = await findProjectRoot(host.stat, systemUrl.fileURLToPath(fileUrl));
+        const root = await findProjectRoot(host.stat, getSystemUrl().fileURLToPath(fileUrl));
         if (root) {
           loadedRoots.add(root);
         }

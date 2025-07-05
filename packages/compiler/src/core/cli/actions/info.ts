@@ -1,14 +1,14 @@
 /* eslint-disable no-console */
 import { stringify } from "yaml";
 import { loadTypeSpecConfigForPath } from "../../../config/config-loader.js";
-import { systemUrl } from "../../system-url.js";
+import { getSystemUrl } from "../../system-url.js";
 import { CompilerHost, Diagnostic } from "../../types.js";
 /**
  * Print the resolved TypeSpec configuration.
  */
 export async function printInfoAction(host: CompilerHost): Promise<readonly Diagnostic[]> {
   const cwd = process.cwd();
-  console.log(`Module: ${systemUrl.fileURLToPath(import.meta.url)}`);
+  console.log(`Module: ${getSystemUrl().fileURLToPath(import.meta.url)}`);
 
   const config = await loadTypeSpecConfigForPath(host, cwd, true, true);
   const { diagnostics, filename, file, ...restOfConfig } = config;

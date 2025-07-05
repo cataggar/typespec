@@ -1,5 +1,5 @@
 import { FSWatcher, WatchEventType, watch } from "fs";
-import { systemUrl } from "../../../system-url.js";
+import { getSystemUrl } from "../../../system-url.js";
 import { CompilerHost } from "../../../types.js";
 import { CliCompilerHost } from "../../types.js";
 
@@ -59,7 +59,7 @@ export function createWatchHost(host: CliCompilerHost): WatchHost {
   return {
     ...host,
     forceJSReload,
-    getJsImport: (path: string) => import(systemUrl.pathToFileURL(path).href + `?=${count}`),
+    getJsImport: (path: string) => import(getSystemUrl().pathToFileURL(path).href + `?=${count}`),
   };
   function forceJSReload() {
     count++;

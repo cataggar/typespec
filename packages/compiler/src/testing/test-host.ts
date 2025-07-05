@@ -4,7 +4,7 @@ import { createLogger } from "../core/logger/logger.js";
 import { CompilerOptions } from "../core/options.js";
 import { getAnyExtensionFromPath, resolvePath } from "../core/path-utils.js";
 import { compile as compileProgram, Program } from "../core/program.js";
-import { systemUrl } from "../core/system-url.js";
+import { getSystemUrl } from "../core/system-url.js";
 import type { CompilerHost, Diagnostic, StringLiteral, Type } from "../core/types.js";
 import { getCompilerHost } from "../core/types.js";
 import { createSourceFile, getSourceFileKindFromExt } from "../index.js";
@@ -143,9 +143,9 @@ function createTestCompilerHost(
 
     logSink: { log: getCompilerHost().logSink.log },
     mkdirp: async (path: string) => path,
-    fileURLToPath: systemUrl.fileURLToPath,
+    fileURLToPath: getSystemUrl().fileURLToPath,
     pathToFileURL(path: string) {
-      return systemUrl.pathToFileURL(path).href;
+      return getSystemUrl().pathToFileURL(path).href;
     },
 
     ...options?.compilerHostOverrides,
@@ -203,7 +203,7 @@ export async function createTestFileSystem(options?: TestHostOptions): Promise<T
 
   async function addRealJsFile(path: string, existingPath: string) {
     const key = resolveVirtualPath(path);
-    const exports = await import(systemUrl.pathToFileURL(existingPath).href);
+    const exports = await import(getSystemUrl().pathToFileURL(existingPath).href);
 
     virtualFs.set(key, "");
     jsImports.set(key, exports);

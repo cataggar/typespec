@@ -4,13 +4,16 @@ import { createConsoleSink } from "./logger/index.js";
 import { NodeSystemHost } from "./node-system-host.js";
 import { joinPaths } from "./path-utils.js";
 import { getSourceFileKindFromExt } from "./source-file.js";
-import { systemUrl } from "./system-url.js";
+import { getSystemUrl } from "./system-url.js";
 import { CompilerHost } from "./types.js";
 
 let _compilerPackageRoot: string | undefined;
 export async function getCompilerPackageRoot(): Promise<string> {
   if (_compilerPackageRoot === undefined) {
-    _compilerPackageRoot = (await findProjectRoot(stat, systemUrl.fileURLToPath(import.meta.url)))!;
+    _compilerPackageRoot = (await findProjectRoot(
+      stat,
+      getSystemUrl().fileURLToPath(import.meta.url),
+    ))!;
   }
   return _compilerPackageRoot;
 }
@@ -24,7 +27,7 @@ export const NodeHost: CompilerHost = {
   getExecutionRoot: async () => {
     return getCompilerPackageRoot();
   },
-  getJsImport: (path: string) => import(systemUrl.pathToFileURL(path).href),
+  getJsImport: (path: string) => import(getSystemUrl().pathToFileURL(path).href),
   async getLibDirs() {
     const rootDir = await this.getExecutionRoot();
     return [joinPaths(rootDir, "lib/std")];
@@ -32,8 +35,8 @@ export const NodeHost: CompilerHost = {
   getSourceFileKind: getSourceFileKindFromExt,
   mkdirp: (path: string) => mkdir(path, { recursive: true }),
   logSink: createConsoleSink(),
-  fileURLToPath: systemUrl.fileURLToPath,
+  fileURLToPath: (url: string) => getSystemUrl().fileURLToPath(url),
   pathToFileURL(path: string) {
-    return systemUrl.pathToFileURL(path).href;
+    return getSystemUrl().pathToFileURL(path).href;
   },
 };
