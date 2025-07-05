@@ -1,8 +1,8 @@
 import { mkdir, readFile, rm, writeFile } from "fs/promises";
 import { beforeAll, describe, it } from "vitest";
-import { NodeHost } from "../../../src/core/node-host.js";
 import { InvalidEncodingError } from "../../../src/core/node-system-host.js";
 import { systemUrl } from "../../../src/core/system-url.js";
+import { getCompilerHost } from "../../../src/core/types.js";
 import { getDirectoryPath, resolvePath } from "../../../src/index.js";
 import { assert } from "../../../src/testing/system-assert.js";
 import { systemPath } from "../../../src/testing/system-path.js";
@@ -50,13 +50,13 @@ describe("compiler: node host", () => {
     describe("encoding", () => {
       it("it reads an UTF-8 file", async () => {
         const fixture = await writeFixture("encoding/utf8.txt", "utf8 file", "utf8");
-        const file = await NodeHost.readFile(fixture);
+        const file = await getCompilerHost().readFile(fixture);
         assert.strictEqual(file.text, "utf8 file");
       });
 
       it("it reads an UTF-8 with bom file", async () => {
         const fixture = await writeFixture("encoding/utf8bom.txt", "utf8 with bom file", "utf8bom");
-        const file = await NodeHost.readFile(fixture);
+        const file = await getCompilerHost().readFile(fixture);
         assert.strictEqual(file.text, "utf8 with bom file");
       });
 
@@ -64,7 +64,7 @@ describe("compiler: node host", () => {
         const fixture = await writeFixture("encoding/utf16be.txt", "utf16be file", "utf16be");
 
         await assert.rejects(
-          () => NodeHost.readFile(fixture),
+          () => getCompilerHost().readFile(fixture),
           (error) => error instanceof InvalidEncodingError,
         );
       });
@@ -73,7 +73,7 @@ describe("compiler: node host", () => {
         const fixture = await writeFixture("encoding/utf16le.txt", "utf16le file", "utf16le");
 
         await assert.rejects(
-          () => NodeHost.readFile(fixture),
+          () => getCompilerHost().readFile(fixture),
           (error) => error instanceof InvalidEncodingError,
         );
       });
@@ -84,7 +84,7 @@ describe("compiler: node host", () => {
     it("write file as UTF-8", async () => {
       const filename = fixturePath("writeFile.saved-as-utf8.txt");
       const content = "Saved as UTF8";
-      await NodeHost.writeFile(filename, content);
+      await getCompilerHost().writeFile(filename, content);
 
       assert.strictEqual(await readFile(filename, "utf-8"), content);
     });

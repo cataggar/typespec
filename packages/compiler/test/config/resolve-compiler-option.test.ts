@@ -1,6 +1,6 @@
 import { describe, it } from "vitest";
 import { resolveCompilerOptions } from "../../src/config/index.js";
-import { NodeHost } from "../../src/core/node-host.js";
+import { getCompilerHost } from "../../src/core/types.js";
 import { normalizePath, resolvePath } from "../../src/index.js";
 import { expectDiagnosticEmpty, expectDiagnostics } from "../../src/testing/expect.js";
 import { assert } from "../../src/testing/system-assert.js";
@@ -17,7 +17,7 @@ describe("compiler: resolve compiler options", () => {
     const resolveOptions = async (path: string) => {
       const fullPath = resolvePath(scenarioRoot, path);
       const [{ configFile: config, ...options }, diagnostics] = await resolveCompilerOptions(
-        NodeHost,
+        getCompilerHost(),
         {
           cwd: normalizePath(process.cwd()),
           entrypoint: fullPath, // not really used here

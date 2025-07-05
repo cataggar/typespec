@@ -1,5 +1,7 @@
 import { NodeUrl } from "../src/core/node-url.js";
 import { setSystemUrl } from "../src/core/system-url.js";
+import { setCompilerHost } from "../src/core/types.js";
+import { NodeHost } from "../src/index.js";
 import { NodeAssert } from "../src/testing/node-assert.js";
 import { NodeFsPromises } from "../src/testing/node-fs-promises.js";
 import { NodeGlobby } from "../src/testing/node-globby.js";
@@ -14,3 +16,4 @@ setSystemFsPromises(NodeFsPromises);
 setSystemGlobby(NodeGlobby);
 setSystemPath(NodePath);
 setSystemUrl(NodeUrl);
+setCompilerHost(NodeHost);

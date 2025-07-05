@@ -7,7 +7,7 @@ import { IdentifierNode, SyntaxKind } from "../core/types.js";
 import { createClientConfigProvider } from "../server/client-config-provider.js";
 import { Server, ServerHost, createServer } from "../server/index.js";
 import { createStringMap } from "../utils/misc.js";
-import { getStandardTestLibrary, TestHostOptions, createTestFileSystem } from "./test-host.js";
+import { TestHostOptions, createTestFileSystem, getStandardTestLibrary } from "./test-host.js";
 import { resolveVirtualPath } from "./test-utils.js";
 import { TestFileSystem } from "./types.js";
 

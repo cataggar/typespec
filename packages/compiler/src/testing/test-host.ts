@@ -1,12 +1,12 @@
 import type { RmOptions } from "fs";
 import { logDiagnostics, logVerboseTestOutput } from "../core/diagnostics.js";
 import { createLogger } from "../core/logger/logger.js";
-import { NodeHost } from "../core/node-host.js";
 import { CompilerOptions } from "../core/options.js";
 import { getAnyExtensionFromPath, resolvePath } from "../core/path-utils.js";
 import { compile as compileProgram, Program } from "../core/program.js";
 import { systemUrl } from "../core/system-url.js";
 import type { CompilerHost, Diagnostic, StringLiteral, Type } from "../core/types.js";
+import { getCompilerHost } from "../core/types.js";
 import { createSourceFile, getSourceFileKindFromExt } from "../index.js";
 import { createStringMap } from "../utils/misc.js";
 import { expectDiagnosticEmpty } from "./expect.js";
@@ -141,7 +141,7 @@ function createTestCompilerHost(
     },
     getSourceFileKind: getSourceFileKindFromExt,
 
-    logSink: { log: NodeHost.logSink.log },
+    logSink: { log: getCompilerHost().logSink.log },
     mkdirp: async (path: string) => path,
     fileURLToPath: systemUrl.fileURLToPath,
     pathToFileURL(path: string) {

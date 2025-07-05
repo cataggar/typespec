@@ -1,9 +1,9 @@
 import { describe, it } from "vitest";
 import { TypeSpecConfigJsonSchema } from "../../src/config/config-schema.js";
 import { TypeSpecRawConfig, loadTypeSpecConfigForPath } from "../../src/config/index.js";
-import { NodeHost } from "../../src/core/node-host.js";
 import { createJSONSchemaValidator } from "../../src/core/schema-validator.js";
 import { createSourceFile } from "../../src/core/source-file.js";
+import { getCompilerHost } from "../../src/core/types.js";
 import { resolvePath } from "../../src/index.js";
 import { assert } from "../../src/testing/system-assert.js";
 import { systemPath } from "../../src/testing/system-path.js";
@@ -23,7 +23,7 @@ describe("compiler: config file loading", () => {
     ) => {
       const fullPath = systemPath.join(scenarioRoot, path);
       const { filename, projectRoot, file, ...config } = await loadTypeSpecConfigForPath(
-        NodeHost,
+        getCompilerHost(),
         fullPath,
         errorIfNotFound,
         lookup,

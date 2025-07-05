@@ -1,6 +1,7 @@
 import { describe, it } from "vitest";
 import { CompilerOptions } from "../../../src/core/options.js";
-import { NodeHost, Program, compile, resolvePath } from "../../../src/index.js";
+import { getCompilerHost } from "../../../src/core/types.js";
+import { Program, compile, resolvePath } from "../../../src/index.js";
 import { expectDiagnosticEmpty, expectDiagnostics } from "../../../src/testing/expect.js";
 import { assert } from "../../../src/testing/system-assert.js";
 import { systemPath } from "../../../src/testing/system-path.js";
@@ -10,7 +11,7 @@ const scenarioRoot = resolvePath(await findTestPackageRoot(import.meta.url), "te
 
 describe("compiler: entrypoints", () => {
   async function compileScenario(name: string, options: CompilerOptions = {}): Promise<Program> {
-    return compile(NodeHost, systemPath.resolve(scenarioRoot, name), { ...options });
+    return compile(getCompilerHost(), systemPath.resolve(scenarioRoot, name), { ...options });
   }
 
   describe("compile library", () => {

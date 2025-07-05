@@ -11,8 +11,8 @@ import {
   WorkspaceEdit,
   createConnection,
 } from "vscode-languageserver/node.js";
-import { NodeHost } from "../core/node-host.js";
 import { systemUrl } from "../core/system-url.js";
+import { getCompilerHost } from "../core/types.js";
 import { typespecVersion } from "../manifest.js";
 import { systemPath } from "../testing/system-path.js";
 import { createClientConfigProvider } from "./client-config-provider.js";
@@ -43,7 +43,7 @@ function main() {
   const documents = new TextDocuments(TextDocument);
 
   const host: ServerHost = {
-    compilerHost: NodeHost,
+    compilerHost: getCompilerHost(),
     sendDiagnostics(params: PublishDiagnosticsParams) {
       void connection.sendDiagnostics(params);
     },

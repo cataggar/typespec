@@ -17,11 +17,11 @@ export type { SystemGlobby } from "./system-globby.js";
 export { setSystemPath } from "./system-path.js";
 export type { SystemPath } from "./system-path.js";
 export {
-  getStandardTestLibrary,
   createTestFileSystem,
   createTestHost,
   createTestRunner,
   findFilesFromPattern,
+  getStandardTestLibrary,
   type TestHostOptions,
 } from "./test-host.js";
 export {

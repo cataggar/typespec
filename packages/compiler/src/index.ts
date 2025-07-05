@@ -105,6 +105,7 @@ export { NodeHost } from "./core/node-host.js";
 export { isNumeric, Numeric } from "./core/numeric.js";
 export type { CompilerOptions } from "./core/options.js";
 export { getPositionBeforeTrivia } from "./core/parser-utils.js";
+export { setCompilerHost } from "./core/types.js";
 export {
   $defaultVisibility,
   $discriminator,

@@ -3,7 +3,7 @@ import { rm } from "fs/promises";
 import { dirname, resolve } from "pathe";
 import { beforeAll, describe, it } from "vitest";
 import { systemUrl } from "../../src/core/system-url.js";
-import { NodeHost } from "../../src/index.js";
+import { getCompilerHost } from "../../src/core/types.js";
 import { getTypeSpecCoreTemplates } from "../../src/init/core-templates.js";
 import { makeScaffoldingConfig, scaffoldNewProject } from "../../src/init/scaffold.js";
 import { assert } from "../../src/testing/system-assert.js";
@@ -63,11 +63,11 @@ describe("Init templates e2e tests", () => {
   });
 
   async function scaffoldTemplateTo(name: string, targetFolder: string) {
-    const typeSpecCoreTemplates = await getTypeSpecCoreTemplates(NodeHost);
+    const typeSpecCoreTemplates = await getTypeSpecCoreTemplates(getCompilerHost());
     const template = typeSpecCoreTemplates.templates[name];
     assert.ok(template, `Template '${name}' not found`);
     await scaffoldNewProject(
-      NodeHost,
+      getCompilerHost(),
       makeScaffoldingConfig(template, {
         name,
         directory: targetFolder,

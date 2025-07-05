@@ -2105,6 +2105,18 @@ export interface CompilerHost extends SystemHost {
   logSink: LogSink;
 }
 
+// CompilerHost setter for test and environment injection
+let compilerHost: CompilerHost | undefined;
+export function setCompilerHost(host: CompilerHost) {
+  compilerHost = host;
+}
+export function getCompilerHost(): CompilerHost {
+  if (!compilerHost) {
+    throw new Error("CompilerHost has not been set.");
+  }
+  return compilerHost;
+}
+
 /**
  * Type of the source file that can be loaded via typespec
  */
