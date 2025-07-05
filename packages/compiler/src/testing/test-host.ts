@@ -88,11 +88,11 @@ function createTestCompilerHost(
       }
     },
 
-    getLibDirs() {
+    async getLibDirs() {
       return libDirs;
     },
 
-    getExecutionRoot() {
+    async getExecutionRoot() {
       return resolveVirtualPath(".tsp");
     },
 

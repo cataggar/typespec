@@ -424,7 +424,7 @@ async function createProgram(
   async function loadIntrinsicTypes(loader: SourceLoader) {
     const locationContext: LocationContext = { type: "compiler" };
     return loader.importFile(
-      resolvePath(host.getExecutionRoot(), "lib/intrinsics.tsp"),
+      resolvePath(await host.getExecutionRoot(), "lib/intrinsics.tsp"),
       NoTarget,
       locationContext,
     );
@@ -432,7 +432,7 @@ async function createProgram(
 
   async function loadStandardLibrary(loader: SourceLoader) {
     const locationContext: LocationContext = { type: "compiler" };
-    for (const dir of host.getLibDirs()) {
+    for (const dir of await host.getLibDirs()) {
       await loader.importFile(resolvePath(dir, "main.tsp"), NoTarget, locationContext);
     }
   }
@@ -746,7 +746,7 @@ async function createProgram(
       throw err;
     }
 
-    const expected = host.getExecutionRoot();
+    const expected = await host.getExecutionRoot();
 
     if (actual.path !== expected && MANIFEST.version !== actual.manifest.version) {
       const betterTypeSpecServerPath = actual.path;

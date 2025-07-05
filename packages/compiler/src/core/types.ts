@@ -2086,10 +2086,10 @@ export interface CompilerHost extends SystemHost {
   parseCache?: WeakMap<SourceFile, TypeSpecScriptNode>;
 
   // get the directory TypeSpec is executing from
-  getExecutionRoot(): string;
+  getExecutionRoot(): Promise<string>;
 
   // get the directories we should load standard library files from
-  getLibDirs(): string[];
+  getLibDirs(): Promise<string[]>;
 
   // get a promise for the ESM module shape of a JS module
   getJsImport(path: string): Promise<Record<string, any>>;

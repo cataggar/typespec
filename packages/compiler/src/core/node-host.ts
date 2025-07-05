@@ -7,10 +7,13 @@ import { getSourceFileKindFromExt } from "./source-file.js";
 import { systemUrl } from "./system-url.js";
 import { CompilerHost } from "./types.js";
 
-export const CompilerPackageRoot = (await findProjectRoot(
-  stat,
-  systemUrl.fileURLToPath(import.meta.url),
-))!;
+let _compilerPackageRoot: string | undefined;
+export async function getCompilerPackageRoot(): Promise<string> {
+  if (_compilerPackageRoot === undefined) {
+    _compilerPackageRoot = (await findProjectRoot(stat, systemUrl.fileURLToPath(import.meta.url)))!;
+  }
+  return _compilerPackageRoot;
+}
 
 /**
  * Implementation of the @see CompilerHost using the real file system.
@@ -18,10 +21,12 @@ export const CompilerPackageRoot = (await findProjectRoot(
  */
 export const NodeHost: CompilerHost = {
   ...NodeSystemHost,
-  getExecutionRoot: () => CompilerPackageRoot,
+  getExecutionRoot: async () => {
+    return getCompilerPackageRoot();
+  },
   getJsImport: (path: string) => import(systemUrl.pathToFileURL(path).href),
-  getLibDirs() {
-    const rootDir = this.getExecutionRoot();
+  async getLibDirs() {
+    const rootDir = await this.getExecutionRoot();
     return [joinPaths(rootDir, "lib/std")];
   },
   getSourceFileKind: getSourceFileKindFromExt,
