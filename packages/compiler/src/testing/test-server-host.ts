@@ -7,7 +7,7 @@ import { IdentifierNode, SyntaxKind } from "../core/types.js";
 import { createClientConfigProvider } from "../server/client-config-provider.js";
 import { Server, ServerHost, createServer } from "../server/index.js";
 import { createStringMap } from "../utils/misc.js";
-import { StandardTestLibrary, TestHostOptions, createTestFileSystem } from "./test-host.js";
+import { getStandardTestLibrary, TestHostOptions, createTestFileSystem } from "./test-host.js";
 import { resolveVirtualPath } from "./test-utils.js";
 import { TestFileSystem } from "./types.js";
 
@@ -26,7 +26,8 @@ export async function createTestServerHost(options?: TestHostOptions & { workspa
   const documents = createStringMap<TextDocument>(!!options?.caseInsensitiveFileSystem);
   const diagnostics = createStringMap<Diagnostic[]>(!!options?.caseInsensitiveFileSystem);
   const fileSystem = await createTestFileSystem({ ...options, excludeTestLib: true });
-  await fileSystem.addTypeSpecLibrary(StandardTestLibrary);
+  const standardLib = await getStandardTestLibrary();
+  await fileSystem.addTypeSpecLibrary(standardLib);
 
   const serverHost: TestServerHost = {
     ...fileSystem,

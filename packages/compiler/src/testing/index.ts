@@ -17,7 +17,7 @@ export type { SystemGlobby } from "./system-globby.js";
 export { setSystemPath } from "./system-path.js";
 export type { SystemPath } from "./system-path.js";
 export {
-  StandardTestLibrary,
+  getStandardTestLibrary,
   createTestFileSystem,
   createTestHost,
   createTestRunner,

@@ -232,18 +232,25 @@ export async function createTestFileSystem(options?: TestHostOptions): Promise<T
   }
 }
 
-export const StandardTestLibrary: TypeSpecTestLibrary = {
-  name: "@typespec/compiler",
-  packageRoot: await findTestPackageRoot(import.meta.url),
-  files: [
-    { virtualPath: "./.tsp/dist/src/lib", realDir: "./dist/src/lib", pattern: "**" },
-    { virtualPath: "./.tsp/lib", realDir: "./lib", pattern: "**" },
-  ],
-};
+let _standardTestLibrary: TypeSpecTestLibrary | undefined;
+export async function getStandardTestLibrary(): Promise<TypeSpecTestLibrary> {
+  if (!_standardTestLibrary) {
+    _standardTestLibrary = {
+      name: "@typespec/compiler",
+      packageRoot: await findTestPackageRoot(import.meta.url),
+      files: [
+        { virtualPath: "./.tsp/dist/src/lib", realDir: "./dist/src/lib", pattern: "**" },
+        { virtualPath: "./.tsp/lib", realDir: "./lib", pattern: "**" },
+      ],
+    };
+  }
+  return _standardTestLibrary;
+}
 
 export async function createTestHost(config: TestHostConfig = {}): Promise<TestHost> {
   const testHost = await createTestHostInternal();
-  await testHost.addTypeSpecLibrary(StandardTestLibrary);
+  const standardLib = await getStandardTestLibrary();
+  await testHost.addTypeSpecLibrary(standardLib);
   if (config.libraries) {
     for (const library of config.libraries) {
       await testHost.addTypeSpecLibrary(library);
@@ -294,7 +301,8 @@ async function createTestHostInternal(): Promise<TestHost> {
   return {
     ...fileSystem,
     addTypeSpecLibrary: async (lib) => {
-      if (lib !== StandardTestLibrary) {
+      const standardLib = await getStandardTestLibrary();
+      if (lib !== standardLib) {
         libraries.push(lib);
       }
       await fileSystem.addTypeSpecLibrary(lib);
