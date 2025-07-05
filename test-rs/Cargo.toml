@@ -21,12 +21,3 @@ package = "test:app"
 
 [package.metadata.component.target.dependencies]
 "ts:compiler-show" = { path = "../packages/compiler-show/wit" }
-
-# "wasi:cli" = { path = "../typescript-system/wit/deps/wasi-cli-0.2.0/package.wit" }
-# "wasi:io" = { path = "../typescript-system/wit/deps/wasi-io-0.2.0/package.wit" }
-# "wasi:clocks" = { path = "../typescript-system/wit/deps/wasi-clocks-0.2.0/package.wit" }
-# "wasi:filesystem" = { path = "../typescript-system/wit/deps/wasi-filesystem-0.2.0/package.wit" }
-# "wasi:sockets" = { path = "../typescript-system/wit/deps/wasi-sockets-0.2.0/package.wit" }
-# "wasi:random" = { path = "../typescript-system/wit/deps/wasi-random-0.2.0/package.wit" }
-
-# "wasi:http" = { path = "../typescript/wit/deps/wasi-http-0.2.0/package.wit" }

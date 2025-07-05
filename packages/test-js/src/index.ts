@@ -1,12 +1,8 @@
-// @ts-ignore
 import { api } from "../../compiler-show/dist/index.js";
 
 async function main() {
-  if (typeof api.version === "function") {
-    console.log("version:", api.version());
-  } else {
-    console.log("version() export not found in ES module");
-  }
+  console.log("version:", api.version());
+  await api.test();
 }
 
 main().catch(console.error);
