@@ -48,6 +48,7 @@
     "@octokit/core": "^7.0.2",
     "@octokit/plugin-paginate-graphql": "^6.0.0",
     "@octokit/plugin-rest-endpoint-methods": "^16.0.0",
+    "@types/bun": "^1.2.18",
     "@types/micromatch": "^4.0.9",
     "@types/node": "~24.0.3",
     "@vitest/coverage-v8": "^3.1.2",

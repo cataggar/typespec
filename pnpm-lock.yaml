@@ -35,6 +35,9 @@ importers:
       '@octokit/plugin-rest-endpoint-methods':
         specifier: ^16.0.0
         version: 16.0.0(@octokit/core@7.0.2)
+      '@types/bun':
+        specifier: ^1.2.18
+        version: 1.2.18(@types/react@18.3.23)
       '@types/micromatch':
         specifier: ^4.0.9
         version: 4.0.9
@@ -429,9 +432,15 @@ importers:
       '@rollup/plugin-typescript':
         specifier: ^12.1.4
         version: 12.1.4(rollup@4.44.1)(tslib@2.8.1)(typescript@5.8.3)
+      '@types/bun':
+        specifier: ^1.2.18
+        version: 1.2.18(@types/react@18.3.23)
       '@typespec/bundler':
         specifier: workspace:^
         version: link:../bundler
+      bun-types:
+        specifier: ^1.2.18
+        version: 1.2.18(@types/react@18.3.23)
       rollup:
         specifier: ^4.44.1
         version: 4.44.1
@@ -6513,6 +6522,9 @@ packages:
   '@types/braces@3.0.5':
     resolution: {integrity: sha512-SQFof9H+LXeWNz8wDe7oN5zu7ket0qwMu5vZubW4GCJ8Kkeh6nBWUz87+KTz/G3Kqsrp0j/W253XJb3KMEeg3w==}
 
+  '@types/bun@1.2.18':
+    resolution: {integrity: sha512-Xf6RaWVheyemaThV0kUfaAUvCNokFr+bH8Jxp+tTZfx7dAPA8z9ePnP9S9+Vspzuxxx9JRAXhnyccRj3GyCMdQ==}
+
   '@types/cacheable-request@6.0.3':
     resolution: {integrity: sha512-IQ3EbTzGxIigb1I3qPZc1rWJnH0BmSKv5QYTalEwweFvyBDLSAe24zP0le/hyi7ecGfZVlIVAg4BZqb8WBwKqw==}
 
@@ -7822,6 +7834,11 @@ packages:
 
   builtins@5.1.0:
     resolution: {integrity: sha512-SW9lzGTLvWTP1AY8xeAMZimqDrIaSdLQUcVr9DMef51niJ022Ri87SwRRKYm4A6iHfkPaiVUu/Duw2Wc4J7kKg==}
+
+  bun-types@1.2.18:
+    resolution: {integrity: sha512-04+Eha5NP7Z0A9YgDAzMk5PHR16ZuLVa83b26kH5+cp1qZW4F6FmAURngE7INf4tKOvCE69vYvDEwoNl1tGiWw==}
+    peerDependencies:
+      '@types/react': ^19
 
   bundle-name@4.1.0:
     resolution: {integrity: sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q==}
@@ -19631,6 +19648,12 @@ snapshots:
 
   '@types/braces@3.0.5': {}
 
+  '@types/bun@1.2.18(@types/react@18.3.23)':
+    dependencies:
+      bun-types: 1.2.18(@types/react@18.3.23)
+    transitivePeerDependencies:
+      - '@types/react'
+
   '@types/cacheable-request@6.0.3':
     dependencies:
       '@types/http-cache-semantics': 4.0.4
@@ -19910,7 +19933,7 @@ snapshots:
 
   '@types/sax@1.2.7':
     dependencies:
-      '@types/node': 17.0.45
+      '@types/node': 24.0.3
 
   '@types/semver@7.7.0': {}
 
@@ -21523,6 +21546,11 @@ snapshots:
   builtins@5.1.0:
     dependencies:
       semver: 7.7.2
+
+  bun-types@1.2.18(@types/react@18.3.23):
+    dependencies:
+      '@types/node': 24.0.3
+      '@types/react': 18.3.23
 
   bundle-name@4.1.0:
     dependencies:
