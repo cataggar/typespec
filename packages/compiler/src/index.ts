@@ -278,6 +278,7 @@ export {
   type NavigationOptions,
 } from "./core/semantic-walker.js";
 export { createSourceFile, getSourceFileKindFromExt } from "./core/source-file.js";
+export type { SystemUrl } from "./core/system-url.js";
 export {
   isArrayModelType,
   isDeclaredInNamespace,

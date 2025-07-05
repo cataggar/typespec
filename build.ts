@@ -11,13 +11,18 @@ async function runScript(cwd: string, script: string) {
   }
 }
 
+await runScript("packages/compiler", "build");
+
 await runScript("packages/compiler-show", "build");
 await runScript("packages/compiler-show", "bundle");
-await runScript("packages/compiler-show", "component");
 
-await runScript("test-rs", "wkg");
-await runScript("test-rs", "cargo");
-await runScript("test-rs", "plug");
-await runScript("test-rs", "run");
+await runScript("packages/test-js", "build");
+await runScript("packages/test-js", "start");
+
+// await runScript("packages/compiler-show", "component");
+// await runScript("test-rs", "wkg");
+// await runScript("test-rs", "cargo");
+// await runScript("test-rs", "plug");
+// await runScript("test-rs", "run");
 
 export {};

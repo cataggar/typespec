@@ -27,7 +27,10 @@ export default [
     ],
     // Do not mark built-ins as external; let the plugin error if referenced
     external: (id) =>
-      /@typespec\/compiler\/node-.*\.js$/.test(id) || /src\/core\/node-system-host\.js$/.test(id),
+      /@typespec\/compiler\/node-.*\.js$/.test(id) ||
+      /src\/core\/node-system-host\.js$/.test(id) ||
+      /src\/testing\//.test(id) ||
+      /test\//.test(id),
   },
   {
     input: "src/index.ts",
