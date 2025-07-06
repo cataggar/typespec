@@ -8,7 +8,7 @@ import { getSystemUrl } from "./system-url.js";
 import { CompilerHost } from "./types.js";
 
 let _compilerPackageRoot: string | undefined;
-export async function getCompilerPackageRoot(): Promise<string> {
+async function getCompilerPackageRoot(): Promise<string> {
   if (_compilerPackageRoot === undefined) {
     _compilerPackageRoot = (await findProjectRoot(
       stat,

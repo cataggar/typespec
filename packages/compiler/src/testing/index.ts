@@ -1,3 +1,5 @@
+export { setSystemFsPromises } from "../core/system-fs-promises.js";
+export type { SystemFsPromises } from "../core/system-fs-promises.js";
 export { setSystemUrl } from "../core/system-url.js";
 export { expectCodeFixOnAst } from "./code-fix-testing.js";
 export { expectDiagnosticEmpty, expectDiagnostics, type DiagnosticMatch } from "./expect.js";
@@ -10,8 +12,6 @@ export {
 export { extractCursor, extractSquiggles } from "./source-utils.js";
 export { setSystemAssert } from "./system-assert.js";
 export type { SystemAssert } from "./system-assert.js";
-export { setSystemFsPromises } from "./system-fs-promises.js";
-export type { SystemFsPromises } from "./system-fs-promises.js";
 export { setSystemGlobby } from "./system-globby.js";
 export type { SystemGlobby } from "./system-globby.js";
 export { setSystemPath } from "./system-path.js";

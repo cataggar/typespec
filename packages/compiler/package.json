@@ -65,6 +65,7 @@
     }
   },
   "browser": {
+    "./dist/src/core/node-host.js": false,
     "./dist/src/core/logger/console-sink.js": "./dist/src/core/logger/console-sink.browser.js"
   },
   "engines": {
