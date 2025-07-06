@@ -1,8 +1,8 @@
-import { strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { SyntaxKind } from "../../../src/ast/index.js";
 import { createChangeIdentifierCodeFix } from "../../../src/core/compiler-code-fixes/change-identifier.codefix.js";
 import { expectCodeFixOnAst } from "../../../src/testing/code-fix-testing.js";
+import { assert } from "../../../src/testing/system-assert.js";
 
 describe("CodeFix: change-identifier", () => {
   it("it change identifier", async () => {
@@ -13,7 +13,7 @@ describe("CodeFix: change-identifier", () => {
       }
     `,
       (node) => {
-        strictEqual(node.kind, SyntaxKind.Identifier);
+        assert.strictEqual(node.kind, SyntaxKind.Identifier);
         return createChangeIdentifierCodeFix(node, "int32");
       },
     ).toChangeTo(`

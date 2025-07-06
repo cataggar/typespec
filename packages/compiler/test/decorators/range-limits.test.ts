@@ -1,4 +1,3 @@
-import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   getMaxItems,
@@ -10,6 +9,7 @@ import {
 } from "../../src/core/intrinsic-type-state.js";
 import { Model } from "../../src/core/types.js";
 import { BasicTestRunner, createTestRunner, expectDiagnostics } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: range limiting decorators", () => {
   let runner: BasicTestRunner;
@@ -26,10 +26,10 @@ describe("compiler: range limiting decorators", () => {
       `,
     )) as { A: Model; B: Model };
 
-    strictEqual(getMinValue(runner.program, A.properties.get("foo")!), 15);
-    strictEqual(getMaxValue(runner.program, A.properties.get("boo")!), 55);
-    strictEqual(getMaxValue(runner.program, B.properties.get("bar")!), 20);
-    strictEqual(getMinValue(runner.program, B.properties.get("car")!), 23);
+    assert.strictEqual(getMinValue(runner.program, A.properties.get("foo")!), 15);
+    assert.strictEqual(getMaxValue(runner.program, A.properties.get("boo")!), 55);
+    assert.strictEqual(getMaxValue(runner.program, B.properties.get("bar")!), 20);
+    assert.strictEqual(getMinValue(runner.program, B.properties.get("car")!), 23);
   });
 
   describe("@minValue, @maxValue", () => {
@@ -43,8 +43,8 @@ describe("compiler: range limiting decorators", () => {
       `)) as { Foo: Model };
       const floorProp = Foo.properties.get("floor")!;
 
-      strictEqual(getMinValue(runner.program, floorProp), 2);
-      strictEqual(getMaxValue(runner.program, floorProp), 10);
+      assert.strictEqual(getMinValue(runner.program, floorProp), 2);
+      assert.strictEqual(getMaxValue(runner.program, floorProp), 10);
     });
 
     it("applies on float", async () => {
@@ -57,8 +57,8 @@ describe("compiler: range limiting decorators", () => {
       `)) as { Foo: Model };
       const percentProp = Foo.properties.get("percent")!;
 
-      strictEqual(getMinValue(runner.program, percentProp), 2.5);
-      strictEqual(getMaxValue(runner.program, percentProp), 32.9);
+      assert.strictEqual(getMinValue(runner.program, percentProp), 2.5);
+      assert.strictEqual(getMaxValue(runner.program, percentProp), 32.9);
     });
 
     it("applies on nullable numeric", async () => {
@@ -71,8 +71,8 @@ describe("compiler: range limiting decorators", () => {
       `)) as { Foo: Model };
       const percentProp = Foo.properties.get("percent")!;
 
-      strictEqual(getMinValue(runner.program, percentProp), 2.5);
-      strictEqual(getMaxValue(runner.program, percentProp), 32.9);
+      assert.strictEqual(getMinValue(runner.program, percentProp), 2.5);
+      assert.strictEqual(getMaxValue(runner.program, percentProp), 32.9);
     });
 
     it("emit diagnostic if @minValue used on non numeric type", async () => {
@@ -127,8 +127,8 @@ describe("compiler: range limiting decorators", () => {
       `)) as { Foo: Model };
       const nameProp = Foo.properties.get("name")!;
 
-      strictEqual(getMinLength(runner.program, nameProp), 2);
-      strictEqual(getMaxLength(runner.program, nameProp), 10);
+      assert.strictEqual(getMinLength(runner.program, nameProp), 2);
+      assert.strictEqual(getMaxLength(runner.program, nameProp), 10);
     });
 
     it("applies @minLength and @maxLength decorators on nullable strings", async () => {
@@ -141,8 +141,8 @@ describe("compiler: range limiting decorators", () => {
       `)) as { Foo: Model };
       const nameProp = Foo.properties.get("name")!;
 
-      strictEqual(getMinLength(runner.program, nameProp), 2);
-      strictEqual(getMaxLength(runner.program, nameProp), 10);
+      assert.strictEqual(getMinLength(runner.program, nameProp), 2);
+      assert.strictEqual(getMaxLength(runner.program, nameProp), 10);
     });
 
     it("emit diagnostic if @minLength used on non string", async () => {
@@ -197,8 +197,8 @@ describe("compiler: range limiting decorators", () => {
       `)) as { Foo: Model };
       const itemsProp = Foo.properties.get("items")!;
 
-      strictEqual(getMinItems(runner.program, itemsProp), 2);
-      strictEqual(getMaxItems(runner.program, itemsProp), 10);
+      assert.strictEqual(getMinItems(runner.program, itemsProp), 2);
+      assert.strictEqual(getMaxItems(runner.program, itemsProp), 10);
     });
 
     it("emit diagnostic if @minItems used on non array", async () => {

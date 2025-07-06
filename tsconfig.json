@@ -7,5 +7,8 @@
     "**/.storybook/**/*.tsx",
     "eng/tsp-core/scripts/resolve-cli-artifacts.js"
   ],
-  "exclude": ["**/node_modules/", "**/dist/", "**/build/", "**/coverage/"]
+  "exclude": ["**/node_modules/", "**/dist/", "**/build/", "**/coverage/"],
+  "compilerOptions": {
+    "types": ["bun"]
+  }
 }

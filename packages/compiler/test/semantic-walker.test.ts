@@ -1,4 +1,3 @@
-import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   NavigationOptions,
@@ -27,6 +26,7 @@ import {
   createTestHost,
   createTestRunner,
 } from "../src/testing/index.js";
+import { assert } from "../src/testing/system-assert.js";
 
 describe("compiler: semantic walker", () => {
   let host: TestHost;
@@ -194,7 +194,7 @@ describe("compiler: semantic walker", () => {
     );
 
     const expectedModels = ["Bird", "SeaGull", "Sparrow", "Goose", "Eagle"];
-    strictEqual(
+    assert.strictEqual(
       expectedModels.every((element) => visitedModels.map((m) => m.name).includes(element)),
       true,
     );
@@ -242,7 +242,7 @@ describe("compiler: semantic walker", () => {
       { visitDerivedTypes: false },
     );
 
-    strictEqual(visitedModels.length, 1);
+    assert.strictEqual(visitedModels.length, 1);
   });
 
   it("finds models", async () => {
@@ -258,10 +258,10 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.models.length, 3);
-    strictEqual(result.models[0].name, "Foo");
-    strictEqual(result.models[1].name, "", "Inline models don't have name");
-    strictEqual(result.models[2].name, "Bar");
+    assert.strictEqual(result.models.length, 3);
+    assert.strictEqual(result.models[0].name, "Foo");
+    assert.strictEqual(result.models[1].name, "", "Inline models don't have name");
+    assert.strictEqual(result.models[2].name, "Bar");
   });
 
   it("finds exit models", async () => {
@@ -277,10 +277,10 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.exitModels.length, 3);
-    strictEqual(result.exitModels[0].name, "", "Inline models don't have name");
-    strictEqual(result.exitModels[1].name, "Foo");
-    strictEqual(result.exitModels[2].name, "Bar");
+    assert.strictEqual(result.exitModels.length, 3);
+    assert.strictEqual(result.exitModels[0].name, "", "Inline models don't have name");
+    assert.strictEqual(result.exitModels[1].name, "Foo");
+    assert.strictEqual(result.exitModels[2].name, "Bar");
   });
 
   it("finds operations", async () => {
@@ -292,9 +292,9 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.operations.length, 2);
-    strictEqual(result.operations[0].name, "foo");
-    strictEqual(result.operations[1].name, "bar");
+    assert.strictEqual(result.operations.length, 2);
+    assert.strictEqual(result.operations[0].name, "foo");
+    assert.strictEqual(result.operations[1].name, "bar");
   });
 
   it("finds exit operations", async () => {
@@ -306,9 +306,9 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.exitOperations.length, 2);
-    strictEqual(result.exitOperations[0].name, "foo");
-    strictEqual(result.exitOperations[1].name, "bar");
+    assert.strictEqual(result.exitOperations.length, 2);
+    assert.strictEqual(result.exitOperations[0].name, "foo");
+    assert.strictEqual(result.exitOperations[1].name, "bar");
   });
 
   it("finds namespaces", async () => {
@@ -322,7 +322,7 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    deepStrictEqual(
+    assert.deepStrictEqual(
       result.namespaces.map((x) => getNamespaceFullName(x)),
       [
         "",
@@ -347,7 +347,7 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    deepStrictEqual(
+    assert.deepStrictEqual(
       result.exitNamespaces.map((x) => getNamespaceFullName(x)),
       [
         "TypeSpec",
@@ -374,10 +374,10 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.modelProperties.length, 3);
-    strictEqual(result.modelProperties[0].name, "nested");
-    strictEqual(result.modelProperties[1].name, "inline");
-    strictEqual(result.modelProperties[2].name, "name");
+    assert.strictEqual(result.modelProperties.length, 3);
+    assert.strictEqual(result.modelProperties[0].name, "nested");
+    assert.strictEqual(result.modelProperties[1].name, "inline");
+    assert.strictEqual(result.modelProperties[2].name, "name");
   });
 
   it("finds exit model properties", async () => {
@@ -393,10 +393,10 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.exitModelProperties.length, 3);
-    strictEqual(result.exitModelProperties[0].name, "inline");
-    strictEqual(result.exitModelProperties[1].name, "nested");
-    strictEqual(result.exitModelProperties[2].name, "name");
+    assert.strictEqual(result.exitModelProperties.length, 3);
+    assert.strictEqual(result.exitModelProperties[0].name, "inline");
+    assert.strictEqual(result.exitModelProperties[1].name, "nested");
+    assert.strictEqual(result.exitModelProperties[2].name, "name");
   });
 
   it("finds enums", async () => {
@@ -415,9 +415,9 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.enums.length, 2);
-    strictEqual(result.enums[0].name, "Direction");
-    strictEqual(result.enums[1].name, "Metric");
+    assert.strictEqual(result.enums.length, 2);
+    assert.strictEqual(result.enums[0].name, "Direction");
+    assert.strictEqual(result.enums[1].name, "Metric");
   });
 
   it("finds exit enums", async () => {
@@ -436,9 +436,9 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.exitEnums.length, 2);
-    strictEqual(result.exitEnums[0].name, "Direction");
-    strictEqual(result.exitEnums[1].name, "Metric");
+    assert.strictEqual(result.exitEnums.length, 2);
+    assert.strictEqual(result.exitEnums[0].name, "Direction");
+    assert.strictEqual(result.exitEnums[1].name, "Metric");
   });
 
   it("finds tuples with model", async () => {
@@ -459,9 +459,9 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.tuples.length, 1);
-    strictEqual(result.enums[0].name, "Direction");
-    strictEqual(result.models[1].name, "Color");
+    assert.strictEqual(result.tuples.length, 1);
+    assert.strictEqual(result.enums[0].name, "Direction");
+    assert.strictEqual(result.models[1].name, "Color");
   });
 
   it("finds exit tuples with model", async () => {
@@ -482,9 +482,9 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.exitTuples.length, 1);
-    strictEqual(result.exitEnums[0].name, "Direction");
-    strictEqual(result.exitModels[0].name, "Color");
+    assert.strictEqual(result.exitTuples.length, 1);
+    assert.strictEqual(result.exitEnums[0].name, "Direction");
+    assert.strictEqual(result.exitModels[0].name, "Color");
   });
 
   it("finds unions", async () => {
@@ -494,10 +494,10 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.unions.length, 1);
-    strictEqual(result.unions[0].name!, "A");
-    strictEqual(result.unionVariants.length, 1);
-    strictEqual(result.unionVariants[0].name!, "x");
+    assert.strictEqual(result.unions.length, 1);
+    assert.strictEqual(result.unions[0].name!, "A");
+    assert.strictEqual(result.unionVariants.length, 1);
+    assert.strictEqual(result.unionVariants[0].name!, "x");
   });
 
   it("finds tuples", async () => {
@@ -507,8 +507,8 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.tuples.length, 1);
-    strictEqual(result.tuples[0].values.length, 1);
+    assert.strictEqual(result.tuples.length, 1);
+    assert.strictEqual(result.tuples[0].values.length, 1);
   });
 
   it("finds exit tuples", async () => {
@@ -518,8 +518,8 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.exitTuples.length, 1);
-    strictEqual(result.exitTuples[0].values.length, 1);
+    assert.strictEqual(result.exitTuples.length, 1);
+    assert.strictEqual(result.exitTuples[0].values.length, 1);
   });
 
   it("finds exit unions", async () => {
@@ -529,10 +529,10 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.exitUnions.length, 1);
-    strictEqual(result.exitUnions[0].name!, "A");
-    strictEqual(result.exitUnionVariants.length, 1);
-    strictEqual(result.exitUnionVariants[0].name!, "x");
+    assert.strictEqual(result.exitUnions.length, 1);
+    assert.strictEqual(result.exitUnions[0].name!, "A");
+    assert.strictEqual(result.exitUnionVariants.length, 1);
+    assert.strictEqual(result.exitUnionVariants[0].name!, "x");
   });
 
   it("finds interfaces", async () => {
@@ -543,10 +543,10 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.interfaces.length, 1, "finds interfaces");
-    strictEqual(result.interfaces[0].name, "A");
-    strictEqual(result.operations.length, 1, "finds operations");
-    strictEqual(result.operations[0].name, "a");
+    assert.strictEqual(result.interfaces.length, 1, "finds interfaces");
+    assert.strictEqual(result.interfaces[0].name, "A");
+    assert.strictEqual(result.operations.length, 1, "finds operations");
+    assert.strictEqual(result.operations[0].name, "a");
   });
 
   it("finds exit interfaces", async () => {
@@ -557,10 +557,10 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.exitInterfaces.length, 1, "finds interfaces");
-    strictEqual(result.exitInterfaces[0].name, "A");
-    strictEqual(result.exitOperations.length, 1, "finds operations");
-    strictEqual(result.exitOperations[0].name, "a");
+    assert.strictEqual(result.exitInterfaces.length, 1, "finds interfaces");
+    assert.strictEqual(result.exitInterfaces[0].name, "A");
+    assert.strictEqual(result.exitOperations.length, 1, "finds operations");
+    assert.strictEqual(result.exitOperations[0].name, "a");
   });
 
   it("finds owned or inherited properties", async () => {
@@ -574,12 +574,12 @@ describe("compiler: semantic walker", () => {
       }
     `);
 
-    strictEqual(result.models.length, 2);
-    strictEqual(result.models[0].name, "Pet");
-    strictEqual(result.models[1].name, "Cat");
-    ok(getProperty(result.models[1], "meow"));
-    ok(getProperty(result.models[1], "name"));
-    strictEqual(getProperty(result.models[1], "bark"), undefined);
+    assert.strictEqual(result.models.length, 2);
+    assert.strictEqual(result.models[0].name, "Pet");
+    assert.strictEqual(result.models[1].name, "Cat");
+    assert.ok(getProperty(result.models[1], "meow"));
+    assert.ok(getProperty(result.models[1], "name"));
+    assert.strictEqual(getProperty(result.models[1], "bark"), undefined);
   });
 
   it("stop navigation of children when returning NoRecursion from callback", async () => {
@@ -596,8 +596,8 @@ describe("compiler: semantic walker", () => {
       { model: (x) => (x.name === "A" ? ListenerFlow.NoRecursion : undefined) },
     );
 
-    strictEqual(result.modelProperties.length, 1);
-    strictEqual(result.modelProperties[0].name, "shouldNavigate");
+    assert.strictEqual(result.modelProperties.length, 1);
+    assert.strictEqual(result.modelProperties[0].name, "shouldNavigate");
   });
 
   describe("findInNamespace", () => {
@@ -606,7 +606,7 @@ describe("compiler: semantic walker", () => {
       await host.compile("main.tsp", { nostdlib: true });
 
       const TargetNs = host.program.getGlobalNamespaceType().namespaces.get("TargetNs");
-      ok(TargetNs, "Should have a namespace called TargetNs");
+      assert.ok(TargetNs, "Should have a namespace called TargetNs");
       const [result, listener] = createCollector();
       navigateTypesInNamespace(TargetNs, listener);
 
@@ -625,8 +625,8 @@ describe("compiler: semantic walker", () => {
           model C {}
         }
       `);
-      strictEqual(results.models.length, 1);
-      strictEqual(results.models[0].name, "A");
+      assert.strictEqual(results.models.length, 1);
+      assert.strictEqual(results.models[0].name, "A");
     });
 
     it("find models in sub namespace", async () => {
@@ -639,9 +639,9 @@ describe("compiler: semantic walker", () => {
           }
         }
       `);
-      strictEqual(results.models.length, 2);
-      strictEqual(results.models[0].name, "A");
-      strictEqual(results.models[1].name, "B");
+      assert.strictEqual(results.models.length, 2);
+      assert.strictEqual(results.models[0].name, "A");
+      assert.strictEqual(results.models[1].name, "B");
     });
   });
 
@@ -652,8 +652,8 @@ describe("compiler: semantic walker", () => {
         model Bar {}
       `);
 
-      strictEqual(result.models.length, 1);
-      strictEqual(result.models[0].name, "Bar");
+      assert.strictEqual(result.models.length, 1);
+      assert.strictEqual(result.models[0].name, "Bar");
     });
 
     it("include when includeTemplateDeclaration is set to true", async () => {
@@ -666,11 +666,11 @@ describe("compiler: semantic walker", () => {
         { includeTemplateDeclaration: true },
       );
 
-      strictEqual(result.models.length, 4);
-      strictEqual(result.models[0].name, "Foo");
-      strictEqual(result.models[1].name, "Bar");
-      strictEqual(result.models[2].name, "Array");
-      strictEqual(result.models[3].name, "Record");
+      assert.strictEqual(result.models.length, 4);
+      assert.strictEqual(result.models[0].name, "Foo");
+      assert.strictEqual(result.models[1].name, "Bar");
+      assert.strictEqual(result.models[2].name, "Array");
+      assert.strictEqual(result.models[3].name, "Record");
     });
 
     it("by default only include the template instantiations", async () => {

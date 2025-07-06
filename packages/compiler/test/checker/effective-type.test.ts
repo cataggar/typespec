@@ -1,8 +1,8 @@
-import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { filterModelProperties, getEffectiveModelType } from "../../src/core/checker.js";
 import { DecoratorContext, Model, ModelProperty, Type } from "../../src/core/types.js";
 import { TestHost, createTestHost, expectTypeEquals } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: effective type", () => {
   let testHost: TestHost;
@@ -34,8 +34,8 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Source, Test } = await testHost.compile("./");
-    strictEqual(Source.kind, "Model" as const);
-    strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Source.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
 
     const propType = Test.properties.get("prop")?.type as Model;
     const effective = getEffectiveModelType(testHost.program, propType);
@@ -61,11 +61,11 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Source, Test } = await testHost.compile("./");
-    strictEqual(Source.kind, "Model" as const);
-    strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Source.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
 
     const propType = Test.properties.get("test")?.type;
-    strictEqual(propType?.kind, "Model" as const);
+    assert.strictEqual(propType?.kind, "Model" as const);
 
     const effective = getEffectiveModelType(testHost.program, propType);
     expectTypeEquals(effective, Source);
@@ -92,11 +92,11 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Source, Test } = await testHost.compile("./");
-    strictEqual(Source.kind, "Model" as const);
-    strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Source.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
 
     const propType = Test.properties.get("test")?.type;
-    strictEqual(propType?.kind, "Model" as const);
+    assert.strictEqual(propType?.kind, "Model" as const);
 
     const effective = getEffectiveModelType(testHost.program, propType, removeFilter);
     expectTypeEquals(effective, Source);
@@ -116,11 +116,11 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Source, Test } = await testHost.compile("./");
-    strictEqual(Source.kind, "Model" as const);
-    strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Source.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
 
     const propType = Test.properties.get("test")?.type;
-    strictEqual(propType?.kind, "Model" as const);
+    assert.strictEqual(propType?.kind, "Model" as const);
 
     const effective = getEffectiveModelType(testHost.program, propType);
     expectTypeEquals(effective, Source);
@@ -144,11 +144,11 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Test, Derived } = await testHost.compile("./");
-    strictEqual(Test.kind, "Model" as const);
-    strictEqual(Derived.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Derived.kind, "Model" as const);
 
     const propType = Test.properties.get("test")?.type;
-    strictEqual(propType?.kind, "Model" as const);
+    assert.strictEqual(propType?.kind, "Model" as const);
     const effective = getEffectiveModelType(testHost.program, propType);
     expectTypeEquals(effective, Derived);
   });
@@ -169,11 +169,11 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Source, Test } = await testHost.compile("./");
-    strictEqual(Source.kind, "Model" as const);
-    strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Source.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
 
     const propType = Test.properties.get("test")?.type;
-    strictEqual(propType?.kind, "Model" as const);
+    assert.strictEqual(propType?.kind, "Model" as const);
     const effective = getEffectiveModelType(testHost.program, propType, removeFilter);
     expectTypeEquals(effective, Source);
   });
@@ -194,11 +194,11 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Base, Derived } = await testHost.compile("./");
-    strictEqual(Base.kind, "Model" as const);
-    strictEqual(Derived.kind, "Model" as const);
+    assert.strictEqual(Base.kind, "Model" as const);
+    assert.strictEqual(Derived.kind, "Model" as const);
 
     const propType = Derived.properties.get("test")?.type;
-    strictEqual(propType?.kind, "Scalar" as const);
+    assert.strictEqual(propType?.kind, "Scalar" as const);
 
     const effective = getEffectiveModelType(testHost.program, Derived, removeFilter);
     expectTypeEquals(effective, Base);
@@ -224,11 +224,11 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Base, Derived } = await testHost.compile("./");
-    strictEqual(Base.kind, "Model" as const);
-    strictEqual(Derived.kind, "Model" as const);
+    assert.strictEqual(Base.kind, "Model" as const);
+    assert.strictEqual(Derived.kind, "Model" as const);
 
     const propType = Derived.properties.get("test")?.type;
-    strictEqual(propType?.kind, "Scalar" as const);
+    assert.strictEqual(propType?.kind, "Scalar" as const);
 
     const effective = getEffectiveModelType(testHost.program, Derived, removeFilter);
     expectTypeEquals(effective, Base);
@@ -257,11 +257,11 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Middle, Derived } = await testHost.compile("./");
-    strictEqual(Middle.kind, "Model" as const);
-    strictEqual(Derived.kind, "Model" as const);
+    assert.strictEqual(Middle.kind, "Model" as const);
+    assert.strictEqual(Derived.kind, "Model" as const);
 
     const propType = Derived.properties.get("test")?.type;
-    strictEqual(propType?.kind, "Scalar" as const);
+    assert.strictEqual(propType?.kind, "Scalar" as const);
 
     const effective = getEffectiveModelType(testHost.program, Derived, removeFilter);
     expectTypeEquals(effective, Middle);
@@ -287,11 +287,11 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Derived, Test } = await testHost.compile("./");
-    strictEqual(Derived.kind, "Model" as const);
-    strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Derived.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
 
     const propType = Test.properties.get("test")?.type;
-    strictEqual(propType?.kind, "Model" as const);
+    assert.strictEqual(propType?.kind, "Model" as const);
 
     const effective = getEffectiveModelType(testHost.program, propType, removeFilter);
     expectTypeEquals(effective, Derived);
@@ -318,11 +318,11 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Thing, Test } = await testHost.compile("./");
-    strictEqual(Thing.kind, "Model" as const);
-    strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Thing.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
 
     const propType = Test.properties.get("test")?.type;
-    strictEqual(propType?.kind, "Model" as const);
+    assert.strictEqual(propType?.kind, "Model" as const);
 
     const effective = getEffectiveModelType(testHost.program, propType, removeFilter);
     expectTypeEquals(effective, Thing);
@@ -338,10 +338,10 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Test } = await testHost.compile("./");
-    strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
 
     const propType = Test.properties.get("test")?.type;
-    strictEqual(propType?.kind, "Model" as const);
+    assert.strictEqual(propType?.kind, "Model" as const);
 
     const effective = getEffectiveModelType(testHost.program, propType);
     expectTypeEquals(effective, propType);
@@ -361,10 +361,10 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Test } = await testHost.compile("./");
-    strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
 
     const propType = Test.properties.get("test")?.type;
-    strictEqual(propType?.kind, "Model" as const);
+    assert.strictEqual(propType?.kind, "Model" as const);
 
     const effective = getEffectiveModelType(testHost.program, propType);
     expectTypeEquals(effective, propType);
@@ -390,10 +390,10 @@ describe("compiler: effective type", () => {
     );
 
     const { Test } = await testHost.compile("./");
-    strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
 
     const SourceOneAndSourceTwo = Test.properties.get("test")?.type;
-    strictEqual(SourceOneAndSourceTwo?.kind, "Model" as const);
+    assert.strictEqual(SourceOneAndSourceTwo?.kind, "Model" as const);
 
     const effective = getEffectiveModelType(testHost.program, SourceOneAndSourceTwo);
     expectTypeEquals(effective, SourceOneAndSourceTwo);
@@ -418,14 +418,14 @@ describe("compiler: effective type", () => {
     );
 
     const { Test } = await testHost.compile("./");
-    strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
 
     const Source = Test.properties.get("test")?.type;
-    strictEqual(Source?.kind, "Model" as const);
+    assert.strictEqual(Source?.kind, "Model" as const);
 
     const filtered = filterModelProperties(testHost.program, Source, removeFilter);
     const effective = getEffectiveModelType(testHost.program, filtered);
-    strictEqual(effective.name, "", "Result should be anonymous");
+    assert.strictEqual(effective.name, "", "Result should be anonymous");
     expectTypeEquals(effective, filtered);
   });
 
@@ -453,11 +453,11 @@ describe("compiler: effective type", () => {
       `,
     );
     const { Derived } = await testHost.compile("./");
-    strictEqual(Derived.kind, "Model" as const);
+    assert.strictEqual(Derived.kind, "Model" as const);
 
     const filtered = filterModelProperties(testHost.program, Derived, removeFilter);
     const effective = getEffectiveModelType(testHost.program, filtered);
-    strictEqual(effective.name, "", "result should be anonymous");
+    assert.strictEqual(effective.name, "", "result should be anonymous");
     expectTypeEquals(filtered, effective);
   });
 
@@ -480,10 +480,10 @@ describe("compiler: effective type", () => {
     );
 
     const { Test } = await testHost.compile("./");
-    strictEqual(Test.kind, "Model" as const);
+    assert.strictEqual(Test.kind, "Model" as const);
 
     const Source = Test.properties.get("test")?.type;
-    strictEqual(Source?.kind, "Model" as const);
+    assert.strictEqual(Source?.kind, "Model" as const);
 
     const effective = getEffectiveModelType(testHost.program, Source, removeFilter);
     expectTypeEquals(effective, Source);

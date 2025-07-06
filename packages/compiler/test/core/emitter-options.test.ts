@@ -1,7 +1,7 @@
-import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { Diagnostic, EmitContext, createTypeSpecLibrary } from "../../src/index.js";
 import { expectDiagnosticEmpty, expectDiagnostics } from "../../src/testing/expect.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestHost } from "../../src/testing/test-host.js";
 
 const fakeEmitter = createTypeSpecLibrary({
@@ -58,7 +58,7 @@ describe("compiler: emitter options", () => {
   async function getEmitContext(options: Record<string, unknown>): Promise<EmitContext> {
     const [context, diagnostics] = await runWithEmitterOptions(options);
     expectDiagnosticEmpty(diagnostics);
-    ok(context, "Emit context should have been set.");
+    assert.ok(context, "Emit context should have been set.");
     return context;
   }
 
@@ -69,9 +69,9 @@ describe("compiler: emitter options", () => {
       "max-files": 10,
     });
 
-    strictEqual(context.emitterOutputDir, "/out");
-    strictEqual(context.options["asset-dir"], "/assets");
-    strictEqual(context.options["max-files"], 10);
+    assert.strictEqual(context.emitterOutputDir, "/out");
+    assert.strictEqual(context.options["asset-dir"], "/assets");
+    assert.strictEqual(context.options["max-files"], 10);
   });
 
   it("emit diagnostic if passing unknown option", async () => {

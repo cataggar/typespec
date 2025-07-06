@@ -1,4 +1,3 @@
-import { deepStrictEqual, equal, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import {
   CompletionItem,
@@ -7,6 +6,7 @@ import {
   MarkupKind,
 } from "vscode-languageserver/node.js";
 import { extractCursor, extractSquiggles } from "../../src/testing/source-utils.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestServerHost } from "../../src/testing/test-server-host.js";
 
 // cspell:ignore 𐌰𐌲𐌰𐌲𐌰𐌲
@@ -163,7 +163,7 @@ describe("completes for keywords", () => {
           keywords.map((w) => ({ label: w, kind: CompletionItemKind.Keyword })),
         );
       } else {
-        equal(completions.items.length, 0, "No completions expected");
+        assert.equal(completions.items.length, 0, "No completions expected");
       }
     });
   });
@@ -447,7 +447,7 @@ describe("identifiers", () => {
       `,
     );
 
-    deepStrictEqual(
+    assert.deepStrictEqual(
       [],
       completions.items.filter(
         (c) => c.label === "doc" || c.label === "getDoc" || c.kind === CompletionItemKind.Function,
@@ -1388,7 +1388,7 @@ describe("identifiers", () => {
       `,
     );
 
-    ok(
+    assert.ok(
       !completions.items.find((t) => t.label === "Foo"),
       "deprecated items should be hidden from completion",
     );
@@ -1408,7 +1408,7 @@ describe("identifiers", () => {
       `,
     );
 
-    ok(
+    assert.ok(
       !completions.items.find((t) => t.label === "AliasedFoo"),
       "deprecated items should be hidden from completion",
     );
@@ -1542,7 +1542,7 @@ describe("identifiers", () => {
         model TestModel<T extends valueof MyLogArg = {┆}>{};
           `,
       );
-      ok(completions.items.length === 0, "No completions expected for model");
+      assert.ok(completions.items.length === 0, "No completions expected for model");
     });
 
     it("no completion for value to type", async () => {
@@ -1551,7 +1551,7 @@ describe("identifiers", () => {
         model TestModel<T extends MyLogArg = #{┆}>{};
           `,
       );
-      ok(completions.items.length === 0, "No completions expected for model");
+      assert.ok(completions.items.length === 0, "No completions expected for model");
     });
     it("no completion when cursor is after }", async () => {
       const completions = await complete(
@@ -1559,7 +1559,7 @@ describe("identifiers", () => {
         model TestModel<T extends MyLogArg = #{}┆>{};
           `,
       );
-      ok(completions.items.length === 0, "No completions expected for model");
+      assert.ok(completions.items.length === 0, "No completions expected for model");
     });
   });
 
@@ -1775,7 +1775,7 @@ describe("identifiers", () => {
         model MyLogContext4<┆;
           `,
       );
-      ok(completions.items.length === 0, "No completions expected for model");
+      assert.ok(completions.items.length === 0, "No completions expected for model");
     });
 
     it("no completion for normal template parameter ref2", async () => {
@@ -1784,7 +1784,7 @@ describe("identifiers", () => {
         model MyLogContext4<string, ┆;
           `,
       );
-      ok(completions.items.length === 0, "No completions expected for model");
+      assert.ok(completions.items.length === 0, "No completions expected for model");
     });
   });
 
@@ -1968,7 +1968,7 @@ describe("identifiers", () => {
          const c = TestString.createFromLog({┆});
         `,
       );
-      ok(completions.items.length === 0, "No completions expected for model");
+      assert.ok(completions.items.length === 0, "No completions expected for model");
     });
     it("no completion for non-literalobject type", async () => {
       const completions = await complete(
@@ -1976,7 +1976,7 @@ describe("identifiers", () => {
          const c = TestString.createFromLog3(┆);
         `,
       );
-      ok(completions.items.length === 0, "No completions expected for model");
+      assert.ok(completions.items.length === 0, "No completions expected for model");
     });
     it("no completion when cursor is after }", async () => {
       const completions = await complete(
@@ -1984,7 +1984,7 @@ describe("identifiers", () => {
          const c = TestString.createFromLog({}┆);
         `,
       );
-      ok(completions.items.length === 0, "No completions expected for model");
+      assert.ok(completions.items.length === 0, "No completions expected for model");
     });
   });
 
@@ -2254,7 +2254,7 @@ describe("identifiers", () => {
          const c : MyLogArg = #{ctx:#[#{item: #[┆]}]};
         `,
       );
-      ok(completions.items.length === 0, "No completions expected for scalar array");
+      assert.ok(completions.items.length === 0, "No completions expected for scalar array");
     });
 
     it("no completion for model", async () => {
@@ -2263,7 +2263,7 @@ describe("identifiers", () => {
          const c : MyLogArg = {┆};
         `,
       );
-      ok(completions.items.length === 0, "No completions expected for model");
+      assert.ok(completions.items.length === 0, "No completions expected for model");
     });
 
     it("no completion when cursor is after }", async () => {
@@ -2272,7 +2272,7 @@ describe("identifiers", () => {
          const c : MyLogArg = #{}┆;
         `,
       );
-      ok(completions.items.length === 0, "No completions expected after }");
+      assert.ok(completions.items.length === 0, "No completions expected after }");
     });
 
     it("no completion for const without type", async () => {
@@ -2281,7 +2281,7 @@ describe("identifiers", () => {
          const c = #{┆};
         `,
       );
-      ok(completions.items.length === 0, "No completions expected for const without type");
+      assert.ok(completions.items.length === 0, "No completions expected for const without type");
     });
   });
 
@@ -2389,7 +2389,7 @@ describe("identifiers", () => {
         `,
         js,
       );
-      ok(result.items.length === 0, "No completions expected when value is used for type");
+      assert.ok(result.items.length === 0, "No completions expected when value is used for type");
     });
 
     it.each([
@@ -2446,7 +2446,7 @@ describe("identifiers", () => {
         `,
         js,
       );
-      ok(result.items.length === 0, "No completions expected when value is used for type");
+      assert.ok(result.items.length === 0, "No completions expected when value is used for type");
     });
 
     it.each([
@@ -2494,7 +2494,7 @@ describe("identifiers", () => {
       `,
         js,
       );
-      ok(result.items.length === 0, "No completions expected when value is used for type");
+      assert.ok(result.items.length === 0, "No completions expected when value is used for type");
     });
 
     it.each([
@@ -2549,7 +2549,7 @@ describe("identifiers", () => {
       `,
         js,
       );
-      ok(result.items.length === 0, "No completions expected when value is used for type");
+      assert.ok(result.items.length === 0, "No completions expected when value is used for type");
     });
 
     it("no completion when cursor is after }", async () => {
@@ -2567,7 +2567,7 @@ describe("identifiers", () => {
         `,
         js,
       );
-      ok(completions.items.length === 0, "No completions expected when cursor is after }");
+      assert.ok(completions.items.length === 0, "No completions expected when cursor is after }");
     });
 
     it("no completion when the model expression is not decorator argument value", async () => {
@@ -2590,7 +2590,10 @@ describe("identifiers", () => {
         `,
         js,
       );
-      ok(completions.items.length === 0, "No completions expected for normal model expression }");
+      assert.ok(
+        completions.items.length === 0,
+        "No completions expected for normal model expression }",
+      );
     });
   });
 
@@ -2642,13 +2645,17 @@ function check(
     ...options,
   };
 
-  ok(!list.isIncomplete, "list should not be incomplete.");
+  assert.ok(!list.isIncomplete, "list should not be incomplete.");
 
   const expectedMap = new Map(expectedItems.map((i) => [i.label, i]));
-  strictEqual(expectedMap.size, expectedItems.length, "Duplicate labels in expected completions.");
+  assert.strictEqual(
+    expectedMap.size,
+    expectedItems.length,
+    "Duplicate labels in expected completions.",
+  );
 
   const actualMap = new Map(list.items.map((i) => [i.label, i]));
-  strictEqual(actualMap.size, list.items.length, "Duplicate labels in actual completions.");
+  assert.strictEqual(actualMap.size, list.items.length, "Duplicate labels in actual completions.");
 
   for (const expected of expectedItems) {
     const actual = actualMap.get(expected.label);
@@ -2666,21 +2673,21 @@ function check(
       };
     }
 
-    ok(
+    assert.ok(
       actual,
       `Expected completion item not found: '${expected.label}'. Available: ${list.items.map((x) => x.label).join(", ")}`,
     );
-    deepStrictEqual(actual, expected);
+    assert.deepStrictEqual(actual, expected);
     actualMap.delete(actual.label);
     expectedMap.delete(expected.label);
   }
 
   const expectedRemaining = Array.from(expectedMap.values());
-  deepStrictEqual(expectedRemaining, [], "Not all expected completions were found.");
+  assert.deepStrictEqual(expectedRemaining, [], "Not all expected completions were found.");
 
   if (!options.allowAdditionalCompletions) {
     const actualRemaining = Array.from(actualMap.values());
-    deepStrictEqual(actualRemaining, [], "Extra completions were found.");
+    assert.deepStrictEqual(actualRemaining, [], "Extra completions were found.");
   }
 }
 

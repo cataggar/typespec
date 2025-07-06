@@ -6,9 +6,8 @@ import { Colors, ExternalError } from "../external-error.js";
 import { createConsoleSink } from "../logger/console-sink.js";
 import { createLogger } from "../logger/logger.js";
 import { createTracer } from "../logger/tracer.js";
-import { NodeHost } from "../node-host.js";
 import { getBaseFileName } from "../path-utils.js";
-import { Diagnostic } from "../types.js";
+import { Diagnostic, getCompilerHost } from "../types.js";
 import { CliCompilerHost } from "./types.js";
 
 // ENOENT checking and handles spaces poorly in some cases.
@@ -76,7 +75,7 @@ export function createCLICompilerHost(options: CliHostArgs): CliCompilerHost {
     filter: options.trace ?? (options.debug ? ["*"] : undefined),
   });
   tracer.trace("cli.args", `CLI args: ${inspect(options, { depth: null })}`);
-  return { ...NodeHost, logSink, logger, tracer, debug: options.debug ?? false };
+  return { ...getCompilerHost(), logSink, logger, tracer, debug: options.debug ?? false };
 }
 
 export function run(

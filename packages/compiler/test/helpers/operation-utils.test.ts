@@ -1,7 +1,7 @@
-import { deepStrictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { Interface, ListOperationOptions, Namespace, listOperationsIn } from "../../src/index.js";
 import { BasicTestRunner, createTestRunner } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: operation-utils", () => {
   let runner: BasicTestRunner;
@@ -29,7 +29,7 @@ describe("compiler: operation-utils", () => {
       }
     `);
 
-    deepStrictEqual(await listOperationNames(runner.program.getGlobalNamespaceType()), [
+    assert.deepStrictEqual(await listOperationNames(runner.program.getGlobalNamespaceType()), [
       "one",
       "two",
       "three",
@@ -46,7 +46,7 @@ describe("compiler: operation-utils", () => {
       }
     `)) as { Foo: Interface };
 
-    deepStrictEqual(await listOperationNames(Foo), ["two", "three"]);
+    assert.deepStrictEqual(await listOperationNames(Foo), ["two", "three"]);
   });
 
   it("list all operation including interface ops under namespace", async () => {
@@ -61,7 +61,7 @@ describe("compiler: operation-utils", () => {
       }
     `)) as { Foo: Interface };
 
-    deepStrictEqual(await listOperationNames(Foo), ["two", "three"]);
+    assert.deepStrictEqual(await listOperationNames(Foo), ["two", "three"]);
   });
 
   it("include operation in subnamespace by default", async () => {
@@ -76,7 +76,7 @@ describe("compiler: operation-utils", () => {
       }
     `)) as { Foo: Interface };
 
-    deepStrictEqual(await listOperationNames(Foo), ["two", "three"]);
+    assert.deepStrictEqual(await listOperationNames(Foo), ["two", "three"]);
   });
 
   it("can exclude sub namespaces", async () => {
@@ -91,6 +91,6 @@ describe("compiler: operation-utils", () => {
       }
     `)) as { Foo: Interface };
 
-    deepStrictEqual(await listOperationNames(Foo, { recursive: false }), ["two"]);
+    assert.deepStrictEqual(await listOperationNames(Foo, { recursive: false }), ["two"]);
   });
 });

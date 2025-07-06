@@ -1,14 +1,14 @@
-import { ok } from "assert";
 import { SpawnOptions, spawn } from "child_process";
 import { rm } from "fs/promises";
 import { dirname, resolve } from "pathe";
-import { fileURLToPath } from "url";
 import { beforeAll, describe, it } from "vitest";
-import { NodeHost } from "../../src/index.js";
+import { getSystemUrl } from "../../src/core/system-url.js";
+import { getCompilerHost } from "../../src/core/types.js";
 import { getTypeSpecCoreTemplates } from "../../src/init/core-templates.js";
 import { makeScaffoldingConfig, scaffoldNewProject } from "../../src/init/scaffold.js";
+import { assert } from "../../src/testing/system-assert.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = dirname(getSystemUrl().fileURLToPath(import.meta.url));
 const testTempRoot = resolve(__dirname, "../../temp/scaffolded-template-tests");
 const snapshotFolder = resolve(__dirname, "../../templates/__snapshots__");
 
@@ -63,11 +63,11 @@ describe("Init templates e2e tests", () => {
   });
 
   async function scaffoldTemplateTo(name: string, targetFolder: string) {
-    const typeSpecCoreTemplates = await getTypeSpecCoreTemplates(NodeHost);
+    const typeSpecCoreTemplates = await getTypeSpecCoreTemplates(getCompilerHost());
     const template = typeSpecCoreTemplates.templates[name];
-    ok(template, `Template '${name}' not found`);
+    assert.ok(template, `Template '${name}' not found`);
     await scaffoldNewProject(
-      NodeHost,
+      getCompilerHost(),
       makeScaffoldingConfig(template, {
         name,
         directory: targetFolder,
@@ -93,7 +93,7 @@ describe("Init templates e2e tests", () => {
           ...options,
           cwd: targetFolder,
         });
-        ok(
+        assert.ok(
           result.exitCode === 0,
           [
             `Command '${command} ${args.join(" ")}' failed with exit code ${result.exitCode}`,

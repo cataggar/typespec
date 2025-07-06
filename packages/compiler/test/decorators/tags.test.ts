@@ -1,8 +1,8 @@
-import { deepStrictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { Interface, Namespace, Operation } from "../../src/core/types.js";
 import { getAllTags } from "../../src/lib/decorators.js";
 import { TestHost, createTestHost } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: tag decorator", () => {
   let testHost: TestHost;
@@ -74,20 +74,28 @@ describe("compiler: tag decorator", () => {
       RecursiveOperation: Operation;
     };
 
-    deepStrictEqual(getAllTags(testHost.program, OpNamespace), ["namespace"]);
-    deepStrictEqual(getAllTags(testHost.program, OpInterface), ["interface"]);
-    deepStrictEqual(getAllTags(testHost.program, UntaggedInterface), undefined);
-    deepStrictEqual(getAllTags(testHost.program, NamespaceOperation), ["namespace", "namespaceOp"]);
-    deepStrictEqual(getAllTags(testHost.program, InterfaceOperation), ["interface", "interfaceOp"]);
-    deepStrictEqual(getAllTags(testHost.program, TaggedOperation), ["taggedOp"]);
+    assert.deepStrictEqual(getAllTags(testHost.program, OpNamespace), ["namespace"]);
+    assert.deepStrictEqual(getAllTags(testHost.program, OpInterface), ["interface"]);
+    assert.deepStrictEqual(getAllTags(testHost.program, UntaggedInterface), undefined);
+    assert.deepStrictEqual(getAllTags(testHost.program, NamespaceOperation), [
+      "namespace",
+      "namespaceOp",
+    ]);
+    assert.deepStrictEqual(getAllTags(testHost.program, InterfaceOperation), [
+      "interface",
+      "interfaceOp",
+    ]);
+    assert.deepStrictEqual(getAllTags(testHost.program, TaggedOperation), ["taggedOp"]);
 
     // Check recursive tag walking
-    deepStrictEqual(getAllTags(testHost.program, RecursiveNamespace), ["recursiveNamespace"]);
-    deepStrictEqual(getAllTags(testHost.program, RecursiveInterface), [
+    assert.deepStrictEqual(getAllTags(testHost.program, RecursiveNamespace), [
+      "recursiveNamespace",
+    ]);
+    assert.deepStrictEqual(getAllTags(testHost.program, RecursiveInterface), [
       "recursiveNamespace",
       "recursiveInterface",
     ]);
-    deepStrictEqual(getAllTags(testHost.program, RecursiveOperation), [
+    assert.deepStrictEqual(getAllTags(testHost.program, RecursiveOperation), [
       "recursiveNamespace",
       "recursiveInterface",
       "recursiveOperation",

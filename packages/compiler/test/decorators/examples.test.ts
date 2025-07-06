@@ -1,14 +1,14 @@
-import { ok } from "assert";
 import { describe, expect, it } from "vitest";
 import { Operation, getExamples, getOpExamples, serializeValueAsJson } from "../../src/index.js";
 import { expectDiagnostics } from "../../src/testing/expect.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestRunner } from "../../src/testing/test-host.js";
 
 async function getExamplesFor(code: string) {
   const runner = await createTestRunner();
   const { test } = await runner.compile(code);
 
-  ok(test, "Expect to have @test type named test.");
+  assert.ok(test, "Expect to have @test type named test.");
   return {
     program: runner.program,
     target: test,
@@ -20,7 +20,7 @@ async function getOpExamplesFor(code: string) {
   const runner = await createTestRunner();
   const { test } = (await runner.compile(code)) as { test: Operation };
 
-  ok(test, "Expect to have @test type named test.");
+  assert.ok(test, "Expect to have @test type named test.");
   return {
     program: runner.program,
     target: test,
@@ -242,8 +242,8 @@ describe("@opExample", () => {
       @test op test(...Pet): Pet;
     `);
     expect(examples).toHaveLength(1);
-    ok(examples[0].parameters);
-    ok(examples[0].returnType);
+    assert.ok(examples[0].parameters);
+    assert.ok(examples[0].returnType);
     expect(serializeValueAsJson(program, examples[0].parameters, target.parameters)).toEqual({
       id: "some",
       name: "Fluffy",
@@ -266,8 +266,8 @@ describe("@opExample", () => {
       @test op test(...Pet): void;
     `);
     expect(examples).toHaveLength(1);
-    ok(examples[0].parameters);
-    ok(examples[0].returnType === undefined);
+    assert.ok(examples[0].parameters);
+    assert.ok(examples[0].returnType === undefined);
     expect(serializeValueAsJson(program, examples[0].parameters, target.parameters)).toEqual({
       id: "some",
       name: "Fluffy",
@@ -285,8 +285,8 @@ describe("@opExample", () => {
       @test op test(): Pet;
     `);
     expect(examples).toHaveLength(1);
-    ok(examples[0].parameters === undefined);
-    ok(examples[0].returnType);
+    assert.ok(examples[0].parameters === undefined);
+    assert.ok(examples[0].returnType);
     expect(serializeValueAsJson(program, examples[0].returnType, target.returnType)).toEqual({
       id: "some",
       name: "Fluffy",

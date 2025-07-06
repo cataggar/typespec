@@ -1,0 +1,2 @@
+[overrides]
+"ts:compiler-show" = { path = "../packages/compiler-show/wit" }

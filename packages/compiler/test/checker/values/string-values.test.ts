@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { assert } from "../../../src/testing/system-assert.js";
 import { describe, it } from "vitest";
 import { expectDiagnostics } from "../../../src/testing/expect.js";
 import { compileValue, diagnoseValue } from "./utils.js";
@@ -6,38 +6,38 @@ import { compileValue, diagnoseValue } from "./utils.js";
 describe("instantiate with constructor", () => {
   it("string", async () => {
     const value = await compileValue(`string("abc")`);
-    strictEqual(value.valueKind, "StringValue");
-    strictEqual(value.type.kind, "Scalar");
-    strictEqual(value.type.name, "string");
-    strictEqual(value.scalar?.name, "string");
-    strictEqual(value.value, "abc");
+    assert.strictEqual(value.valueKind, "StringValue");
+    assert.strictEqual(value.type.kind, "Scalar");
+    assert.strictEqual(value.type.name, "string");
+    assert.strictEqual(value.scalar?.name, "string");
+    assert.strictEqual(value.value, "abc");
   });
 });
 
 describe("implicit type", () => {
   it("doesn't pick scalar if const has no type (string literal)", async () => {
     const value = await compileValue(`a`, `const a = "abc";`);
-    strictEqual(value.valueKind, "StringValue");
-    strictEqual(value.type.kind, "String");
-    strictEqual(value.type.value, "abc");
-    strictEqual(value.scalar, undefined);
-    strictEqual(value.value, "abc");
+    assert.strictEqual(value.valueKind, "StringValue");
+    assert.strictEqual(value.type.kind, "String");
+    assert.strictEqual(value.type.value, "abc");
+    assert.strictEqual(value.scalar, undefined);
+    assert.strictEqual(value.value, "abc");
   });
   it("doesn't pick scalar if const has no type (string template )", async () => {
     const value = await compileValue(`a`, `const a = "one ${"abc"} def";`);
-    strictEqual(value.valueKind, "StringValue");
-    strictEqual(value.type.kind, "String");
-    strictEqual(value.type.value, "one abc def");
-    strictEqual(value.scalar, undefined);
-    strictEqual(value.value, "one abc def");
+    assert.strictEqual(value.valueKind, "StringValue");
+    assert.strictEqual(value.type.kind, "String");
+    assert.strictEqual(value.type.value, "one abc def");
+    assert.strictEqual(value.scalar, undefined);
+    assert.strictEqual(value.value, "one abc def");
   });
 
   it("instantiate if there is a single string option", async () => {
     const value = await compileValue(`a`, `const a: int32 | string = "abc";`);
-    strictEqual(value.valueKind, "StringValue");
-    strictEqual(value.type.kind, "Union");
-    strictEqual(value.scalar?.name, "string");
-    strictEqual(value.value, "abc");
+    assert.strictEqual(value.valueKind, "StringValue");
+    assert.strictEqual(value.type.kind, "Union");
+    assert.strictEqual(value.scalar?.name, "string");
+    assert.strictEqual(value.value, "abc");
   });
 
   it("emit diagnostics if there is multiple numeric choices", async () => {
@@ -57,17 +57,17 @@ describe("implicit type", () => {
 describe("string templates", () => {
   it("create string value from string template if able to serialize to string", async () => {
     const value = await compileValue(`string("one \${"abc"} def")`);
-    strictEqual(value.valueKind, "StringValue");
-    strictEqual(value.type.kind, "Scalar");
-    strictEqual(value.type.name, "string");
-    strictEqual(value.scalar?.name, "string");
-    strictEqual(value.value, "one abc def");
+    assert.strictEqual(value.valueKind, "StringValue");
+    assert.strictEqual(value.type.kind, "Scalar");
+    assert.strictEqual(value.type.name, "string");
+    assert.strictEqual(value.scalar?.name, "string");
+    assert.strictEqual(value.value, "one abc def");
   });
 
   it("interpolate another const", async () => {
     const value = await compileValue(`string("one \${a} def")`, `const a = "abc";`);
-    strictEqual(value.valueKind, "StringValue");
-    strictEqual(value.value, "one abc def");
+    assert.strictEqual(value.valueKind, "StringValue");
+    assert.strictEqual(value.value, "one abc def");
   });
 
   it("emit error if string template is not serializable to string", async () => {

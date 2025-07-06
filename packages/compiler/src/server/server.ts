@@ -1,8 +1,6 @@
 import { Console } from "console";
 import { mkdir, writeFile } from "fs/promises";
 import inspector from "inspector";
-import { join } from "path";
-import { fileURLToPath } from "url";
 import { inspect } from "util";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
@@ -13,8 +11,10 @@ import {
   WorkspaceEdit,
   createConnection,
 } from "vscode-languageserver/node.js";
-import { NodeHost } from "../core/node-host.js";
+import { getSystemUrl } from "../core/system-url.js";
+import { getCompilerHost } from "../core/types.js";
 import { typespecVersion } from "../manifest.js";
+import { systemPath } from "../testing/system-path.js";
 import { createClientConfigProvider } from "./client-config-provider.js";
 import { createServer } from "./serverlib.js";
 import { CustomRequestName, Server, ServerHost, ServerLog } from "./types.js";
@@ -43,7 +43,7 @@ function main() {
   const documents = new TextDocuments(TextDocument);
 
   const host: ServerHost = {
-    compilerHost: NodeHost,
+    compilerHost: getCompilerHost(),
     sendDiagnostics(params: PublishDiagnosticsParams) {
       void connection.sendDiagnostics(params);
     },
@@ -91,7 +91,7 @@ function main() {
   const s = createServer(host, clientConfigProvider);
   server = s;
   s.log({ level: `info`, message: `TypeSpec language server v${typespecVersion}` });
-  s.log({ level: `info`, message: `Module: ${fileURLToPath(import.meta.url)}` });
+  s.log({ level: `info`, message: `Module: ${getSystemUrl().fileURLToPath(import.meta.url)}` });
   s.log({ level: `info`, message: `Process ID: ${process.pid}` });
   s.log({ level: `info`, message: `Command Line`, detail: process.argv });
 
@@ -181,7 +181,10 @@ function profile<T extends (...args: any) => any>(func: T): T {
         profileSession!.post("Profiler.stop", async (err, args) => {
           if (!err && args.profile) {
             await mkdir(profileDir!, { recursive: true });
-            await writeFile(join(profileDir!, name + ".cpuprofile"), JSON.stringify(args.profile));
+            await writeFile(
+              systemPath.join(profileDir!, name + ".cpuprofile"),
+              JSON.stringify(args.profile),
+            );
           }
         });
         return ret;

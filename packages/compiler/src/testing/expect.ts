@@ -1,4 +1,5 @@
-import { fail, match, strictEqual } from "assert";
+import { assert } from "./system-assert.js";
+
 import { getSourceLocation } from "../core/diagnostics.js";
 import { formatDiagnostic } from "../core/logger/console-sink.js";
 import { NoTarget, type Diagnostic } from "../core/types.js";
@@ -11,7 +12,7 @@ import { resolveVirtualPath } from "./test-utils.js";
  */
 export function expectDiagnosticEmpty(diagnostics: readonly Diagnostic[]) {
   if (diagnostics.length > 0) {
-    fail(`Unexpected diagnostics:\n${formatDiagnostics(diagnostics)}`);
+    assert.fail(`Unexpected diagnostics:\n${formatDiagnostics(diagnostics)}`);
   }
 }
 
@@ -60,14 +61,12 @@ export interface DiagnosticMatch {
 export function expectDiagnostics(
   diagnostics: readonly Diagnostic[],
   match: DiagnosticMatch | DiagnosticMatch[],
-  options = {
-    strict: true,
-  },
+  options = { strict: true },
 ) {
   const array = isArray(match) ? match : [match];
 
   if (options.strict && array.length !== diagnostics.length) {
-    fail(
+    assert.fail(
       `Expected ${array.length} diagnostics but found ${diagnostics.length}:\n ${formatDiagnostics(
         diagnostics,
       )}`,
@@ -79,7 +78,7 @@ export function expectDiagnostics(
     const sep = "-".repeat(100);
     const message = `Diagnostics found:\n${sep}\n${formatDiagnostics(diagnostics)}\n${sep}`;
     if (expectation.code !== undefined) {
-      strictEqual(
+      assert.strictEqual(
         diagnostic.code,
         expectation.code,
         `Diagnostic at index ${i} has non matching code.\n${message}`,
@@ -94,7 +93,7 @@ export function expectDiagnostics(
       );
     }
     if (expectation.severity !== undefined) {
-      strictEqual(
+      assert.strictEqual(
         diagnostic.severity,
         expectation.severity,
         `Diagnostic at index ${i} has non matching severity.\n${message}`,
@@ -106,10 +105,12 @@ export function expectDiagnostics(
       expectation.end !== undefined
     ) {
       if (diagnostic.target === NoTarget) {
-        fail(`Diagnostics at index ${i} expected to have a target.\n${message}`);
+        assert.fail(`Diagnostics at index ${i} expected to have a target.\n${message}`);
       }
       const source = getSourceLocation(diagnostic.target);
-
+      if (!source) {
+        assert.fail(`Diagnostics at index ${i} has no source location.\n${message}`);
+      }
       if (expectation.file !== undefined) {
         matchStrOrRegex(
           source.file.path,
@@ -121,7 +122,7 @@ export function expectDiagnostics(
       }
 
       if (expectation.pos !== undefined) {
-        strictEqual(
+        assert.strictEqual(
           source.pos,
           expectation.pos,
           `Diagnostic at index ${i} has non-matching start position.`,
@@ -129,7 +130,7 @@ export function expectDiagnostics(
       }
 
       if (expectation.end !== undefined) {
-        strictEqual(
+        assert.strictEqual(
           source.end,
           expectation.end,
           `Diagnostic at index ${i} has non-matching end position.`,
@@ -138,11 +139,10 @@ export function expectDiagnostics(
     }
   }
 }
-
 function matchStrOrRegex(value: string, expectation: string | RegExp, assertMessage: string) {
   if (typeof expectation === "string") {
-    strictEqual(value, expectation, assertMessage);
+    assert.strictEqual(value, expectation, assertMessage);
   } else {
-    match(value, expectation, assertMessage);
+    assert.match(value, expectation, assertMessage);
   }
 }

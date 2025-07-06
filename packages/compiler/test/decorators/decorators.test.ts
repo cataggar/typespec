@@ -1,4 +1,3 @@
-import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   Enum,
@@ -33,6 +32,7 @@ import {
   expectDiagnosticEmpty,
   expectDiagnostics,
 } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: built-in decorators", () => {
   let runner: BasicTestRunner;
@@ -53,7 +53,7 @@ describe("compiler: built-in decorators", () => {
         `,
       );
 
-      strictEqual(getDoc(runner.program, Foo), "doc for namespace Foo");
+      assert.strictEqual(getDoc(runner.program, Foo), "doc for namespace Foo");
     });
 
     it("applies /** */ on enclosed namespace", async () => {
@@ -67,7 +67,7 @@ describe("compiler: built-in decorators", () => {
         `,
       );
 
-      strictEqual(getDoc(runner.program, Foo), "doc for namespace Foo");
+      assert.strictEqual(getDoc(runner.program, Foo), "doc for namespace Foo");
     });
 
     it("applies /** */ on nested enclosed namespace", async () => {
@@ -86,8 +86,8 @@ describe("compiler: built-in decorators", () => {
       );
 
       const Bar = (Foo as Namespace).namespaces.get("Bar")!;
-      strictEqual(getDoc(runner.program, Foo), "doc for namespace Foo");
-      strictEqual(getDoc(runner.program, Bar), "doc for namespace Bar");
+      assert.strictEqual(getDoc(runner.program, Foo), "doc for namespace Foo");
+      assert.strictEqual(getDoc(runner.program, Bar), "doc for namespace Bar");
     });
 
     it("applies /** */ on nested blockless + enclosed namespace", async () => {
@@ -105,8 +105,8 @@ describe("compiler: built-in decorators", () => {
       );
 
       const Bar = (Foo as Namespace).namespaces.get("Bar")!;
-      strictEqual(getDoc(runner.program, Foo), "doc for namespace Foo");
-      strictEqual(getDoc(runner.program, Bar), "doc for namespace Bar");
+      assert.strictEqual(getDoc(runner.program, Foo), "doc for namespace Foo");
+      assert.strictEqual(getDoc(runner.program, Bar), "doc for namespace Bar");
     });
   });
 
@@ -120,7 +120,7 @@ describe("compiler: built-in decorators", () => {
         `,
       );
 
-      strictEqual(getDoc(runner.program, A), "My Doc");
+      assert.strictEqual(getDoc(runner.program, A), "My Doc");
     });
 
     it("formats @doc string using source object", async () => {
@@ -139,8 +139,8 @@ describe("compiler: built-in decorators", () => {
         }
         `,
       );
-      strictEqual(getDoc(runner.program, A), "Model A");
-      strictEqual(getDoc(runner.program, B), "Templated B");
+      assert.strictEqual(getDoc(runner.program, A), "Model A");
+      assert.strictEqual(getDoc(runner.program, B), "Templated B");
     });
 
     it("applies @doc on namespace", async () => {
@@ -153,7 +153,7 @@ describe("compiler: built-in decorators", () => {
         `,
       );
 
-      strictEqual(getDoc(runner.program, TestDoc), "doc for namespace");
+      assert.strictEqual(getDoc(runner.program, TestDoc), "doc for namespace");
     });
 
     it("applies @doc on enum", async () => {
@@ -169,8 +169,8 @@ describe("compiler: built-in decorators", () => {
         `,
       );
 
-      strictEqual(getDoc(runner.program, Color), "doc for enum");
-      strictEqual(getDoc(runner.program, Red), "doc for enum element");
+      assert.strictEqual(getDoc(runner.program, Color), "doc for enum");
+      assert.strictEqual(getDoc(runner.program, Red), "doc for enum element");
     });
 
     it("applies @doc on union", async () => {
@@ -185,7 +185,7 @@ describe("compiler: built-in decorators", () => {
         `,
       );
 
-      strictEqual(getDoc(runner.program, AB), "doc for union");
+      assert.strictEqual(getDoc(runner.program, AB), "doc for union");
     });
 
     it("applies @doc on interfaces", async () => {
@@ -201,8 +201,8 @@ describe("compiler: built-in decorators", () => {
         `,
       );
 
-      strictEqual(getDoc(runner.program, TestDoc), "doc for interface");
-      strictEqual(getDoc(runner.program, a), "doc for interface operation");
+      assert.strictEqual(getDoc(runner.program, TestDoc), "doc for interface");
+      assert.strictEqual(getDoc(runner.program, a), "doc for interface operation");
     });
 
     it("applies @doc on operations", async () => {
@@ -214,7 +214,7 @@ describe("compiler: built-in decorators", () => {
         `,
       );
 
-      strictEqual(getDoc(runner.program, b), "doc for an operation");
+      assert.strictEqual(getDoc(runner.program, b), "doc for an operation");
     });
 
     it("emit diagnostic if doc is not a string", async () => {
@@ -239,7 +239,7 @@ describe("compiler: built-in decorators", () => {
         `,
       )) as { A: Scalar };
 
-      strictEqual(getPattern(runner.program, A), "^[a-z]+$");
+      assert.strictEqual(getPattern(runner.program, A), "^[a-z]+$");
     });
 
     it("applies @pattern to model property", async () => {
@@ -255,8 +255,8 @@ describe("compiler: built-in decorators", () => {
       )) as { A: Model };
 
       const prop = A.properties.get("prop") as ModelProperty;
-      strictEqual(prop.kind, "ModelProperty");
-      strictEqual(getPattern(runner.program, prop), "^[a-z]+$");
+      assert.strictEqual(prop.kind, "ModelProperty");
+      assert.strictEqual(getPattern(runner.program, prop), "^[a-z]+$");
     });
 
     it("emit diagnostic if pattern is not a string", async () => {
@@ -327,16 +327,16 @@ describe("compiler: built-in decorators", () => {
       )) as { A: Scalar; B: Scalar };
 
       const pattern = getPattern(runner.program, A);
-      strictEqual(pattern, "^[a-z]+$");
+      assert.strictEqual(pattern, "^[a-z]+$");
       const data = getPatternData(runner.program, A);
-      strictEqual(data?.pattern, pattern);
-      strictEqual(data?.validationMessage, "Must be all lowercase.");
+      assert.strictEqual(data?.pattern, pattern);
+      assert.strictEqual(data?.validationMessage, "Must be all lowercase.");
 
       const pattern2 = getPattern(runner.program, B);
-      strictEqual(pattern2, "^[a-z]+$");
+      assert.strictEqual(pattern2, "^[a-z]+$");
       const data2 = getPatternData(runner.program, B);
-      strictEqual(data2?.pattern, pattern2);
-      strictEqual(data2?.validationMessage, undefined);
+      assert.strictEqual(data2?.pattern, pattern2);
+      assert.strictEqual(data2?.validationMessage, undefined);
     });
   });
 
@@ -350,7 +350,7 @@ describe("compiler: built-in decorators", () => {
         `,
       )) as { A: Scalar };
 
-      strictEqual(getFormat(runner.program, A), "email");
+      assert.strictEqual(getFormat(runner.program, A), "email");
     });
 
     it("applies @pattern to model property", async () => {
@@ -363,7 +363,7 @@ describe("compiler: built-in decorators", () => {
         }
         `,
       )) as { prop: ModelProperty };
-      strictEqual(getFormat(runner.program, prop), "email");
+      assert.strictEqual(getFormat(runner.program, prop), "email");
     });
 
     it("emit diagnostic if targeting bytes", async () => {
@@ -391,7 +391,7 @@ describe("compiler: built-in decorators", () => {
         `,
       )) as { test: Operation };
 
-      strictEqual(getReturnsDoc(runner.program, test), "A string");
+      assert.strictEqual(getReturnsDoc(runner.program, test), "A string");
     });
 
     it("emit diagnostic if doc is not a string", async () => {
@@ -417,7 +417,7 @@ describe("compiler: built-in decorators", () => {
         `,
       )) as { test: Operation };
 
-      strictEqual(getErrorsDoc(runner.program, test), "An error");
+      assert.strictEqual(getErrorsDoc(runner.program, test), "An error");
     });
 
     it("emit diagnostic if doc is not a string", async () => {
@@ -449,8 +449,8 @@ describe("compiler: built-in decorators", () => {
           prop: T;
         }
         `);
-      strictEqual(getFriendlyName(runner.program, A), "MyNameIsA");
-      strictEqual(getFriendlyName(runner.program, B), "BModel");
+      assert.strictEqual(getFriendlyName(runner.program, A), "MyNameIsA");
+      assert.strictEqual(getFriendlyName(runner.program, B), "BModel");
     });
 
     it(" @friendlyName doesn't carry over to derived models", async () => {
@@ -462,8 +462,8 @@ describe("compiler: built-in decorators", () => {
         @test
         model B is A<string> { }
         `);
-      strictEqual(getFriendlyName(runner.program, A), "MyNameIsA");
-      strictEqual(getFriendlyName(runner.program, B), undefined);
+      assert.strictEqual(getFriendlyName(runner.program, A), "MyNameIsA");
+      assert.strictEqual(getFriendlyName(runner.program, B), undefined);
     });
   });
 
@@ -474,7 +474,7 @@ describe("compiler: built-in decorators", () => {
         @error
         model A { }
       `);
-      ok(isErrorModel(runner.program, A), "isError should be true");
+      assert.ok(isErrorModel(runner.program, A), "isError should be true");
     });
 
     it("applies @error on derived models", async () => {
@@ -483,8 +483,8 @@ describe("compiler: built-in decorators", () => {
         @test model B extends A { }
         @test model C extends B { }
       `);
-      ok(isErrorModel(runner.program, B), "isError should be true");
-      ok(isErrorModel(runner.program, C), "isError should be true");
+      assert.ok(isErrorModel(runner.program, B), "isError should be true");
+      assert.ok(isErrorModel(runner.program, C), "isError should be true");
     });
 
     it("emit diagnostic if error is not applied to a model", async () => {
@@ -493,9 +493,9 @@ describe("compiler: built-in decorators", () => {
         enum A { B, C }
         `);
 
-      strictEqual(diagnostics.length, 1);
-      strictEqual(diagnostics[0].code, "decorator-wrong-target");
-      strictEqual(
+      assert.strictEqual(diagnostics.length, 1);
+      assert.strictEqual(diagnostics[0].code, "decorator-wrong-target");
+      assert.strictEqual(
         diagnostics[0].message,
         `Cannot apply @error decorator to A since it is not assignable to Model`,
       );
@@ -541,8 +541,8 @@ describe("compiler: built-in decorators", () => {
         }`,
       );
 
-      strictEqual(prop.kind, "ModelProperty" as const);
-      strictEqual(getKeyName(runner.program, prop), "prop");
+      assert.strictEqual(prop.kind, "ModelProperty" as const);
+      assert.strictEqual(getKeyName(runner.program, prop), "prop");
     });
 
     it("sets key to alternate name when provided", async () => {
@@ -554,8 +554,8 @@ describe("compiler: built-in decorators", () => {
         }`,
       );
 
-      strictEqual(prop.kind, "ModelProperty" as const);
-      strictEqual(getKeyName(runner.program, prop), "alternateName");
+      assert.strictEqual(prop.kind, "ModelProperty" as const);
+      assert.strictEqual(getKeyName(runner.program, prop), "alternateName");
     });
 
     it("getKeyName returns undefined if used on property not annotated with @key", async () => {
@@ -565,8 +565,8 @@ describe("compiler: built-in decorators", () => {
         }`,
       );
 
-      strictEqual(prop.kind, "ModelProperty" as const);
-      strictEqual(getKeyName(runner.program, prop), undefined);
+      assert.strictEqual(prop.kind, "ModelProperty" as const);
+      assert.strictEqual(getKeyName(runner.program, prop), undefined);
     });
 
     it("emits diagnostic when key property is marked as optional", async () => {
@@ -594,7 +594,7 @@ describe("compiler: built-in decorators", () => {
         scalar s extends utcDateTime;
       `)) as { s: Scalar };
 
-      strictEqual(getEncode(runner.program, s)?.encoding, "rfc3339");
+      assert.strictEqual(getEncode(runner.program, s)?.encoding, "rfc3339");
     });
 
     it(`set encoding on model property`, async () => {
@@ -606,7 +606,7 @@ describe("compiler: built-in decorators", () => {
         }
       `)) as { prop: ModelProperty };
 
-      strictEqual(getEncode(runner.program, prop)?.encoding, "rfc3339");
+      assert.strictEqual(getEncode(runner.program, prop)?.encoding, "rfc3339");
     });
 
     it(`set encoding on model property of union type`, async () => {
@@ -618,7 +618,7 @@ describe("compiler: built-in decorators", () => {
         }
       `)) as { prop: ModelProperty };
 
-      strictEqual(getEncode(runner.program, prop)?.encoding, "rfc3339");
+      assert.strictEqual(getEncode(runner.program, prop)?.encoding, "rfc3339");
     });
 
     it(`encode type default to string`, async () => {
@@ -628,7 +628,7 @@ describe("compiler: built-in decorators", () => {
         scalar s extends utcDateTime;
       `)) as { s: Scalar };
 
-      strictEqual(getEncode(runner.program, s)?.type.name, "string");
+      assert.strictEqual(getEncode(runner.program, s)?.type.name, "string");
     });
 
     it(`change encode type`, async () => {
@@ -638,7 +638,7 @@ describe("compiler: built-in decorators", () => {
         scalar s extends utcDateTime;
       `)) as { s: Scalar };
 
-      strictEqual(getEncode(runner.program, s)?.type.name, "int32");
+      assert.strictEqual(getEncode(runner.program, s)?.type.name, "int32");
     });
 
     describe("known encoding validation", () => {
@@ -726,9 +726,9 @@ describe("compiler: built-in decorators", () => {
         `)) as { s: Scalar };
 
             const encodeData = getEncode(runner.program, s);
-            ok(encodeData);
-            strictEqual(encodeData.encoding, encoding);
-            strictEqual(encodeData.type.name, encodeAs ?? "string");
+            assert.ok(encodeData);
+            assert.strictEqual(encodeData.encoding, encoding);
+            assert.strictEqual(encodeData.type.name, encodeAs ?? "string");
           });
         });
 
@@ -740,9 +740,9 @@ describe("compiler: built-in decorators", () => {
           `)) as { s: Scalar };
 
           const encodeData = getEncode(runner.program, s);
-          ok(encodeData);
-          strictEqual(encodeData.encoding, undefined);
-          strictEqual(encodeData.type.name, "string");
+          assert.ok(encodeData);
+          assert.strictEqual(encodeData.encoding, undefined);
+          assert.strictEqual(encodeData.type.name, "string");
         });
       });
       describe("invalid", () => {
@@ -796,7 +796,7 @@ describe("compiler: built-in decorators", () => {
       );
 
       const properties = TestModel.kind === "Model" ? Array.from(TestModel.properties.keys()) : [];
-      deepStrictEqual(properties, ["notMe"]);
+      assert.deepStrictEqual(properties, ["notMe"]);
     });
 
     it("removes model properties when given a union containing strings", async () => {
@@ -814,7 +814,7 @@ describe("compiler: built-in decorators", () => {
       );
 
       const properties = TestModel.kind === "Model" ? Array.from(TestModel.properties.keys()) : [];
-      deepStrictEqual(properties, ["notMe"]);
+      assert.deepStrictEqual(properties, ["notMe"]);
     });
   });
 
@@ -833,7 +833,7 @@ describe("compiler: built-in decorators", () => {
       );
 
       const properties = TestModel.kind === "Model" ? Array.from(TestModel.properties.keys()) : [];
-      deepStrictEqual(properties, ["pickMe"]);
+      assert.deepStrictEqual(properties, ["pickMe"]);
     });
 
     it("picks model properties when given a union containing strings", async () => {
@@ -851,7 +851,7 @@ describe("compiler: built-in decorators", () => {
       );
 
       const properties = TestModel.kind === "Model" ? Array.from(TestModel.properties.keys()) : [];
-      deepStrictEqual(properties, ["pickMe", "pickMeToo"]);
+      assert.deepStrictEqual(properties, ["pickMe", "pickMeToo"]);
     });
   });
 
@@ -921,16 +921,16 @@ describe("compiler: built-in decorators", () => {
         someUnrelatedThing: Operation;
       };
 
-      strictEqual(compiled.someThing.kind, "Operation");
-      ok(getOverloadedOperation(runner.program, compiled.someStringThing));
-      ok(getOverloadedOperation(runner.program, compiled.someNumberThing));
-      ok(!getOverloadedOperation(runner.program, compiled.someThing));
-      ok(!getOverloadedOperation(runner.program, compiled.someUnrelatedThing));
+      assert.strictEqual(compiled.someThing.kind, "Operation");
+      assert.ok(getOverloadedOperation(runner.program, compiled.someStringThing));
+      assert.ok(getOverloadedOperation(runner.program, compiled.someNumberThing));
+      assert.ok(!getOverloadedOperation(runner.program, compiled.someThing));
+      assert.ok(!getOverloadedOperation(runner.program, compiled.someUnrelatedThing));
       const overloadedBy = getOverloads(runner.program, compiled.someThing)?.map((op) => op.name);
-      ok(overloadedBy?.length === 2);
-      ok(overloadedBy?.includes("someStringThing"));
-      ok(overloadedBy?.includes("someNumberThing"));
-      ok(getOverloads(runner.program, compiled.someUnrelatedThing) === undefined);
+      assert.ok(overloadedBy?.length === 2);
+      assert.ok(overloadedBy?.includes("someStringThing"));
+      assert.ok(overloadedBy?.includes("someNumberThing"));
+      assert.ok(getOverloads(runner.program, compiled.someUnrelatedThing) === undefined);
     });
 
     it("can overload operations defined in a namespace", async () => {
@@ -954,14 +954,14 @@ describe("compiler: built-in decorators", () => {
         someNumberThing: Operation;
       };
 
-      strictEqual(compiled.someThing.kind, "Operation");
-      ok(getOverloadedOperation(runner.program, compiled.someStringThing));
-      ok(getOverloadedOperation(runner.program, compiled.someNumberThing));
-      ok(!getOverloadedOperation(runner.program, compiled.someThing));
+      assert.strictEqual(compiled.someThing.kind, "Operation");
+      assert.ok(getOverloadedOperation(runner.program, compiled.someStringThing));
+      assert.ok(getOverloadedOperation(runner.program, compiled.someNumberThing));
+      assert.ok(!getOverloadedOperation(runner.program, compiled.someThing));
       const overloadedBy = getOverloads(runner.program, compiled.someThing)?.map((op) => op.name);
-      ok(overloadedBy?.length === 2);
-      ok(overloadedBy?.includes("someStringThing"));
-      ok(overloadedBy?.includes("someNumberThing"));
+      assert.ok(overloadedBy?.length === 2);
+      assert.ok(overloadedBy?.includes("someStringThing"));
+      assert.ok(overloadedBy?.includes("someNumberThing"));
     });
 
     it("can overload operations defined in an interface", async () => {
@@ -984,14 +984,14 @@ describe("compiler: built-in decorators", () => {
         someNumberThing: Operation;
       };
 
-      strictEqual(compiled.someThing.kind, "Operation");
-      ok(getOverloadedOperation(runner.program, compiled.someStringThing));
-      ok(getOverloadedOperation(runner.program, compiled.someNumberThing));
-      ok(!getOverloadedOperation(runner.program, compiled.someThing));
+      assert.strictEqual(compiled.someThing.kind, "Operation");
+      assert.ok(getOverloadedOperation(runner.program, compiled.someStringThing));
+      assert.ok(getOverloadedOperation(runner.program, compiled.someNumberThing));
+      assert.ok(!getOverloadedOperation(runner.program, compiled.someThing));
       const overloadedBy = getOverloads(runner.program, compiled.someThing)?.map((op) => op.name);
-      ok(overloadedBy?.length === 2);
-      ok(overloadedBy?.includes("someStringThing"));
-      ok(overloadedBy?.includes("someNumberThing"));
+      assert.ok(overloadedBy?.length === 2);
+      assert.ok(overloadedBy?.includes("someStringThing"));
+      assert.ok(overloadedBy?.includes("someNumberThing"));
     });
 
     describe("overloads must have the same parent as the overload base", () => {
@@ -1086,7 +1086,7 @@ describe("compiler: built-in decorators", () => {
         `,
       );
 
-      ok(isSecret(runner.program, A));
+      assert.ok(isSecret(runner.program, A));
     });
 
     it("can be applied on a model property with string type", async () => {
@@ -1100,7 +1100,7 @@ describe("compiler: built-in decorators", () => {
         `,
       )) as { A: Model };
 
-      ok(isSecret(runner.program, A.properties.get("a")!));
+      assert.ok(isSecret(runner.program, A.properties.get("a")!));
     });
 
     it("can be applied on a model property with stringlike model as type", async () => {
@@ -1116,7 +1116,7 @@ describe("compiler: built-in decorators", () => {
         `,
       )) as { A: Model };
 
-      ok(isSecret(runner.program, A.properties.get("a")!));
+      assert.ok(isSecret(runner.program, A.properties.get("a")!));
     });
 
     it("emit diagnostic if model is not a string", async () => {
@@ -1355,8 +1355,8 @@ describe("compiler: built-in decorators", () => {
           @test expireAt: utcDateTime;
         }
       `)) as { expireAt: ModelProperty };
-      strictEqual(resolveEncodedName(runner.program, expireAt, "application/json"), "exp");
-      strictEqual(
+      assert.strictEqual(resolveEncodedName(runner.program, expireAt, "application/json"), "exp");
+      assert.strictEqual(
         resolveEncodedName(runner.program, expireAt, "application/merge-patch+json"),
         "exp",
       );
@@ -1369,7 +1369,10 @@ describe("compiler: built-in decorators", () => {
           @test expireAt: utcDateTime;
         }
       `)) as { expireAt: ModelProperty };
-      strictEqual(resolveEncodedName(runner.program, expireAt, "application/xml"), "expireAt");
+      assert.strictEqual(
+        resolveEncodedName(runner.program, expireAt, "application/xml"),
+        "expireAt",
+      );
     });
   });
 
@@ -1389,12 +1392,12 @@ describe("compiler: built-in decorators", () => {
 
       const string = runner.program.checker.getStdType("string");
 
-      strictEqual(getMediaTypeHint(runner.program, A), "application/json");
-      strictEqual(getMediaTypeHint(runner.program, string), "text/plain");
+      assert.strictEqual(getMediaTypeHint(runner.program, A), "application/json");
+      assert.strictEqual(getMediaTypeHint(runner.program, string), "text/plain");
 
-      strictEqual(getMediaTypeHint(runner.program, B), "application/json");
+      assert.strictEqual(getMediaTypeHint(runner.program, B), "application/json");
 
-      strictEqual(getMediaTypeHint(runner.program, C), "text/plain");
+      assert.strictEqual(getMediaTypeHint(runner.program, C), "text/plain");
     });
 
     it("returns correct media type hint for bytes", async () => {
@@ -1410,12 +1413,15 @@ describe("compiler: built-in decorators", () => {
         scalar C extends bytes;
       `)) as { A: Scalar; B: Scalar; C: Scalar };
 
-      strictEqual(getMediaTypeHint(runner.program, A), "application/json");
-      strictEqual(getMediaTypeHint(runner.program, A.baseScalar!), "application/octet-stream");
+      assert.strictEqual(getMediaTypeHint(runner.program, A), "application/json");
+      assert.strictEqual(
+        getMediaTypeHint(runner.program, A.baseScalar!),
+        "application/octet-stream",
+      );
 
-      strictEqual(getMediaTypeHint(runner.program, B), "application/json");
+      assert.strictEqual(getMediaTypeHint(runner.program, B), "application/json");
 
-      strictEqual(getMediaTypeHint(runner.program, C), "application/octet-stream");
+      assert.strictEqual(getMediaTypeHint(runner.program, C), "application/octet-stream");
     });
 
     it("returns correct media type hint for model", async () => {
@@ -1435,10 +1441,10 @@ describe("compiler: built-in decorators", () => {
         model D extends C {}
       `)) as { A: Model; B: Model; C: Model; D: Model };
 
-      strictEqual(getMediaTypeHint(runner.program, A), undefined);
-      strictEqual(getMediaTypeHint(runner.program, B), "application/xml");
-      strictEqual(getMediaTypeHint(runner.program, C), "application/xml");
-      strictEqual(getMediaTypeHint(runner.program, D), "application/json");
+      assert.strictEqual(getMediaTypeHint(runner.program, A), undefined);
+      assert.strictEqual(getMediaTypeHint(runner.program, B), "application/xml");
+      assert.strictEqual(getMediaTypeHint(runner.program, C), "application/xml");
+      assert.strictEqual(getMediaTypeHint(runner.program, D), "application/json");
     });
 
     it("returns correct media type hint for enum", async () => {
@@ -1451,8 +1457,8 @@ describe("compiler: built-in decorators", () => {
         enum B { a, b }
       `)) as { A: Enum; B: Enum };
 
-      strictEqual(getMediaTypeHint(runner.program, A), undefined);
-      strictEqual(getMediaTypeHint(runner.program, B), "application/json");
+      assert.strictEqual(getMediaTypeHint(runner.program, A), undefined);
+      assert.strictEqual(getMediaTypeHint(runner.program, B), "application/json");
     });
 
     it("returns correct media type hint for union", async () => {
@@ -1465,8 +1471,8 @@ describe("compiler: built-in decorators", () => {
         union B {}
       `)) as { A: Union; B: Union };
 
-      strictEqual(getMediaTypeHint(runner.program, A), undefined);
-      strictEqual(getMediaTypeHint(runner.program, B), "text/plain");
+      assert.strictEqual(getMediaTypeHint(runner.program, A), undefined);
+      assert.strictEqual(getMediaTypeHint(runner.program, B), "text/plain");
     });
   });
 });

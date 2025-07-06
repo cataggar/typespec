@@ -1,10 +1,10 @@
-import assert, { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { Model, Type } from "../../src/core/types.js";
 import { TestHost, createTestHost } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 function assertModel(type?: Type): asserts type is Model {
-  assert(type?.kind === "Model");
+  assert.ok(type?.kind === "Model");
 }
 
 describe("compiler: model circular references", () => {
@@ -26,7 +26,7 @@ describe("compiler: model circular references", () => {
 
     const m = records["M"];
     assertModel(m);
-    assert(m.properties.get("self")?.type === m);
+    assert.ok(m.properties.get("self")?.type === m);
   });
 
   it("model can reference itself in an array", async () => {
@@ -43,7 +43,7 @@ describe("compiler: model circular references", () => {
     assertModel(m);
     const propType = m.properties.get("selfs")!.type;
     assertModel(propType);
-    assert(propType.indexer!.value === m);
+    assert.ok(propType.indexer!.value === m);
   });
 
   it("models can reference each other", async () => {
@@ -65,8 +65,8 @@ describe("compiler: model circular references", () => {
     const child = records["Child"];
     assertModel(parent);
     assertModel(child);
-    assert(parent.properties.get("child")?.type === child);
-    assert(child.properties.get("parent")?.type === parent);
+    assert.ok(parent.properties.get("child")?.type === child);
+    assert.ok(child.properties.get("parent")?.type === parent);
   });
 
   it("template model can reference itself", async () => {
@@ -87,7 +87,7 @@ describe("compiler: model circular references", () => {
     assertModel(model);
     const parentType = model.properties.get("parent")?.type;
     assertModel(parentType);
-    strictEqual(parentType, model);
+    assert.strictEqual(parentType, model);
   });
 
   it("template model can reference each other", async () => {
@@ -114,7 +114,7 @@ describe("compiler: model circular references", () => {
     const aTypeViaB = bType.properties.get("a")?.type;
     assertModel(aTypeViaB);
 
-    strictEqual(model, aTypeViaB);
+    assert.strictEqual(model, aTypeViaB);
   });
 
   it("models can reference each other in different namespace with the same name", async () => {
@@ -145,12 +145,12 @@ describe("compiler: model circular references", () => {
 
     const fooSome = records["Some"];
     assertModel(fooSome);
-    assert(fooSome.properties.get("self")?.type === fooSome);
+    assert.ok(fooSome.properties.get("self")?.type === fooSome);
 
     const barSome = fooSome.properties.get("related")!.type;
     assertModel(barSome);
-    assert(barSome !== fooSome);
-    assert(barSome.properties.get("self")?.type === barSome);
-    assert(barSome.properties.get("related")?.type === fooSome);
+    assert.ok(barSome !== fooSome);
+    assert.ok(barSome.properties.get("self")?.type === barSome);
+    assert.ok(barSome.properties.get("related")?.type === fooSome);
   });
 });

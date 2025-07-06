@@ -95,7 +95,8 @@ export function createBrowserHostInternal(options: BrowserHostCreateOptions): Br
       }
     },
 
-    getLibDirs() {
+
+    async getLibDirs() {
       if (
         virtualFs.has(resolveVirtualPath("/test/node_modules/@typespec/compiler/lib/std/main.tsp"))
       ) {
@@ -106,7 +107,8 @@ export function createBrowserHostInternal(options: BrowserHostCreateOptions): Br
       }
     },
 
-    getExecutionRoot() {
+
+    async getExecutionRoot() {
       return resolveVirtualPath("/test/node_modules/@typespec/compiler");
     },
 

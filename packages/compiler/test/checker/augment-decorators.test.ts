@@ -1,4 +1,3 @@
-import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { StringLiteral, Type } from "../../src/core/types.js";
 import {
@@ -7,6 +6,7 @@ import {
   expectDiagnosticEmpty,
   expectDiagnostics,
 } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 let testHost: TestHost;
 
@@ -35,7 +35,7 @@ it("run decorator without arguments", async () => {
   );
 
   const { Foo } = await testHost.compile("test.tsp");
-  strictEqual(Foo, blueThing);
+  assert.strictEqual(Foo, blueThing);
 });
 
 it("run decorator with arguments", async () => {
@@ -59,7 +59,7 @@ it("run decorator with arguments", async () => {
   );
 
   await testHost.compile("test.tsp");
-  strictEqual(customName, "FooCustom");
+  assert.strictEqual(customName, "FooCustom");
 });
 
 describe("declaration scope", () => {
@@ -87,7 +87,7 @@ describe("declaration scope", () => {
     );
 
     const { Foo } = await testHost.compile("test.tsp");
-    strictEqual(Foo, blueThing);
+    assert.strictEqual(Foo, blueThing);
   });
 
   it("can be defined in blockless namespace", async () => {
@@ -105,7 +105,7 @@ describe("declaration scope", () => {
     );
 
     const { Foo } = await testHost.compile("test.tsp");
-    strictEqual(Foo, blueThing);
+    assert.strictEqual(Foo, blueThing);
   });
 
   it("can be defined in namespace", async () => {
@@ -123,7 +123,7 @@ describe("declaration scope", () => {
     );
 
     const { Foo } = await testHost.compile("test.tsp");
-    strictEqual(Foo, blueThing);
+    assert.strictEqual(Foo, blueThing);
   });
 
   // Regression for https://github.com/microsoft/typespec/issues/2600
@@ -153,7 +153,7 @@ describe("declaration scope", () => {
     );
 
     const { Foo } = await testHost.compile("test.tsp");
-    strictEqual(Foo, blueThing);
+    assert.strictEqual(Foo, blueThing);
   });
 });
 
@@ -216,10 +216,10 @@ describe("augment types", () => {
 
     const [result, diagnostics] = await testHost.compileAndDiagnose("test.tsp");
     expectDiagnosticEmpty(diagnostics);
-    ok(result.target, `Missing element decorated with '@test("target")'`);
-    strictEqual(runOnTarget?.kind, result.target.kind);
-    strictEqual(runOnTarget, result.target);
-    strictEqual(customName, "FooCustom");
+    assert.ok(result.target, `Missing element decorated with '@test("target")'`);
+    assert.strictEqual(runOnTarget?.kind, result.target.kind);
+    assert.strictEqual(runOnTarget, result.target);
+    assert.strictEqual(customName, "FooCustom");
   }
 
   it("namespace", () => expectTarget(`@test("target") namespace Foo {}`, "Foo"));
@@ -485,9 +485,9 @@ describe("augment location", () => {
     );
 
     const { target } = await testHost.compile("test.tsp");
-    strictEqual(runOnTarget?.kind, target.kind);
-    strictEqual(runOnTarget, target);
-    strictEqual(customName, "FooCustom");
+    assert.strictEqual(runOnTarget?.kind, target.kind);
+    assert.strictEqual(runOnTarget, target);
+    assert.strictEqual(customName, "FooCustom");
   }
 
   it("augment type in another namespace", async () => {
@@ -544,9 +544,9 @@ describe("augment order", () => {
     );
 
     const { target } = await testHost.compile("test.tsp");
-    strictEqual(runOnTarget?.kind, target.kind);
-    strictEqual(runOnTarget, target);
-    strictEqual(customName, "FooCustom");
+    assert.strictEqual(runOnTarget?.kind, target.kind);
+    assert.strictEqual(runOnTarget, target);
+    assert.strictEqual(customName, "FooCustom");
   }
 
   it("augment decorator should be applied at last", async () => {

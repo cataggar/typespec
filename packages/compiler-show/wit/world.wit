@@ -1,0 +1,10 @@
+package ts:compiler-show@0.1.0;
+
+interface api {
+  version: func() -> string;
+  test: func();
+}
+
+world root {
+  export api;
+}

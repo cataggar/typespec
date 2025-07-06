@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { assert } from "../../../src/testing/system-assert.js";
 import { it } from "vitest";
 import { SyntaxKind } from "../../../src/ast/index.js";
 import { createTripleQuoteIndentCodeFix } from "../../../src/core/compiler-code-fixes/triple-quote-indent.codefix.js";
@@ -14,7 +14,7 @@ it("each triple-quote is on a new line", async () => {
         """;
     `,
     (node) => {
-      strictEqual(node.kind, SyntaxKind.StringLiteral);
+      assert.strictEqual(node.kind, SyntaxKind.StringLiteral);
       const target = getSourceLocation(node);
       return createTripleQuoteIndentCodeFix(target);
     },
@@ -33,7 +33,7 @@ it("all triple-quote is on one line", async () => {
         two    """;
     `,
     (node) => {
-      strictEqual(node.kind, SyntaxKind.StringLiteral);
+      assert.strictEqual(node.kind, SyntaxKind.StringLiteral);
       const target = getSourceLocation(node);
       return createTripleQuoteIndentCodeFix(target);
     },
@@ -51,7 +51,7 @@ it("all triple-quote is on one line and is no carriage return in line", async ()
       const a = ┆""" one  two    """;
     `,
     (node) => {
-      strictEqual(node.kind, SyntaxKind.StringLiteral);
+      assert.strictEqual(node.kind, SyntaxKind.StringLiteral);
       const target = getSourceLocation(node);
       return createTripleQuoteIndentCodeFix(target);
     },
@@ -70,7 +70,7 @@ it("start triple-quote is not on a new line but end one is", async () => {
           """;
     `,
     (node) => {
-      strictEqual(node.kind, SyntaxKind.StringLiteral);
+      assert.strictEqual(node.kind, SyntaxKind.StringLiteral);
       const target = getSourceLocation(node);
       return createTripleQuoteIndentCodeFix(target);
     },
@@ -90,7 +90,7 @@ it("end triple-quote is not on a new line but start one is", async () => {
           two   """;
     `,
     (node) => {
-      strictEqual(node.kind, SyntaxKind.StringLiteral);
+      assert.strictEqual(node.kind, SyntaxKind.StringLiteral);
       const target = getSourceLocation(node);
       return createTripleQuoteIndentCodeFix(target);
     },

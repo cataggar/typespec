@@ -1,4 +1,3 @@
-import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { Binder, createBinder } from "../src/core/binder.js";
 import { createLogger } from "../src/core/logger/logger.js";
@@ -19,6 +18,7 @@ import {
   UnionStatementNode,
 } from "../src/core/types.js";
 import { expectDiagnosticEmpty } from "../src/testing/expect.js";
+import { assert } from "../src/testing/system-assert.js";
 
 describe("compiler: binder", () => {
   let binder: Binder;
@@ -35,7 +35,7 @@ describe("compiler: binder", () => {
       model D { }
     `;
     const script = bindTypeSpec(code);
-    strictEqual(script.namespaces.length, 3);
+    assert.strictEqual(script.namespaces.length, 3);
     assertBindings("root", script.symbol.exports!, {
       A: {
         declarations: [SyntaxKind.NamespaceStatement],
@@ -44,13 +44,8 @@ describe("compiler: binder", () => {
           B: {
             flags: SymbolFlags.Namespace | SymbolFlags.Declaration,
             exports: {
-              C: {
-                flags: SymbolFlags.Namespace | SymbolFlags.Declaration,
-                exports: {},
-              },
-              D: {
-                flags: SymbolFlags.Model | SymbolFlags.Declaration,
-              },
+              C: { flags: SymbolFlags.Namespace | SymbolFlags.Declaration, exports: {} },
+              D: { flags: SymbolFlags.Model | SymbolFlags.Declaration },
             },
           },
         },
@@ -66,7 +61,7 @@ describe("compiler: binder", () => {
       }
     `;
     const script = bindTypeSpec(code);
-    strictEqual(script.namespaces.length, 4);
+    assert.strictEqual(script.namespaces.length, 4);
     assertBindings("root", script.symbol.exports!, {
       A: {
         declarations: [SyntaxKind.NamespaceStatement],
@@ -81,11 +76,7 @@ describe("compiler: binder", () => {
                 exports: {
                   B: {
                     flags: SymbolFlags.Namespace | SymbolFlags.Declaration,
-                    exports: {
-                      D: {
-                        flags: SymbolFlags.Model | SymbolFlags.Declaration,
-                      },
-                    },
+                    exports: { D: { flags: SymbolFlags.Model | SymbolFlags.Declaration } },
                   },
                 },
               },
@@ -104,17 +95,12 @@ describe("compiler: binder", () => {
       }
     `;
     const script = bindTypeSpec(code);
-    strictEqual(script.namespaces.length, 2);
+    assert.strictEqual(script.namespaces.length, 2);
     assertBindings("root", script.symbol.exports!, {
       A: {
         declarations: [SyntaxKind.NamespaceStatement],
         flags: SymbolFlags.Namespace | SymbolFlags.Declaration,
-        exports: {
-          B: {
-            flags: SymbolFlags.Namespace | SymbolFlags.Declaration,
-            exports: {},
-          },
-        },
+        exports: { B: { flags: SymbolFlags.Namespace | SymbolFlags.Declaration, exports: {} } },
       },
     });
   });
@@ -139,7 +125,7 @@ describe("compiler: binder", () => {
       }
     `;
     const script = bindTypeSpec(code);
-    strictEqual(script.namespaces.length, 5);
+    assert.strictEqual(script.namespaces.length, 5);
     assertBindings("root", script.symbol.exports!, {
       test: {
         declarations: [SyntaxKind.NamespaceStatement],
@@ -154,12 +140,8 @@ describe("compiler: binder", () => {
                 flags: SymbolFlags.Namespace | SymbolFlags.Declaration,
                 exports: {},
               },
-              get1: {
-                flags: SymbolFlags.Operation | SymbolFlags.Declaration,
-              },
-              get2: {
-                flags: SymbolFlags.Operation | SymbolFlags.Declaration,
-              },
+              get1: { flags: SymbolFlags.Operation | SymbolFlags.Declaration },
+              get2: { flags: SymbolFlags.Operation | SymbolFlags.Declaration },
             },
           },
         },
@@ -176,16 +158,12 @@ describe("compiler: binder", () => {
       model B<Foo, Bar> { }
     `;
     const script = bindTypeSpec(code);
-    strictEqual(script.namespaces.length, 1);
+    assert.strictEqual(script.namespaces.length, 1);
     assertBindings("root", script.symbol.exports!, {
       A: {
         declarations: [SyntaxKind.NamespaceStatement],
         flags: SymbolFlags.Namespace | SymbolFlags.Declaration,
-        exports: {
-          A: {
-            flags: SymbolFlags.Model | SymbolFlags.Declaration,
-          },
-        },
+        exports: { A: { flags: SymbolFlags.Model | SymbolFlags.Declaration } },
       },
       B: {
         declarations: [SyntaxKind.ModelStatement],
@@ -208,16 +186,12 @@ describe("compiler: binder", () => {
       enum B { }
     `;
     const script = bindTypeSpec(code);
-    strictEqual(script.namespaces.length, 1);
+    assert.strictEqual(script.namespaces.length, 1);
     assertBindings("root", script.symbol.exports!, {
       A: {
         declarations: [SyntaxKind.NamespaceStatement],
         flags: SymbolFlags.Namespace | SymbolFlags.Declaration,
-        exports: {
-          A: {
-            flags: SymbolFlags.Enum | SymbolFlags.Declaration,
-          },
-        },
+        exports: { A: { flags: SymbolFlags.Enum | SymbolFlags.Declaration } },
       },
       B: {
         declarations: [SyntaxKind.EnumStatement],
@@ -235,7 +209,7 @@ describe("compiler: binder", () => {
       op Foo(): void;
     `;
     const script = bindTypeSpec(code);
-    strictEqual(script.namespaces.length, 1);
+    assert.strictEqual(script.namespaces.length, 1);
     assertBindings("root", script.symbol.exports!, {
       A: {
         declarations: [SyntaxKind.NamespaceStatement],
@@ -263,7 +237,7 @@ describe("compiler: binder", () => {
       interface Bar<T, U> { }
     `;
     const script = bindTypeSpec(code);
-    strictEqual(script.namespaces.length, 1);
+    assert.strictEqual(script.namespaces.length, 1);
     assertBindings("root", script.symbol.exports!, {
       A: {
         declarations: [SyntaxKind.NamespaceStatement],
@@ -297,7 +271,7 @@ describe("compiler: binder", () => {
       union Bar<T, U> { }
     `;
     const script = bindTypeSpec(code);
-    strictEqual(script.namespaces.length, 1);
+    assert.strictEqual(script.namespaces.length, 1);
     assertBindings("root", script.symbol.exports!, {
       A: {
         declarations: [SyntaxKind.NamespaceStatement],
@@ -331,7 +305,7 @@ describe("compiler: binder", () => {
       alias Bar<T, U> = { a: T, b: U };
     `;
     const script = bindTypeSpec(code);
-    strictEqual(script.namespaces.length, 1);
+    assert.strictEqual(script.namespaces.length, 1);
     assertBindings("root", script.symbol.exports!, {
       A: {
         declarations: [SyntaxKind.NamespaceStatement],
@@ -365,13 +339,7 @@ describe("compiler: binder", () => {
     const fn2 = () => {};
     fn2.namespace = "Bar";
 
-    const exports = {
-      namespace: "Foo",
-      $myDec,
-      $myDec2,
-      fn,
-      fn2,
-    };
+    const exports = { namespace: "Foo", $myDec, $myDec2, fn, fn2 };
 
     const sourceFile = bindJs(exports);
     assertBindings("jsFile", sourceFile.symbol.exports!, {
@@ -407,12 +375,7 @@ describe("compiler: binder", () => {
   });
 
   it("binds $decorators in JS file", () => {
-    const exports = {
-      $decorators: {
-        "Foo.Bar": { myDec2: () => {} },
-        Foo: { myDec: () => {} },
-      },
-    };
+    const exports = { $decorators: { "Foo.Bar": { myDec2: () => {} }, Foo: { myDec: () => {} } } };
 
     const sourceFile = bindJs(exports);
     assertBindings("jsFile", sourceFile.symbol.exports!, {
@@ -461,21 +424,21 @@ interface BindingDescriptor {
 }
 
 function assertBindings(path: string, table: SymbolTable, descriptor: BindTest, parent?: Sym) {
-  strictEqual(table.duplicates.size, 0, `no duplicate bindings for ${path}`);
+  assert.strictEqual(table.duplicates.size, 0, `no duplicate bindings for ${path}`);
   for (const [key, value] of Object.entries(descriptor)) {
     const subpath = `${path}.${key}`;
     const binding = table.get(key);
-    ok(binding, `binding for ${subpath}`);
+    assert.ok(binding, `binding for ${subpath}`);
     if (parent) {
-      strictEqual(parent, binding.parent, `parent for ${path}`);
+      assert.strictEqual(parent, binding.parent, `parent for ${path}`);
     }
 
     if (value.flags) {
-      strictEqual(binding.flags, value.flags, `flags for ${subpath}`);
+      assert.strictEqual(binding.flags, value.flags, `flags for ${subpath}`);
     }
 
     if (value.exports) {
-      ok(binding.exports, `exports for ${subpath} should be present`);
+      assert.ok(binding.exports, `exports for ${subpath} should be present`);
       const expectedBindingNames = Object.keys(value.exports);
 
       for (const exportBindingName of binding.exports.keys()) {
@@ -488,17 +451,17 @@ function assertBindings(path: string, table: SymbolTable, descriptor: BindTest, 
 
       assertBindings(subpath, binding.exports, value.exports, binding);
     } else {
-      strictEqual(binding.exports, undefined, `exports for ${subpath} should be undefined`);
+      assert.strictEqual(binding.exports, undefined, `exports for ${subpath} should be undefined`);
     }
 
     if (value.declarations) {
-      strictEqual(
+      assert.strictEqual(
         binding.declarations.length,
         value.declarations.length,
         `declaration count for ${subpath}`,
       );
       for (const [i, kind] of value.declarations.entries()) {
-        strictEqual(binding.declarations[i].kind, kind, `declaration ${i} of ${subpath}`);
+        assert.strictEqual(binding.declarations[i].kind, kind, `declaration ${i} of ${subpath}`);
       }
     }
   }

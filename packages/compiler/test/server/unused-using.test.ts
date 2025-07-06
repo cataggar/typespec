@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { it } from "vitest";
 import { DiagnosticSeverity } from "vscode-languageserver";
 import { createTestServerHost } from "../../src/testing/test-server-host.js";
@@ -10,10 +10,10 @@ it("hint by default", async () => {
 
   await testHost.server.compile(mainFile);
   const diags = testHost.getDiagnostics("main.tsp");
-  strictEqual(diags.length, 1);
-  strictEqual(diags[0].code, "@typespec/compiler/unused-using");
-  strictEqual(diags[0].severity, DiagnosticSeverity.Hint);
-  strictEqual(diags[0].message, "'using Foo' is declared but never be used.");
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, "@typespec/compiler/unused-using");
+  assert.strictEqual(diags[0].severity, DiagnosticSeverity.Hint);
+  assert.strictEqual(diags[0].message, "'using Foo' is declared but never be used.");
 });
 
 it("warning if enable === true", async () => {
@@ -27,10 +27,10 @@ it("warning if enable === true", async () => {
 
   await testHost.server.compile(mainFile);
   const diags = testHost.getDiagnostics("main.tsp");
-  strictEqual(diags.length, 1);
-  strictEqual(diags[0].code, "@typespec/compiler/unused-using");
-  strictEqual(diags[0].severity, DiagnosticSeverity.Warning);
-  strictEqual(diags[0].message, "'using Foo' is declared but never be used.");
+  assert.strictEqual(diags.length, 1);
+  assert.strictEqual(diags[0].code, "@typespec/compiler/unused-using");
+  assert.strictEqual(diags[0].severity, DiagnosticSeverity.Warning);
+  assert.strictEqual(diags[0].message, "'using Foo' is declared but never be used.");
 });
 
 it("nothing if enable === false", async () => {
@@ -44,7 +44,7 @@ it("nothing if enable === false", async () => {
 
   await testHost.server.compile(mainFile);
   const diags = testHost.getDiagnostics("main.tsp");
-  strictEqual(diags.length, 0);
+  assert.strictEqual(diags.length, 0);
 });
 
 it("nothing if disabled", async () => {
@@ -58,5 +58,5 @@ it("nothing if disabled", async () => {
 
   await testHost.server.compile(mainFile);
   const diags = testHost.getDiagnostics("main.tsp");
-  strictEqual(diags.length, 0);
+  assert.strictEqual(diags.length, 0);
 });

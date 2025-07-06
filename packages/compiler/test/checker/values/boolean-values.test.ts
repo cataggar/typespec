@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { assert } from "../../../src/testing/system-assert.js";
 import { describe, it } from "vitest";
 import { expectDiagnostics } from "../../../src/testing/expect.js";
 import { compileValue, diagnoseValue } from "./utils.js";
@@ -6,30 +6,30 @@ import { compileValue, diagnoseValue } from "./utils.js";
 describe("instantiate with constructor", () => {
   it("with boolean literal", async () => {
     const value = await compileValue(`boolean(true)`);
-    strictEqual(value.valueKind, "BooleanValue");
-    strictEqual(value.type.kind, "Scalar");
-    strictEqual(value.type.name, "boolean");
-    strictEqual(value.scalar?.name, "boolean");
-    strictEqual(value.value, true);
+    assert.strictEqual(value.valueKind, "BooleanValue");
+    assert.strictEqual(value.type.kind, "Scalar");
+    assert.strictEqual(value.type.name, "boolean");
+    assert.strictEqual(value.scalar?.name, "boolean");
+    assert.strictEqual(value.value, true);
   });
 });
 
 describe("implicit type", () => {
   it("doesn't pick scalar if const has no type", async () => {
     const value = await compileValue(`a`, `const a = true;`);
-    strictEqual(value.valueKind, "BooleanValue");
-    strictEqual(value.type.kind, "Boolean");
-    strictEqual(value.type.value, true);
-    strictEqual(value.scalar, undefined);
-    strictEqual(value.value, true);
+    assert.strictEqual(value.valueKind, "BooleanValue");
+    assert.strictEqual(value.type.kind, "Boolean");
+    assert.strictEqual(value.type.value, true);
+    assert.strictEqual(value.scalar, undefined);
+    assert.strictEqual(value.value, true);
   });
 
   it("instantiate if there is a single string option", async () => {
     const value = await compileValue(`a`, `const a: boolean | string = true;`);
-    strictEqual(value.valueKind, "BooleanValue");
-    strictEqual(value.type.kind, "Union");
-    strictEqual(value.scalar?.name, "boolean");
-    strictEqual(value.value, true);
+    assert.strictEqual(value.valueKind, "BooleanValue");
+    assert.strictEqual(value.type.kind, "Union");
+    assert.strictEqual(value.scalar?.name, "boolean");
+    assert.strictEqual(value.value, true);
   });
 
   it("emit diagnostics if there is multiple numeric choices", async () => {

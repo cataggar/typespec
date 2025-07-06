@@ -1,7 +1,7 @@
-import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
 import { Hover, MarkupKind } from "vscode-languageserver/node.js";
 import { extractCursor } from "../../src/testing/source-utils.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestServerHost } from "../../src/testing/test-server-host.js";
 
 describe("compiler: server: on hover", () => {
@@ -12,7 +12,7 @@ describe("compiler: server: on hover", () => {
           scalar myStr┆ing;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "scalar myString\n" + "```",
@@ -27,7 +27,7 @@ describe("compiler: server: on hover", () => {
           scalar myStringEx extends myStr┆ing;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "scalar myString\n" + "```",
@@ -48,7 +48,7 @@ describe("compiler: server: on hover", () => {
       }
       const abc = MyString.createFromModel(#{ na┆me: "hello" });
       `);
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "(model property)\n```typespec\nMyModel.name: string\n```\n\nname of the model",
@@ -69,7 +69,7 @@ describe("compiler: server: on hover", () => {
         }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "enum Direction\n" + "```",
@@ -89,7 +89,7 @@ describe("compiler: server: on hover", () => {
         }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "(enum member)\n" + "```typespec\n" + "TestNS.Direction.North\n" + "```",
@@ -106,7 +106,7 @@ describe("compiler: server: on hover", () => {
           alias Mix┆ed<T> = string | int16 | Array<T>;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "alias TestNS.Mixed<T>\n" + "```",
@@ -122,7 +122,7 @@ describe("compiler: server: on hover", () => {
           alias myStringEx = myStr┆ing;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "alias TestNS.myString\n" + "```",
@@ -146,7 +146,7 @@ describe("compiler: server: on hover", () => {
           namespace TestNS;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value:
@@ -213,7 +213,7 @@ describe("compiler: server: on hover", () => {
           namespace TestNS;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value:
@@ -245,7 +245,7 @@ describe("compiler: server: on hover", () => {
           namespace TestNS;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value:
@@ -267,7 +267,7 @@ describe("compiler: server: on hover", () => {
           namespace Test┆NS;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "namespace TestNS\n" + "```",
@@ -287,7 +287,7 @@ describe("compiler: server: on hover", () => {
         }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "namespace Foo.Bar.Baz\n" + "```",
@@ -306,7 +306,7 @@ describe("compiler: server: on hover", () => {
           }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "model Animal\n" + "```",
@@ -325,7 +325,7 @@ describe("compiler: server: on hover", () => {
           }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "model Animal\n" + "```",
@@ -345,7 +345,7 @@ describe("compiler: server: on hover", () => {
           }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "model TestNs.Animal\n" + "```",
@@ -366,7 +366,7 @@ describe("compiler: server: on hover", () => {
           }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "model TestNs.Animal<T>\n" + "```",
@@ -387,7 +387,7 @@ describe("compiler: server: on hover", () => {
           }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "model TestNs.Animal<T, P>\n" + "```",
@@ -422,7 +422,7 @@ describe("compiler: server: on hover", () => {
           }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: `\`\`\`typespec
@@ -455,7 +455,7 @@ model TestNs.Dog{
           }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "interface IActions\n" + "```",
@@ -473,7 +473,7 @@ model TestNs.Dog{
           }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "interface IActions\n" + "```",
@@ -492,7 +492,7 @@ model TestNs.Dog{
         }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "interface TestNs.IActions\n" + "```",
@@ -514,7 +514,7 @@ model TestNs.Dog{
           }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: `\`\`\`typespec
@@ -541,7 +541,7 @@ interface TestNs.Bird {
           op Ea┆t(food: string): void;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "op Eat(food: string): void\n" + "```",
@@ -556,7 +556,7 @@ interface TestNs.Bird {
           op Swallow is Ea┆t;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "op Eat(food: string): void\n" + "```",
@@ -573,7 +573,7 @@ interface TestNs.Bird {
           op Ea┆t(food: string): void;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "op TestNs.Eat(food: string): void\n" + "```",
@@ -590,7 +590,7 @@ interface TestNs.Bird {
           op Ea┆t<T>(food: string): void;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "op TestNs.Eat<T>(food: string): void\n" + "```",
@@ -607,7 +607,7 @@ interface TestNs.Bird {
           op Ea┆t<T, P>(food: string): void;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "op TestNs.Eat<T, P>(food: string): void\n" + "```",
@@ -626,7 +626,7 @@ interface TestNs.Bird {
           }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "op TestNs.IActions.Eat<T, P>(food: string): string\n" + "```",
@@ -645,7 +645,7 @@ interface TestNs.Bird {
           }
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "op TestNs.IActions.Eat<T, P>(food: string): string\n" + "```",
@@ -661,7 +661,7 @@ interface TestNs.Bird {
           const a┆bc = #{ a: 123 };
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "const abc: { a: 123 }\n" + "```",
@@ -676,7 +676,7 @@ interface TestNs.Bird {
           const def = a┆bc;
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "```typespec\n" + "const abc: { a: 123 }\n" + "```",
@@ -696,7 +696,7 @@ interface TestNs.Bird {
           const abc : MyModel = #{ na┆me: "hello" };
         `,
       );
-      deepStrictEqual(hover, {
+      assert.deepStrictEqual(hover, {
         contents: {
           kind: MarkupKind.Markdown,
           value: "(model property)\n```typespec\nMyModel.name: string\n```\n\nname of the model",

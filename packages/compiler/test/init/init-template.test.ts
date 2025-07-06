@@ -1,4 +1,3 @@
-import { ok, strictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
 import { parse } from "yaml";
 import { InitTemplate } from "../../src/init/init-template.js";
@@ -8,6 +7,7 @@ import {
   scaffoldNewProject,
 } from "../../src/init/scaffold.js";
 import { TestHost, createTestHost, resolveVirtualPath } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 let testHost: TestHost;
 beforeEach(async () => {
@@ -77,7 +77,7 @@ describe("libraries", () => {
       bar: "latest",
     });
 
-    strictEqual(getOutputFile("main.tsp")!, 'import "foo";\nimport "bar";\n');
+    assert.strictEqual(getOutputFile("main.tsp")!, 'import "foo";\nimport "bar";\n');
   });
 });
 
@@ -100,12 +100,12 @@ describe("project", () => {
 
 it("can generate .gitignore file by default", async () => {
   await runTemplate({});
-  strictEqual(typeof getOutputFile(".gitignore"), "string");
+  assert.strictEqual(typeof getOutputFile(".gitignore"), "string");
 });
 
 it("can exclude .gitignore file", async () => {
   await runTemplate({}, { includeGitignore: false });
-  strictEqual(typeof getOutputFile(".gitignore"), "undefined");
+  assert.strictEqual(typeof getOutputFile(".gitignore"), "undefined");
 });
 
 it("specifying both config and emitters merge the 2", async () => {
@@ -121,7 +121,7 @@ it("specifying both config and emitters merge the 2", async () => {
     { emitters },
   );
   const output = getOutputFile("tspconfig.yaml");
-  ok(output);
+  assert.ok(output);
   expect(parse(output)).toEqual({
     "warn-as-error": true,
     emit: ["foo"],

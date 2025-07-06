@@ -1,4 +1,3 @@
-import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import type { Program } from "../../src/core/program.js";
 import { Model, Namespace, Type } from "../../src/core/types.js";
@@ -9,6 +8,7 @@ import {
   expectDiagnostics,
   expectTypeEquals,
 } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: namespaces with blocks", () => {
   const blues = new WeakSet();
@@ -39,9 +39,9 @@ describe("compiler: namespaces with blocks", () => {
       Q: Namespace;
     };
 
-    ok(blues.has(N), "N is blue");
-    ok(blues.has(Y), "Y is blue");
-    ok(blues.has(Q), "Q is blue");
+    assert.ok(blues.has(N), "N is blue");
+    assert.ok(blues.has(Y), "Y is blue");
+    assert.ok(blues.has(Q), "Q is blue");
   });
 
   it("can reference array expression on decorator of namespace", async () => {
@@ -59,7 +59,7 @@ describe("compiler: namespaces with blocks", () => {
     );
     const { Test } = await testHost.compile("./");
 
-    strictEqual(Test.kind, "Namespace" as const);
+    assert.strictEqual(Test.kind, "Namespace" as const);
   });
 
   it("merges like namespaces", async () => {
@@ -78,10 +78,10 @@ describe("compiler: namespaces with blocks", () => {
       Y: Model;
       Z: Model;
     };
-    strictEqual(X.namespace, N);
-    strictEqual(Y.namespace, N);
-    strictEqual(Z.namespace, N);
-    strictEqual(Z.properties.size, 2, "has two properties");
+    assert.strictEqual(X.namespace, N);
+    assert.strictEqual(Y.namespace, N);
+    assert.strictEqual(Z.namespace, N);
+    assert.strictEqual(Z.properties.size, 2, "has two properties");
   });
 
   it("merges like namespaces across files", async () => {
@@ -118,10 +118,10 @@ describe("compiler: namespaces with blocks", () => {
       Y: Model;
       Z: Model;
     };
-    strictEqual(X.namespace, N, "X namespace");
-    strictEqual(Y.namespace, N, "Y namespace");
-    strictEqual(Z.namespace, N, "Z namespace");
-    strictEqual(Z.properties.size, 2, "has two properties");
+    assert.strictEqual(X.namespace, N, "X namespace");
+    assert.strictEqual(Y.namespace, N, "Y namespace");
+    assert.strictEqual(Z.namespace, N, "Z namespace");
+    assert.strictEqual(Z.properties.size, 2, "has two properties");
   });
 
   it("merges sub-namespaces across files", async () => {
@@ -155,7 +155,7 @@ describe("compiler: namespaces with blocks", () => {
     const { Z } = (await testHost.compile("./")) as {
       Z: Model;
     };
-    strictEqual(Z.properties.size, 2, "has two properties");
+    assert.strictEqual(Z.properties.size, 2, "has two properties");
   });
 
   it("runs all decorators on merged namespaces", async () => {
@@ -194,11 +194,11 @@ describe("compiler: namespaces with blocks", () => {
       N: Namespace;
     };
 
-    ok(reds.has(N), "is ultimately red"); // passes
-    ok(blues.has(N), "is ultimately blue"); // passes
+    assert.ok(reds.has(N), "is ultimately red"); // passes
+    assert.ok(blues.has(N), "is ultimately blue"); // passes
 
-    ok(isRedDuringRef, "red at ref point");
-    ok(isBlueDuringRef, "blue at ref point"); // fails
+    assert.ok(isRedDuringRef, "red at ref point");
+    assert.ok(isBlueDuringRef, "blue at ref point"); // fails
   });
 
   it("runs all decorators on merged namespaces across files", async () => {
@@ -251,11 +251,11 @@ describe("compiler: namespaces with blocks", () => {
       N: Namespace;
     };
 
-    ok(reds.has(N), "is ultimately red"); // passes
-    ok(blues.has(N), "is ultimately blue"); // passes
+    assert.ok(reds.has(N), "is ultimately red"); // passes
+    assert.ok(blues.has(N), "is ultimately blue"); // passes
 
-    ok(isRedDuringRef, "red at ref point");
-    ok(isBlueDuringRef, "blue at ref point"); // fails
+    assert.ok(isRedDuringRef, "red at ref point");
+    assert.ok(isBlueDuringRef, "blue at ref point"); // fails
   });
 
   it("can see things in outer scope same file", async () => {
@@ -318,9 +318,9 @@ describe("compiler: namespaces with blocks", () => {
       Foo: Namespace;
     };
 
-    strictEqual(Foo.operations.size, 1);
-    strictEqual(Foo.models.size, 1);
-    strictEqual(Foo.namespaces.size, 1);
+    assert.strictEqual(Foo.operations.size, 1);
+    assert.strictEqual(Foo.models.size, 1);
+    assert.strictEqual(Foo.namespaces.size, 1);
   });
 
   it("can be decorated, passing a model in a later namespace", async () => {
@@ -385,7 +385,7 @@ describe("compiler: blockless namespaces", () => {
     const { Z } = (await testHost.compile("./")) as {
       Z: Model;
     };
-    strictEqual(Z.properties.size, 2, "has two properties");
+    assert.strictEqual(Z.properties.size, 2, "has two properties");
   });
 
   it("does lookup correctly", async () => {
@@ -472,8 +472,8 @@ describe("compiler: blockless namespaces", () => {
       M: Namespace;
     };
 
-    ok(M.namespace);
-    strictEqual(M.namespace, N);
+    assert.ok(M.namespace);
+    assert.strictEqual(M.namespace, N);
   });
 
   it("works with nested blockless and blockfull namespaces", async () => {
@@ -507,9 +507,9 @@ describe("compiler: blockless namespaces", () => {
       O: Namespace;
     };
 
-    ok(M.namespace);
-    ok(O.namespace);
-    strictEqual(O.namespace, M);
+    assert.ok(M.namespace);
+    assert.ok(O.namespace);
+    assert.strictEqual(O.namespace, M);
   });
 
   it("works when namespaces aren't evaluated first", async () => {
@@ -546,9 +546,9 @@ describe("compiler: blockless namespaces", () => {
       Foo: Namespace;
     };
 
-    strictEqual(Foo.operations.size, 1);
-    strictEqual(Foo.models.size, 1);
-    strictEqual(Foo.namespaces.size, 1);
+    assert.strictEqual(Foo.operations.size, 1);
+    assert.strictEqual(Foo.models.size, 1);
+    assert.strictEqual(Foo.namespaces.size, 1);
   });
 });
 
@@ -576,8 +576,8 @@ describe("compiler: namespace type name", () => {
     );
 
     const { Model1, Model2 } = await testHost.compile("./a.tsp");
-    strictEqual(getTypeName(Model1), "Foo.Model1");
-    strictEqual(getTypeName(Model2), "Foo.Other.Bar.Model2");
+    assert.strictEqual(getTypeName(Model1), "Foo.Model1");
+    assert.strictEqual(getTypeName(Model2), "Foo.Other.Bar.Model2");
   });
 
   it("gets full name in edge case with decorators", async () => {
@@ -605,8 +605,8 @@ describe("compiler: namespace type name", () => {
     );
 
     const { SomeModel, AnotherModel } = await testHost.compile("./main.tsp");
-    strictEqual(getTypeName(SomeModel), "SomeNamespace.SomeModel");
-    strictEqual(getTypeName(AnotherModel), "AnotherNamespace.AnotherModel");
+    assert.strictEqual(getTypeName(SomeModel), "SomeNamespace.SomeModel");
+    assert.strictEqual(getTypeName(AnotherModel), "AnotherNamespace.AnotherModel");
   });
 });
 
@@ -644,8 +644,8 @@ describe("compiler: decorators in namespaces", () => {
     );
 
     await testHost.compile("main.tsp");
-    ok(fooCalled);
-    ok(barCalled);
+    assert.ok(fooCalled);
+    assert.ok(barCalled);
   });
 
   it("puts decorators in a namespace using the .namespace property", async () => {
@@ -674,8 +674,8 @@ describe("compiler: decorators in namespaces", () => {
     );
 
     await testHost.compile("main.tsp");
-    ok(fooCalled);
-    ok(barCalled);
+    assert.ok(fooCalled);
+    assert.ok(barCalled);
   });
 
   it("provides full namespace name in error when namespace is missing a member", async () => {
@@ -721,10 +721,10 @@ describe("compiler: decorators in namespaces", () => {
     );
 
     const { B, X, Y } = await testHost.compile("./main.tsp");
-    strictEqual(B.kind, "Namespace" as const);
-    strictEqual(X.kind, "Model" as const);
-    strictEqual(Y.kind, "Model" as const);
-    ok(Y.baseModel);
+    assert.strictEqual(B.kind, "Namespace" as const);
+    assert.strictEqual(X.kind, "Model" as const);
+    assert.strictEqual(Y.kind, "Model" as const);
+    assert.ok(Y.baseModel);
     expectTypeEquals(Y.baseModel, X);
   });
 });

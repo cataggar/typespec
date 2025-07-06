@@ -1,7 +1,7 @@
-import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
 import { DocumentHighlight } from "vscode-languageserver/node.js";
 import { extractCursor } from "../../src/testing/source-utils.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestServerHost } from "../../src/testing/test-server-host.js";
 
 describe("compiler: server: documentHighlight", () => {
@@ -12,7 +12,7 @@ describe("compiler: server: documentHighlight", () => {
       petId: int64;
       name: string;
     }`);
-    deepStrictEqual(ranges, [
+    assert.deepStrictEqual(ranges, [
       {
         kind: 2,
         range: {
@@ -50,7 +50,7 @@ describe("compiler: server: documentHighlight", () => {
       petId: int64;
       name: string;
     }`);
-    deepStrictEqual(ranges, [
+    assert.deepStrictEqual(ranges, [
       {
         kind: 2,
         range: {
@@ -86,7 +86,7 @@ describe("compiler: server: documentHighlight", () => {
       @statusCode _: 304;
       @body body: T;
     }`);
-    deepStrictEqual(ranges, [
+    assert.deepStrictEqual(ranges, [
       {
         kind: 2,
         range: {
@@ -106,7 +106,7 @@ describe("compiler: server: documentHighlight", () => {
   it("includes namespace in highlighting", async () => {
     const ranges = await findDocumentHighlight(`namespace Pets┆ {
     }`);
-    deepStrictEqual(ranges, [
+    assert.deepStrictEqual(ranges, [
       {
         kind: 2,
         range: {
@@ -129,7 +129,7 @@ describe("compiler: server: documentHighlight", () => {
     @doc("List pets")
     @doc┆("Delete a pet") {
     }`);
-    deepStrictEqual(ranges, [
+    assert.deepStrictEqual(ranges, [
       {
         kind: 2,
         range: {

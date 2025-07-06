@@ -1,7 +1,7 @@
-import { rejects, strictEqual } from "assert";
 import * as prettier from "prettier";
 import { describe, it } from "vitest";
 import * as plugin from "../../src/formatter/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 type TestParser = "typespec" | "markdown";
 async function format(code: string, parser: TestParser = "typespec"): Promise<string> {
@@ -22,14 +22,14 @@ async function assertFormat({
   parser?: TestParser;
 }) {
   const result = await format(code, parser ?? "typespec");
-  strictEqual(result.trim(), expected.trim());
+  assert.strictEqual(result.trim(), expected.trim());
 }
 
 describe("compiler: prettier formatter", () => {
   it("throws error if there is a parsing issue", async () => {
     const code = `namespace this is invalid`;
 
-    await rejects(() => format(code));
+    await assert.rejects(() => format(code));
   });
 
   it("format imports", async () => {

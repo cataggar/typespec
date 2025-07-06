@@ -1,13 +1,13 @@
-import { deepStrictEqual, ok } from "assert";
 import { readFile } from "fs/promises";
 import { createRequire } from "module";
-import { dirname, resolve } from "path";
 import { describe, it } from "vitest";
 import vscode_oniguruma from "vscode-oniguruma";
 import vscode_textmate, { IOnigLib, StateStack } from "vscode-textmate";
 import { createSourceFile } from "../../src/core/source-file.js";
 import { TypeSpecScope } from "../../src/server/tmlanguage.js";
 import { SemanticToken, SemanticTokenKind } from "../../src/server/types.js";
+import { assert } from "../../src/testing/system-assert.js";
+import { systemPath } from "../../src/testing/system-path.js";
 import { createTestServerHost } from "../../src/testing/test-server-host.js";
 import { findTestPackageRoot } from "../../src/testing/test-utils.js";
 import { deepEquals } from "../../src/utils/index.js";
@@ -132,7 +132,7 @@ function testColorization(description: string, tokenize: Tokenize) {
       describe("single line", () => {
         it("tokenize template", async () => {
           const tokens = await tokenize(`"Start \${123} end"`);
-          deepStrictEqual(tokens, [
+          assert.deepStrictEqual(tokens, [
             ...joinTokensInSemantic([Token.literals.string('"'), Token.literals.string("Start ")]),
             Token.punctuation.templateExpression.begin,
             Token.literals.numeric("123"),
@@ -143,7 +143,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
         it("tokenize template with multiple interpolation", async () => {
           const tokens = await tokenize(`"Start \${123} middle \${456} end"`);
-          deepStrictEqual(tokens, [
+          assert.deepStrictEqual(tokens, [
             ...joinTokensInSemantic([Token.literals.string('"'), Token.literals.string("Start ")]),
             Token.punctuation.templateExpression.begin,
             Token.literals.numeric("123"),
@@ -158,7 +158,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
         it("tokenize as a string if the template expression are escaped", async () => {
           const tokens = await tokenize(`"Start \\\${123} end"`);
-          deepStrictEqual(tokens, [
+          assert.deepStrictEqual(tokens, [
             ...joinTokensInSemantic([
               Token.literals.string('"'),
               Token.literals.string("Start "),
@@ -171,7 +171,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
         it("tokenize as a string if it is a simple string", async () => {
           const tokens = await tokenize(`"Start end"`);
-          deepStrictEqual(tokens, [Token.literals.stringQuoted("Start end")]);
+          assert.deepStrictEqual(tokens, [Token.literals.stringQuoted("Start end")]);
         });
       });
 
@@ -181,7 +181,7 @@ function testColorization(description: string, tokenize: Tokenize) {
           Start \${123} 
           end
           """`);
-          deepStrictEqual(tokens, [
+          assert.deepStrictEqual(tokens, [
             ...joinTokensInSemantic(
               [Token.literals.stringTriple('"""'), Token.literals.stringTriple("          Start ")],
               "\n",
@@ -208,7 +208,7 @@ function testColorization(description: string, tokenize: Tokenize) {
           Start \\\${123} 
           end
           """`);
-          deepStrictEqual(tokens, [
+          assert.deepStrictEqual(tokens, [
             ...joinTokensInSemantic(
               [
                 Token.literals.stringTriple('"""'),
@@ -233,7 +233,7 @@ function testColorization(description: string, tokenize: Tokenize) {
           Start
           end
           """`);
-          deepStrictEqual(tokens, [
+          assert.deepStrictEqual(tokens, [
             ...joinTokensInSemantic(
               [
                 Token.literals.stringTriple(`"""`),
@@ -254,7 +254,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("using", () => {
       it("single namespace", async () => {
         const tokens = await tokenize("using foo;");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.using,
           Token.identifiers.type("foo"),
           Token.punctuation.semicolon,
@@ -263,7 +263,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("nested namespace", async () => {
         const tokens = await tokenize("using foo.bar;");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.using,
           Token.identifiers.type("foo"),
           Token.punctuation.accessor,
@@ -276,7 +276,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("aliases", () => {
       it("simple alias", async () => {
         const tokens = await tokenize("alias Foo = string");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.alias,
           Token.identifiers.type("Foo"),
           Token.operators.assignment,
@@ -286,7 +286,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("templated alias", async () => {
         const tokens = await tokenize("alias Foo<T> = T");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.alias,
           Token.identifiers.type("Foo"),
           Token.punctuation.typeParameters.begin,
@@ -299,7 +299,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("templated alias with default", async () => {
         const tokens = await tokenize("alias Foo<T = string> = T");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.alias,
           Token.identifiers.type("Foo"),
           Token.punctuation.typeParameters.begin,
@@ -313,7 +313,7 @@ function testColorization(description: string, tokenize: Tokenize) {
       });
       it("templated alias with constraint", async () => {
         const tokens = await tokenize("alias Foo<T extends string> = T");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.alias,
           Token.identifiers.type("Foo"),
           Token.punctuation.typeParameters.begin,
@@ -330,7 +330,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("valueof", () => {
       it("simple valueof", async () => {
         const tokens = await tokenize("model Foo<T extends valueof string> {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.punctuation.typeParameters.begin,
@@ -348,7 +348,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("typeof", () => {
       it("simple typeof", async () => {
         const tokens = await tokenize(`alias B = Foo<typeof "abc">;`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.alias,
           Token.identifiers.type("B"),
           Token.operators.assignment,
@@ -365,15 +365,18 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("decorators", () => {
       it("simple parameterless decorator", async () => {
         const tokens = await tokenize("@foo");
-        deepStrictEqual(tokens, [Token.identifiers.tag("@"), Token.identifiers.tag("foo")]);
+        assert.deepStrictEqual(tokens, [Token.identifiers.tag("@"), Token.identifiers.tag("foo")]);
       });
 
       it("fully qualified decorator name", async () => {
         const tokens = await tokenize("@Foo.bar");
         if (tokenize === tokenizeTMLanguage) {
-          deepStrictEqual(tokens, [Token.identifiers.tag("@"), Token.identifiers.tag("Foo.bar")]);
+          assert.deepStrictEqual(tokens, [
+            Token.identifiers.tag("@"),
+            Token.identifiers.tag("Foo.bar"),
+          ]);
         } else {
-          deepStrictEqual(tokens, [
+          assert.deepStrictEqual(tokens, [
             Token.identifiers.tag("@"),
             Token.identifiers.type("Foo"),
             Token.punctuation.accessor,
@@ -384,7 +387,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("decorator with parameters", async () => {
         const tokens = await tokenize(`@foo("param1", 123)`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.identifiers.tag("@"),
           Token.identifiers.tag("foo"),
           Token.punctuation.openParen,
@@ -409,7 +412,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("decorator", async () => {
         const tokens = await tokenize(`@@foo(MyModel, "param1", 123)`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.identifiers.tag("@@"),
           Token.identifiers.tag("foo"),
           ...params,
@@ -420,13 +423,13 @@ function testColorization(description: string, tokenize: Tokenize) {
         const tokens = await tokenize(`@@Foo.bar(MyModel, "param1", 123)`);
 
         if (tokenize === tokenizeTMLanguage) {
-          deepStrictEqual(tokens, [
+          assert.deepStrictEqual(tokens, [
             Token.identifiers.tag("@@"),
             Token.identifiers.tag("Foo.bar"),
             ...params,
           ]);
         } else {
-          deepStrictEqual(tokens, [
+          assert.deepStrictEqual(tokens, [
             Token.identifiers.tag("@@"),
             Token.identifiers.type("Foo"),
             Token.punctuation.accessor,
@@ -440,7 +443,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("interfaces", () => {
       it("empty interface", async () => {
         const tokens = await tokenize("interface Foo {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.interface,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -450,7 +453,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("interface with single extends", async () => {
         const tokens = await tokenize("interface Foo extends Bar {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.interface,
           Token.identifiers.type("Foo"),
           Token.keywords.extends,
@@ -462,7 +465,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("interface with multiple extends", async () => {
         const tokens = await tokenize("interface Foo extends Bar1, Bar2 {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.interface,
           Token.identifiers.type("Foo"),
           Token.keywords.extends,
@@ -476,7 +479,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("template interface", async () => {
         const tokens = await tokenize("interface Foo<T> {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.interface,
           Token.identifiers.type("Foo"),
           Token.punctuation.typeParameters.begin,
@@ -489,7 +492,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("template interface with extends", async () => {
         const tokens = await tokenize("interface Foo<T> extends Bar<T> {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.interface,
           Token.identifiers.type("Foo"),
           Token.punctuation.typeParameters.begin,
@@ -510,7 +513,7 @@ function testColorization(description: string, tokenize: Tokenize) {
         interface Foo {
           bar(): string;
         }`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.interface,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -530,7 +533,7 @@ function testColorization(description: string, tokenize: Tokenize) {
           bar is ResourceRead<Widget>
         }`);
 
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.interface,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -548,7 +551,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("models", () => {
       it("simple model", async () => {
         const tokens = await tokenize("model Foo {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -558,7 +561,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("model with extends", async () => {
         const tokens = await tokenize("model Foo extends Bar {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.keywords.extends,
@@ -570,7 +573,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("model with is", async () => {
         const tokens = await tokenize("model Foo is Bar {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.keywords.is,
@@ -582,7 +585,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("model with is array expression", async () => {
         const tokens = await tokenize("model Foo is string[] {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.keywords.is,
@@ -596,7 +599,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("single template argument model", async () => {
         const tokens = await tokenize("model Foo<T> {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.punctuation.typeParameters.begin,
@@ -609,7 +612,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("templated model with default", async () => {
         const tokens = await tokenize("model Foo<T = string> {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.punctuation.typeParameters.begin,
@@ -623,7 +626,7 @@ function testColorization(description: string, tokenize: Tokenize) {
       });
       it("templated model with constraint", async () => {
         const tokens = await tokenize("model Foo<T extends string> {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.punctuation.typeParameters.begin,
@@ -638,7 +641,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("multiple template argument model", async () => {
         const tokens = await tokenize("model Foo<A, B, C> {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.punctuation.typeParameters.begin,
@@ -659,7 +662,7 @@ function testColorization(description: string, tokenize: Tokenize) {
             prop1: string;
             prop2: int32;
           }`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -680,7 +683,7 @@ function testColorization(description: string, tokenize: Tokenize) {
         model Foo {
           prop1?: string;
         }`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -698,7 +701,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     model Foo {
       prop1?: string = "my-default";
     }`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -720,7 +723,7 @@ function testColorization(description: string, tokenize: Tokenize) {
             prop1: string;
           };
         }`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -742,7 +745,7 @@ function testColorization(description: string, tokenize: Tokenize) {
         model Foo {
           ...Bar;
         }`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.model,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -757,7 +760,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("scalar", () => {
       it("simple scalar", async () => {
         const tokens = await tokenize("scalar Foo;");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.scalar,
           Token.identifiers.type("Foo"),
           Token.punctuation.semicolon,
@@ -766,7 +769,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("scalar with extends", async () => {
         const tokens = await tokenize("scalar Foo extends Bar;");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.scalar,
           Token.identifiers.type("Foo"),
           Token.keywords.extends,
@@ -777,7 +780,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("single template argument model", async () => {
         const tokens = await tokenize("scalar Foo<T>;");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.scalar,
           Token.identifiers.type("Foo"),
           Token.punctuation.typeParameters.begin,
@@ -789,7 +792,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("scalar with constructor", async () => {
         const tokens = await tokenize("scalar foo { init fromFoo(value: string); }");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.scalar,
           Token.identifiers.type("foo"),
           Token.punctuation.openBrace,
@@ -810,7 +813,7 @@ function testColorization(description: string, tokenize: Tokenize) {
           scalar foo { }
           scalar bar;
         `);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.scalar,
           Token.identifiers.type("foo"),
           Token.punctuation.openBrace,
@@ -825,7 +828,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("template argument", () => {
       it("multiple named arguments", async () => {
         const tokens = await tokenize("alias X = Foo<boolean, T = string, U = int32>;");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.alias,
           Token.identifiers.type("X"),
           Token.operators.assignment,
@@ -850,7 +853,7 @@ function testColorization(description: string, tokenize: Tokenize) {
           alias A = Foo<Parameters=string>;
           alias B = Foo<Parameters=string>;  
         `);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.alias,
           Token.identifiers.type("A"),
           Token.operators.assignment,
@@ -879,7 +882,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("enums", () => {
       it("simple enum", async () => {
         const tokens = await tokenize("enum Foo {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.enum,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -889,7 +892,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("enum with simple members", async () => {
         const tokens = await tokenize("enum Direction { up, down}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.enum,
           Token.identifiers.type("Direction"),
           Token.punctuation.openBrace,
@@ -902,7 +905,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("enum with escaped identifiers", async () => {
         const tokens = await tokenize("enum Direction { `North West`, `North West`}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.enum,
           Token.identifiers.type("Direction"),
           Token.punctuation.openBrace,
@@ -915,7 +918,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("decorators on escaped members", async () => {
         const tokens = await tokenize("enum Direction { @foo `Val 123`, @foo(123) `456 after`}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.enum,
           Token.identifiers.type("Direction"),
           Token.punctuation.openBrace,
@@ -935,7 +938,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("enum with string values", async () => {
         const tokens = await tokenize(`enum Direction { up: "Up", down: "Down"}`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.enum,
           Token.identifiers.type("Direction"),
           Token.punctuation.openBrace,
@@ -954,7 +957,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("union statements", () => {
       it("simple union", async () => {
         const tokens = await tokenize("union Foo {}");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.union,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -964,7 +967,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("union with unamed variants", async () => {
         const tokens = await tokenize(`union Direction { "up", string, 123 }`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.union,
           Token.identifiers.type("Direction"),
           Token.punctuation.openBrace,
@@ -979,7 +982,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("union with named variants", async () => {
         const tokens = await tokenize(`union Direction { up: "Up", down: "Down" }`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.union,
           Token.identifiers.type("Direction"),
           Token.punctuation.openBrace,
@@ -998,7 +1001,7 @@ function testColorization(description: string, tokenize: Tokenize) {
         const tokens = await tokenize(
           `union Direction { \`north east\`: "North East", \`north west\`: "North West" }`,
         );
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.union,
           Token.identifiers.type("Direction"),
           Token.punctuation.openBrace,
@@ -1017,7 +1020,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("namespaces", () => {
       it("simple global namespace", async () => {
         const tokens = await tokenize("namespace Foo;");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.namespace,
           Token.identifiers.type("Foo"),
           Token.punctuation.semicolon,
@@ -1026,7 +1029,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("subnamespace global namespace", async () => {
         const tokens = await tokenize("namespace Foo.Bar;");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.namespace,
           Token.identifiers.type("Foo"),
           Token.punctuation.accessor,
@@ -1040,7 +1043,7 @@ function testColorization(description: string, tokenize: Tokenize) {
         namespace Foo {
 
         }`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.namespace,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -1055,7 +1058,7 @@ function testColorization(description: string, tokenize: Tokenize) {
             
           }
         }`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.namespace,
           Token.identifiers.type("Foo"),
           Token.punctuation.openBrace,
@@ -1071,7 +1074,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("operations", () => {
       it("simple operation", async () => {
         const tokens = await tokenize("op foo(): string");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.operation,
           Token.identifiers.functionName("foo"),
           Token.punctuation.openParen,
@@ -1083,7 +1086,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("operation with parameters", async () => {
         const tokens = await tokenize("op foo(param1: string, param2: int32): string");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.operation,
           Token.identifiers.functionName("foo"),
           Token.punctuation.openParen,
@@ -1105,7 +1108,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("model with properties with default value", async () => {
         const tokens = await tokenize(`op foo(param1?: string = "my-default"): string`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.operation,
           Token.identifiers.functionName("foo"),
           Token.punctuation.openParen,
@@ -1127,7 +1130,7 @@ function testColorization(description: string, tokenize: Tokenize) {
         const tokens = await tokenize(
           "op foo(@path param1: string, @query param2?: int32): string",
         );
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.operation,
           Token.identifiers.functionName("foo"),
           Token.punctuation.openParen,
@@ -1154,7 +1157,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("operation that copies the signature of another operation", async () => {
         const tokens = await tokenize("op foo is ResourceRead<Widget>");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.operation,
           Token.identifiers.functionName("foo"),
           Token.keywords.is,
@@ -1169,7 +1172,7 @@ function testColorization(description: string, tokenize: Tokenize) {
         const tokens = await tokenize(
           "op ResourceRead<TResource> is ResourceReadBase<TResource, DefaultOptions>",
         );
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.operation,
           Token.identifiers.functionName("ResourceRead"),
           Token.punctuation.typeParameters.begin,
@@ -1189,7 +1192,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("const", () => {
       it("without type annotation", async () => {
         const tokens = await tokenize("const foo = 123;");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.const,
           Token.identifiers.variable("foo"),
           Token.operators.assignment,
@@ -1200,7 +1203,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("with type annotation", async () => {
         const tokens = await tokenize("const foo: int32 = 123;");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.const,
           Token.identifiers.variable("foo"),
           Token.operators.typeAnnotation,
@@ -1215,7 +1218,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("call expressions", () => {
       it("without parameters", async () => {
         const tokens = await tokenizeWithConst("foo()");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.identifiers.functionName("foo"),
           Token.punctuation.openParen,
           Token.punctuation.closeParen,
@@ -1226,12 +1229,15 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("object literals", () => {
       it("empty", async () => {
         const tokens = await tokenizeWithConst("#{}");
-        deepStrictEqual(tokens, [Token.punctuation.openHashBrace, Token.punctuation.closeBrace]);
+        assert.deepStrictEqual(tokens, [
+          Token.punctuation.openHashBrace,
+          Token.punctuation.closeBrace,
+        ]);
       });
 
       it("single prop", async () => {
         const tokens = await tokenizeWithConst(`#{name: "John"}`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.punctuation.openHashBrace,
           Token.identifiers.variable("name"),
           Token.operators.typeAnnotation,
@@ -1242,7 +1248,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("multiple prop", async () => {
         const tokens = await tokenizeWithConst(`#{name: "John", age: 21}`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.punctuation.openHashBrace,
           Token.identifiers.variable("name"),
           Token.operators.typeAnnotation,
@@ -1257,7 +1263,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("spreading prop", async () => {
         const tokens = await tokenizeWithConst(`#{name: "John", ...Common}`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.punctuation.openHashBrace,
           Token.identifiers.variable("name"),
           Token.operators.typeAnnotation,
@@ -1271,7 +1277,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("nested prop", async () => {
         const tokens = await tokenizeWithConst(`#{prop: #{age: 21}}`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.punctuation.openHashBrace,
           Token.identifiers.variable("prop"),
           Token.operators.typeAnnotation,
@@ -1288,7 +1294,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("array literals", () => {
       it("empty", async () => {
         const tokens = await tokenizeWithConst("#[]");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.punctuation.openHashBracket,
           Token.punctuation.closeBracket,
         ]);
@@ -1296,7 +1302,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("single value", async () => {
         const tokens = await tokenizeWithConst(`#["John"]`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.punctuation.openHashBracket,
           Token.literals.stringQuoted("John"),
           Token.punctuation.closeBracket,
@@ -1305,7 +1311,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("multiple values", async () => {
         const tokens = await tokenizeWithConst(`#["John", 21]`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.punctuation.openHashBracket,
           Token.literals.stringQuoted("John"),
           Token.punctuation.comma,
@@ -1316,7 +1322,7 @@ function testColorization(description: string, tokenize: Tokenize) {
 
       it("nested tuple", async () => {
         const tokens = await tokenizeWithConst(`#[#[21]]`);
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.punctuation.openHashBracket,
           Token.punctuation.openHashBracket,
           Token.literals.numeric("21"),
@@ -1329,7 +1335,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("decorator declarations", () => {
       it("extern decorator", async () => {
         const tokens = await tokenize("extern dec tag(target: Namespace);");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.extern,
           Token.keywords.dec,
           Token.identifiers.functionName("tag"),
@@ -1346,7 +1352,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     describe("function declarations", () => {
       it("extern fn", async () => {
         const tokens = await tokenize("extern fn camelCase(target: StringLiteral): StringLiteral;");
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.keywords.extern,
           Token.keywords.fn,
           Token.identifiers.functionName("camelCase"),
@@ -1368,20 +1374,20 @@ function testColorization(description: string, tokenize: Tokenize) {
           const tokens = await tokenize(`
         //
         `);
-          deepStrictEqual(tokens, [Token.comment.line("//")]);
+          assert.deepStrictEqual(tokens, [Token.comment.line("//")]);
         });
         it("tokenize line comment", async () => {
           const tokens = await tokenize(`
         // This is a line comment
         `);
-          deepStrictEqual(tokens, [Token.comment.line("// This is a line comment")]);
+          assert.deepStrictEqual(tokens, [Token.comment.line("// This is a line comment")]);
         });
         it("tokenize line comment before statement", async () => {
           const tokens = await tokenize(`
         // Comment
         model Foo {}
         `);
-          deepStrictEqual(tokens, [
+          assert.deepStrictEqual(tokens, [
             Token.comment.line("// Comment"),
             Token.keywords.model,
             Token.identifiers.type("Foo"),
@@ -1394,7 +1400,7 @@ function testColorization(description: string, tokenize: Tokenize) {
           const tokens = await tokenize(`
           /* Comment */
           `);
-          deepStrictEqual(tokens, [
+          assert.deepStrictEqual(tokens, [
             Token.comment.block("/*"),
             Token.comment.block(" Comment "),
             Token.comment.block("*/"),
@@ -1408,7 +1414,7 @@ function testColorization(description: string, tokenize: Tokenize) {
             on multi line
           */
           `);
-          deepStrictEqual(tokens, [
+          assert.deepStrictEqual(tokens, [
             Token.comment.block("/*"),
             Token.comment.block("            Comment"),
             Token.comment.block("            on multi line"),
@@ -1451,7 +1457,7 @@ function testColorization(description: string, tokenize: Tokenize) {
             const index = tokens.findIndex((x) =>
               deepEquals(x, Token.punctuation.typeParameters.begin),
             );
-            deepStrictEqual(tokens.slice(index, index + 4), [
+            assert.deepStrictEqual(tokens.slice(index, index + 4), [
               Token.punctuation.typeParameters.begin,
               Token.identifiers.type("T"),
               Token.comment.line("// comment"),
@@ -1488,7 +1494,7 @@ function testColorization(description: string, tokenize: Tokenize) {
           alias A = 1;`,
         );
 
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.tspdoc.tag("@"),
           Token.tspdoc.tag("param"),
           Token.identifiers.variable("foo"),
@@ -1505,7 +1511,7 @@ function testColorization(description: string, tokenize: Tokenize) {
           alias A = 1;`,
         );
 
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.tspdoc.tag("@"),
           Token.tspdoc.tag("template"),
           Token.identifiers.variable("foo"),
@@ -1522,7 +1528,7 @@ function testColorization(description: string, tokenize: Tokenize) {
           alias A = 1;`,
         );
 
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.tspdoc.tag("@"),
           Token.tspdoc.tag("prop"),
           Token.identifiers.variable("foo"),
@@ -1539,7 +1545,11 @@ function testColorization(description: string, tokenize: Tokenize) {
           alias A = 1;`,
         );
 
-        deepStrictEqual(tokens, [Token.tspdoc.tag("@"), Token.tspdoc.tag("returns"), ...common]);
+        assert.deepStrictEqual(tokens, [
+          Token.tspdoc.tag("@"),
+          Token.tspdoc.tag("returns"),
+          ...common,
+        ]);
       });
       it("tokenize @custom", async () => {
         const tokens = await tokenizeDocComment(
@@ -1550,7 +1560,7 @@ function testColorization(description: string, tokenize: Tokenize) {
           alias A = 1;`,
         );
 
-        deepStrictEqual(tokens, [
+        assert.deepStrictEqual(tokens, [
           Token.identifiers.tag("@"),
           Token.identifiers.tag("custom"),
           ...common,
@@ -1567,7 +1577,7 @@ function testColorization(description: string, tokenize: Tokenize) {
     ];
     const tokens = await tokenize(`const a = ${text}`);
     for (let i = 0; i < common.length; i++) {
-      deepStrictEqual(tokens[i], common[i]);
+      assert.deepStrictEqual(tokens[i], common[i]);
     }
 
     return tokens.slice(common.length);
@@ -1639,19 +1649,21 @@ export async function tokenizeSemantic(input: string): Promise<Token[]> {
         if (text === "@") return Token.identifiers.tag("@");
         if (text === "@@") return Token.identifiers.tag("@@");
         const punctuation = punctuationMap.get(text);
-        ok(punctuation, `No tmlanguage equivalent for punctuation: "${text}".`);
+        assert.ok(punctuation, `No tmlanguage equivalent for punctuation: "${text}".`);
         return punctuation;
       case SemanticTokenKind.DocCommentTag:
         return Token.tspdoc.tag(text);
       default:
-        ok(false, "Unexpected SemanticTokenKind: " + SemanticTokenKind[token.kind]);
+        assert.ok(false, "Unexpected SemanticTokenKind: " + SemanticTokenKind[token.kind]);
     }
   }
 }
 
 async function createOnigLib(): Promise<IOnigLib> {
   const require = createRequire(import.meta.url);
-  const onigWasm = await readFile(`${dirname(require.resolve("vscode-oniguruma"))}/onig.wasm`);
+  const onigWasm = await readFile(
+    `${systemPath.dirname(require.resolve("vscode-oniguruma"))}/onig.wasm`,
+  );
 
   await loadWASM(onigWasm.buffer as any);
 
@@ -1665,7 +1677,7 @@ const registry = new Registry({
   onigLib: createOnigLib(),
   loadGrammar: async () => {
     const data = await readFile(
-      resolve(await findTestPackageRoot(import.meta.url), "dist/typespec.tmLanguage"),
+      systemPath.resolve(await findTestPackageRoot(import.meta.url), "dist/typespec.tmLanguage"),
       "utf-8",
     );
     return parseRawGrammar(data);

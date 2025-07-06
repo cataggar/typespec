@@ -1,4 +1,3 @@
-import { strictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   mutateSubgraph,
@@ -8,6 +7,7 @@ import {
   MutatorWithNamespace,
 } from "../../src/experimental/mutators.js";
 import { Model, ModelProperty, Namespace, Operation } from "../../src/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestHost } from "../../src/testing/test-host.js";
 import { createTestWrapper, expectTypeEquals } from "../../src/testing/test-utils.js";
 import { BasicTestRunner, TestHost } from "../../src/testing/types.js";
@@ -310,24 +310,24 @@ it("can mutate literals", async () => {
     },
   };
 
-  strictEqual(a.type.kind, "String");
-  strictEqual(b.type.kind, "Number");
-  strictEqual(c.type.kind, "Boolean");
+  assert.strictEqual(a.type.kind, "String");
+  assert.strictEqual(b.type.kind, "Number");
+  assert.strictEqual(c.type.kind, "Boolean");
 
   const mutatedA = mutateSubgraph(runner.program, [mutator], a.type).type;
 
-  strictEqual(mutatedA.kind, "String");
-  strictEqual(mutatedA.value, "example!");
+  assert.strictEqual(mutatedA.kind, "String");
+  assert.strictEqual(mutatedA.value, "example!");
 
   const mutatedB = mutateSubgraph(runner.program, [mutator], b.type).type;
 
-  strictEqual(mutatedB.kind, "Number");
-  strictEqual(mutatedB.value, 43);
+  assert.strictEqual(mutatedB.kind, "Number");
+  assert.strictEqual(mutatedB.value, 43);
 
   const mutatedC = mutateSubgraph(runner.program, [mutator], c.type).type;
 
-  strictEqual(mutatedC.kind, "Boolean");
-  strictEqual(mutatedC.value, true);
+  assert.strictEqual(mutatedC.kind, "Boolean");
+  assert.strictEqual(mutatedC.value, true);
 });
 
 // When mutating everything verify all reference between types are kept in the new realm.
@@ -356,7 +356,7 @@ describe("global graph mutation", () => {
       [mutator],
       runner.program.getGlobalNamespaceType(),
     );
-    strictEqual(type.kind, "Namespace");
+    assert.strictEqual(type.kind, "Namespace");
 
     return type;
   }

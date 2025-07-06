@@ -1,4 +1,4 @@
-import { deepStrictEqual, ok, strictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import { numericRanges } from "../../src/core/numeric-ranges.js";
 import { Numeric } from "../../src/core/numeric.js";
@@ -43,8 +43,8 @@ describe("compiler: checker: decorators", () => {
       let $otherDec: DecoratorFunction;
       function expectDecorator(ns: Namespace) {
         const otherDecDecorator = ns.decoratorDeclarations.get("otherDec");
-        ok(otherDecDecorator);
-        strictEqual(otherDecDecorator.implementation, $otherDec);
+        assert.ok(otherDecDecorator);
+        assert.strictEqual(otherDecDecorator.implementation, $otherDec);
       }
 
       describe("with $fn", () => {
@@ -74,8 +74,8 @@ describe("compiler: checker: decorators", () => {
             .getGlobalNamespaceType()
             .namespaces.get("Foo")
             ?.namespaces.get("Bar");
-          ok(ns);
-          expectDecorator(ns);
+          assert.ok(ns);
+          expectDecorator(ns!);
         });
       });
 
@@ -103,8 +103,8 @@ describe("compiler: checker: decorators", () => {
             .getGlobalNamespaceType()
             .namespaces.get("Foo")
             ?.namespaces.get("Bar");
-          ok(ns);
-          expectDecorator(ns);
+          assert.ok(ns);
+          expectDecorator(ns!);
         });
       });
     });
@@ -158,17 +158,17 @@ describe("compiler: checker: decorators", () => {
     });
 
     function expectDecoratorCalledWith(target: unknown, ...args: unknown[]) {
-      ok(calledArgs, "Decorator was not called.");
-      strictEqual(calledArgs.length, 2 + args.length);
-      strictEqual(calledArgs[0].program, runner.program);
-      strictEqual(calledArgs[1], target);
+      assert.ok(calledArgs, "Decorator was not called.");
+      assert.strictEqual(calledArgs.length, 2 + args.length);
+      assert.strictEqual(calledArgs[0].program, runner.program);
+      assert.strictEqual(calledArgs[1], target);
       for (const [index, arg] of args.entries()) {
-        strictEqual(calledArgs[2 + index], arg);
+        assert.strictEqual(calledArgs[2 + index], arg);
       }
     }
 
     function expectDecoratorNotCalled() {
-      strictEqual(calledArgs, undefined);
+      assert.strictEqual(calledArgs, undefined);
     }
 
     it("calls a decorator with no argument", async () => {
@@ -341,7 +341,7 @@ describe("compiler: checker: decorators", () => {
         extern dec testDec(target: unknown, arg1: valueof string);
 
       `);
-      strictEqual(calledArgs![2], "abc");
+      assert.strictEqual(calledArgs![2], "abc");
     });
 
     describe("value marshalling", () => {
@@ -364,12 +364,12 @@ describe("compiler: checker: decorators", () => {
       describe("passing a string literal", () => {
         it("`: valueof string` cast the value to a JS string", async () => {
           const arg = await testCallDecorator("valueof string", `"one"`);
-          strictEqual(arg, "one");
+          assert.strictEqual(arg, "one");
         });
 
         it("`: string` keeps the StringLiteral type", async () => {
           const arg = await testCallDecorator("string", `"one"`);
-          strictEqual(arg.kind, "String");
+          assert.strictEqual(arg.kind, "String");
         });
       });
 
@@ -379,12 +379,12 @@ describe("compiler: checker: decorators", () => {
             "valueof string",
             '"Start ${"one"} middle ${"two"} end"',
           );
-          strictEqual(arg, "Start one middle two end");
+          assert.strictEqual(arg, "Start one middle two end");
         });
 
         it("`: string` keeps the StringTemplate type", async () => {
           const arg = await testCallDecorator("string", '"Start ${"one"} middle ${"two"} end"');
-          strictEqual(arg.kind, "StringTemplate");
+          assert.strictEqual(arg.kind, "StringTemplate");
         });
       });
 
@@ -426,9 +426,9 @@ describe("compiler: checker: decorators", () => {
           async (type, expectedKind, cstr) => {
             const arg = await testCallDecorator(`valueof ${type}`, cstr ?? `123`);
             if (expectedKind === "number") {
-              strictEqual(arg, 123);
+              assert.strictEqual(arg, 123);
             } else {
-              deepStrictEqual(arg, Numeric("123"));
+              assert.deepStrictEqual(arg, Numeric("123"));
             }
           },
         );
@@ -437,21 +437,21 @@ describe("compiler: checker: decorators", () => {
       describe("passing a boolean literal", () => {
         it("valueof boolean cast the value to a JS boolean", async () => {
           const arg = await testCallDecorator("valueof boolean", `true`);
-          strictEqual(arg, true);
+          assert.strictEqual(arg, true);
         });
       });
 
       describe("passing null", () => {
         it("sends null", async () => {
           const arg = await testCallDecorator("valueof null", `null`);
-          strictEqual(arg, null);
+          assert.strictEqual(arg, null);
         });
       });
 
       describe("passing an object value", () => {
         it("valueof model cast the value to a JS object", async () => {
           const arg = await testCallDecorator("valueof {name: string}", `#{name: "foo"}`);
-          deepStrictEqual(arg, { name: "foo" });
+          assert.deepStrictEqual(arg, { name: "foo" });
         });
 
         it("valueof model cast the value recursively to a JS object", async () => {
@@ -459,19 +459,19 @@ describe("compiler: checker: decorators", () => {
             "valueof {name: unknown}",
             `#{name: #{other: "foo"}}`,
           );
-          deepStrictEqual(arg, { name: { other: "foo" } });
+          assert.deepStrictEqual(arg, { name: { other: "foo" } });
         });
       });
 
       describe("passing an array value", () => {
         it("valueof model cast the value to a JS array", async () => {
           const arg = await testCallDecorator("valueof string[]", `#["foo"]`);
-          deepStrictEqual(arg, ["foo"]);
+          assert.deepStrictEqual(arg, ["foo"]);
         });
 
         it("valueof model cast the value recursively to a JS object", async () => {
           const arg = await testCallDecorator("valueof unknown[]", `#[#["foo"]]`);
-          deepStrictEqual(arg, [["foo"]]);
+          assert.deepStrictEqual(arg, [["foo"]]);
         });
       });
     });
@@ -496,7 +496,7 @@ describe("compiler: checker: decorators", () => {
     );
 
     await testHost.compile("test.tsp");
-    ok(called);
+    assert.ok(called);
   });
 
   it("doesn't conflict with type bindings at global scope", async () => {
@@ -543,6 +543,6 @@ describe("compiler: checker: decorators", () => {
     );
 
     await testHost.diagnose("test.tsp");
-    ok(result, "expected Foo to be blue in isBlue decorator");
+    assert.ok(result, "expected Foo to be blue in isBlue decorator");
   });
 });

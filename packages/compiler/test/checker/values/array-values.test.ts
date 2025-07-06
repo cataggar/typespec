@@ -1,35 +1,35 @@
-import { strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { expectDiagnostics } from "../../../src/testing/index.js";
+import { assert } from "../../../src/testing/system-assert.js";
 import { compileValue, diagnoseUsage, diagnoseValue } from "./utils.js";
 
 it("no values", async () => {
   const object = await compileValue(`#[]`);
-  strictEqual(object.valueKind, "ArrayValue");
-  strictEqual(object.values.length, 0);
+  assert.strictEqual(object.valueKind, "ArrayValue");
+  assert.strictEqual(object.values.length, 0);
 });
 
 it("single value", async () => {
   const object = await compileValue(`#["John"]`);
-  strictEqual(object.valueKind, "ArrayValue");
-  strictEqual(object.values.length, 1);
+  assert.strictEqual(object.valueKind, "ArrayValue");
+  assert.strictEqual(object.values.length, 1);
   const first = object.values[0];
-  strictEqual(first.valueKind, "StringValue");
-  strictEqual(first.value, "John");
+  assert.strictEqual(first.valueKind, "StringValue");
+  assert.strictEqual(first.value, "John");
 });
 
 it("multiple property", async () => {
   const object = await compileValue(`#["John", 21]`);
-  strictEqual(object.valueKind, "ArrayValue");
-  strictEqual(object.values.length, 2);
+  assert.strictEqual(object.valueKind, "ArrayValue");
+  assert.strictEqual(object.values.length, 2);
 
   const nameProp = object.values[0];
-  strictEqual(nameProp?.valueKind, "StringValue");
-  strictEqual(nameProp.value, "John");
+  assert.strictEqual(nameProp?.valueKind, "StringValue");
+  assert.strictEqual(nameProp.value, "John");
 
   const ageProp = object.values[1];
-  strictEqual(ageProp?.valueKind, "NumericValue");
-  strictEqual(ageProp.value.asNumber(), 21);
+  assert.strictEqual(ageProp?.valueKind, "NumericValue");
+  assert.strictEqual(ageProp.value.asNumber(), 21);
 });
 
 describe("valid property types", () => {
@@ -43,9 +43,9 @@ describe("valid property types", () => {
     ["ArrayValue", `#["foo"]`],
   ])("%s", async (kind, type, other?) => {
     const object = await compileValue(`#[${type}]`, other);
-    strictEqual(object.valueKind, "ArrayValue");
+    assert.strictEqual(object.valueKind, "ArrayValue");
     const nameProp = object.values[0];
-    strictEqual(nameProp?.valueKind, kind);
+    assert.strictEqual(nameProp?.valueKind, kind);
   });
 });
 

@@ -1,4 +1,3 @@
-import assert, { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { CharCode } from "../src/core/charcode.js";
 import { logVerboseTestOutput } from "../src/core/diagnostics.js";
@@ -19,6 +18,7 @@ import {
   expectDiagnosticEmpty,
   expectDiagnostics,
 } from "../src/testing/expect.js";
+import { assert } from "../src/testing/system-assert.js";
 import { dumpAST } from "./ast-test-utils.js";
 
 describe("compiler: parser", () => {
@@ -468,9 +468,9 @@ describe("compiler: parser", () => {
         [/Unterminated string literal/],
         (node) => {
           const statement = node.statements[0];
-          assert(statement.kind === SyntaxKind.AliasStatement, "alias statement expected");
+          assert.ok(statement.kind === SyntaxKind.AliasStatement, "alias statement expected");
           const value = statement.value;
-          assert(value.kind === SyntaxKind.StringLiteral, "string literal expected");
+          assert.ok(value.kind === SyntaxKind.StringLiteral, "string literal expected");
           assert.strictEqual(value.value, "banana");
         },
       ]),
@@ -543,9 +543,9 @@ describe("compiler: parser", () => {
 
     function isNumericLiteral(node: TypeSpecScriptNode, value: number) {
       const statement = node.statements[0];
-      assert(statement.kind === SyntaxKind.AliasStatement, "alias statement expected");
+      assert.ok(statement.kind === SyntaxKind.AliasStatement, "alias statement expected");
       const assignment = statement.value;
-      assert(assignment?.kind === SyntaxKind.NumericLiteral, "numeric literal expected");
+      assert.ok(assignment?.kind === SyntaxKind.NumericLiteral, "numeric literal expected");
       assert.strictEqual(assignment.value, value);
     }
   });
@@ -608,7 +608,7 @@ describe("compiler: parser", () => {
           `model ${input} {}`,
           (node) => {
             const statement = node.statements[0];
-            assert(statement.kind === SyntaxKind.ModelStatement, "Model statement expected.");
+            assert.ok(statement.kind === SyntaxKind.ModelStatement, "Model statement expected.");
             assert.strictEqual(statement.id.sv, expected);
           },
         ];
@@ -621,12 +621,12 @@ describe("compiler: parser", () => {
   describe("string template expressions", () => {
     function getNode(astNode: TypeSpecScriptNode): Node {
       const statement = astNode.statements[0];
-      strictEqual(statement.kind, SyntaxKind.AliasStatement);
+      assert.strictEqual(statement.kind, SyntaxKind.AliasStatement);
       return statement.value;
     }
     function getStringTemplateNode(astNode: TypeSpecScriptNode): StringTemplateExpressionNode {
       const node = getNode(astNode);
-      strictEqual(node.kind, SyntaxKind.StringTemplateExpression);
+      assert.strictEqual(node.kind, SyntaxKind.StringTemplateExpression);
       return node;
     }
 
@@ -634,18 +634,18 @@ describe("compiler: parser", () => {
       it("parse a single line template expression", () => {
         const astNode = parseSuccessWithLog(`alias T = "Start \${"one"} middle \${23} end";`);
         const node = getStringTemplateNode(astNode);
-        strictEqual(node.head.value, "Start ");
-        strictEqual(node.spans.length, 2);
+        assert.strictEqual(node.head.value, "Start ");
+        assert.strictEqual(node.spans.length, 2);
 
         const span0 = node.spans[0];
-        strictEqual(span0.literal.value, " middle ");
-        strictEqual(span0.expression.kind, SyntaxKind.StringLiteral);
-        strictEqual(span0.expression.value, "one");
+        assert.strictEqual(span0.literal.value, " middle ");
+        assert.strictEqual(span0.expression.kind, SyntaxKind.StringLiteral);
+        assert.strictEqual(span0.expression.value, "one");
 
         const span1 = node.spans[1];
-        strictEqual(span1.literal.value, " end");
-        strictEqual(span1.expression.kind, SyntaxKind.NumericLiteral);
-        strictEqual(span1.expression.value, 23);
+        assert.strictEqual(span1.literal.value, " end");
+        assert.strictEqual(span1.expression.kind, SyntaxKind.NumericLiteral);
+        assert.strictEqual(span1.expression.value, 23);
       });
 
       it("parse a single line template with a multi line model expression inside", () => {
@@ -653,25 +653,25 @@ describe("compiler: parser", () => {
           `alias T = "Start \${{ foo: "one",\nbar: "two" }} end";`,
         );
         const node = getStringTemplateNode(astNode);
-        strictEqual(node.head.value, "Start ");
-        strictEqual(node.spans.length, 1);
+        assert.strictEqual(node.head.value, "Start ");
+        assert.strictEqual(node.spans.length, 1);
 
         const span0 = node.spans[0];
-        strictEqual(span0.literal.value, " end");
-        strictEqual(span0.expression.kind, SyntaxKind.ModelExpression);
-        strictEqual(span0.expression.properties.length, 2);
+        assert.strictEqual(span0.literal.value, " end");
+        assert.strictEqual(span0.expression.kind, SyntaxKind.ModelExpression);
+        assert.strictEqual(span0.expression.properties.length, 2);
       });
 
       it("can escape some ${}", () => {
         const astNode = parseSuccessWithLog(`alias T = "Start \${"one"} middle \\\${23} end";`);
         const node = getStringTemplateNode(astNode);
-        strictEqual(node.head.value, "Start ");
-        strictEqual(node.spans.length, 1);
+        assert.strictEqual(node.head.value, "Start ");
+        assert.strictEqual(node.spans.length, 1);
 
         const span0 = node.spans[0];
-        strictEqual(span0.literal.value, " middle ${23} end");
-        strictEqual(span0.expression.kind, SyntaxKind.StringLiteral);
-        strictEqual(span0.expression.value, "one");
+        assert.strictEqual(span0.literal.value, " middle ${23} end");
+        assert.strictEqual(span0.expression.kind, SyntaxKind.StringLiteral);
+        assert.strictEqual(span0.expression.value, "one");
       });
 
       it("can nest string templates", () => {
@@ -679,26 +679,26 @@ describe("compiler: parser", () => {
           'alias T = "Start ${"nested-start ${"hi"} nested-end"} end";',
         );
         const node = getStringTemplateNode(astNode);
-        strictEqual(node.head.value, "Start ");
-        strictEqual(node.spans.length, 1);
+        assert.strictEqual(node.head.value, "Start ");
+        assert.strictEqual(node.spans.length, 1);
 
         const span0 = node.spans[0];
-        strictEqual(span0.literal.value, " end");
-        strictEqual(span0.expression.kind, SyntaxKind.StringTemplateExpression);
-        strictEqual(span0.expression.head.value, "nested-start ");
-        strictEqual(span0.expression.spans.length, 1);
+        assert.strictEqual(span0.literal.value, " end");
+        assert.strictEqual(span0.expression.kind, SyntaxKind.StringTemplateExpression);
+        assert.strictEqual(span0.expression.head.value, "nested-start ");
+        assert.strictEqual(span0.expression.spans.length, 1);
 
         const nestedSpan0 = span0.expression.spans[0];
-        strictEqual(nestedSpan0.literal.value, " nested-end");
-        strictEqual(nestedSpan0.expression.kind, SyntaxKind.StringLiteral);
-        strictEqual(nestedSpan0.expression.value, "hi");
+        assert.strictEqual(nestedSpan0.literal.value, " nested-end");
+        assert.strictEqual(nestedSpan0.expression.kind, SyntaxKind.StringLiteral);
+        assert.strictEqual(nestedSpan0.expression.value, "hi");
       });
 
       it("string with all ${} escape is still a StringLiteral", () => {
         const astNode = parseSuccessWithLog(`alias T = "Start \\\${12} middle \\\${23} end";`);
         const node = getNode(astNode);
-        strictEqual(node.kind, SyntaxKind.StringLiteral);
-        strictEqual(node.value, "Start ${12} middle ${23} end");
+        assert.strictEqual(node.kind, SyntaxKind.StringLiteral);
+        assert.strictEqual(node.value, "Start ${12} middle ${23} end");
       });
     });
 
@@ -710,18 +710,18 @@ describe("compiler: parser", () => {
       end
       """;`);
         const node = getStringTemplateNode(astNode);
-        strictEqual(node.head.value, "Start ");
-        strictEqual(node.spans.length, 2);
+        assert.strictEqual(node.head.value, "Start ");
+        assert.strictEqual(node.spans.length, 2);
 
         const span0 = node.spans[0];
-        strictEqual(span0.literal.value, " \nmiddle ");
-        strictEqual(span0.expression.kind, SyntaxKind.StringLiteral);
-        strictEqual(span0.expression.value, "one");
+        assert.strictEqual(span0.literal.value, " \nmiddle ");
+        assert.strictEqual(span0.expression.kind, SyntaxKind.StringLiteral);
+        assert.strictEqual(span0.expression.value, "one");
 
         const span1 = node.spans[1];
-        strictEqual(span1.literal.value, " \nend");
-        strictEqual(span1.expression.kind, SyntaxKind.NumericLiteral);
-        strictEqual(span1.expression.value, 23);
+        assert.strictEqual(span1.literal.value, " \nend");
+        assert.strictEqual(span1.expression.kind, SyntaxKind.NumericLiteral);
+        assert.strictEqual(span1.expression.value, 23);
       });
 
       it("can escape some ${}", () => {
@@ -731,13 +731,13 @@ describe("compiler: parser", () => {
       end
       """;`);
         const node = getStringTemplateNode(astNode);
-        strictEqual(node.head.value, "Start ");
-        strictEqual(node.spans.length, 1);
+        assert.strictEqual(node.head.value, "Start ");
+        assert.strictEqual(node.spans.length, 1);
 
         const span0 = node.spans[0];
-        strictEqual(span0.literal.value, " \nmiddle ${23} \nend");
-        strictEqual(span0.expression.kind, SyntaxKind.StringLiteral);
-        strictEqual(span0.expression.value, "one");
+        assert.strictEqual(span0.literal.value, " \nmiddle ${23} \nend");
+        assert.strictEqual(span0.expression.kind, SyntaxKind.StringLiteral);
+        assert.strictEqual(span0.expression.value, "one");
       });
 
       it("escaping all ${} still produce a string literal", () => {
@@ -747,8 +747,8 @@ describe("compiler: parser", () => {
       end
       """;`);
         const node = getNode(astNode);
-        strictEqual(node.kind, SyntaxKind.StringLiteral);
-        strictEqual(node.value, "Start ${12} \nmiddle ${23} \nend");
+        assert.strictEqual(node.kind, SyntaxKind.StringLiteral);
+        assert.strictEqual(node.value, "Start ${12} \nmiddle ${23} \nend");
       });
     });
   });
@@ -759,8 +759,10 @@ describe("compiler: parser", () => {
       [
         `/* \\n <-- before string! */ @pattern("\\\\w") model M {}`,
         (node) => {
-          assert(node.statements[0].kind === SyntaxKind.ModelStatement);
-          assert(node.statements[0].decorators[0].arguments[0].kind === SyntaxKind.StringLiteral);
+          assert.ok(node.statements[0].kind === SyntaxKind.ModelStatement);
+          assert.ok(
+            node.statements[0].decorators[0].arguments[0].kind === SyntaxKind.StringLiteral,
+          );
           assert.strictEqual(node.statements[0].decorators[0].arguments[0].value, "\\w");
         },
       ],
@@ -813,15 +815,15 @@ describe("compiler: parser", () => {
           `@doc("foo")\n#suppress "foo"\nnamespace Foo.Bar {}`,
           (node) => {
             const fooNs = node.statements[0];
-            strictEqual(fooNs.kind, SyntaxKind.NamespaceStatement);
+            assert.strictEqual(fooNs.kind, SyntaxKind.NamespaceStatement);
             const barNs = (fooNs as any).statements;
-            strictEqual(barNs.kind, SyntaxKind.NamespaceStatement);
-            strictEqual(fooNs.id.sv, "Foo");
-            strictEqual(barNs.id.sv, "Bar");
-            strictEqual(fooNs.directives?.length, 0);
-            strictEqual(fooNs.decorators.length, 0);
-            strictEqual(barNs.directives?.length, 1);
-            strictEqual(barNs.decorators.length, 1);
+            assert.strictEqual(barNs.kind, SyntaxKind.NamespaceStatement);
+            assert.strictEqual(fooNs.id.sv, "Foo");
+            assert.strictEqual(barNs.id.sv, "Bar");
+            assert.strictEqual(fooNs.directives?.length, 0);
+            assert.strictEqual(fooNs.decorators.length, 0);
+            assert.strictEqual(barNs.directives?.length, 1);
+            assert.strictEqual(barNs.decorators.length, 1);
           },
         ],
       ]);
@@ -874,12 +876,7 @@ describe("compiler: parser", () => {
       ],
       [
         "dec myDec(target: Type, ...optionalRest?: StringLiteral[]);",
-        [
-          {
-            code: "rest-parameter-required",
-            message: "A rest parameter cannot be optional.",
-          },
-        ],
+        [{ code: "rest-parameter-required", message: "A rest parameter cannot be optional." }],
       ],
       [
         "dec myDec(target: Type, ...restFirst: StringLiteral[], paramAfter: StringLiteral);",
@@ -918,12 +915,7 @@ describe("compiler: parser", () => {
       ],
       [
         "fn myDec(target: Type, ...optionalRest?: StringLiteral[]): void;",
-        [
-          {
-            code: "rest-parameter-required",
-            message: "A rest parameter cannot be optional.",
-          },
-        ],
+        [{ code: "rest-parameter-required", message: "A rest parameter cannot be optional." }],
       ],
       [
         "fn myDec(target: Type, ...restFirst: StringLiteral[], paramAfter: StringLiteral): void;",
@@ -951,10 +943,10 @@ describe("compiler: parser", () => {
           `,
           (script) => {
             const docs = script.statements[0].docs;
-            strictEqual(docs?.length, 1);
-            strictEqual(docs[0].content.length, 1);
-            strictEqual(docs[0].content[0].text, "One-liner");
-            strictEqual(docs[0].tags.length, 0);
+            assert.strictEqual(docs?.length, 1);
+            assert.strictEqual(docs[0].content.length, 1);
+            assert.strictEqual(docs[0].content[0].text, "One-liner");
+            assert.strictEqual(docs[0].tags.length, 0);
           },
         ],
         [
@@ -964,10 +956,10 @@ describe("compiler: parser", () => {
           `,
           (script) => {
             const docs = script.statements[0].docs;
-            strictEqual(docs?.length, 1);
-            strictEqual(docs[0].content.length, 1);
-            strictEqual(docs[0].content[0].text, "Escape at the end \\");
-            strictEqual(docs[0].tags.length, 0);
+            assert.strictEqual(docs?.length, 1);
+            assert.strictEqual(docs[0].content.length, 1);
+            assert.strictEqual(docs[0].content[0].text, "Escape at the end \\");
+            assert.strictEqual(docs[0].tags.length, 0);
           },
         ],
         [
@@ -1002,10 +994,10 @@ describe("compiler: parser", () => {
           `,
           (script) => {
             const docs = script.statements[0].docs;
-            strictEqual(docs?.length, 1);
-            strictEqual(docs[0].content.length, 1);
+            assert.strictEqual(docs?.length, 1);
+            assert.strictEqual(docs[0].content.length, 1);
 
-            strictEqual(
+            assert.strictEqual(
               docs[0].content[0].text,
               "This one has a `code span` and a code fence and it spreads over\n" +
                 "more than one line.\n\n" +
@@ -1021,38 +1013,38 @@ describe("compiler: parser", () => {
                 "\n" +
                 "This is not a @tag because it is escaped.",
             );
-            strictEqual(docs[0].tags.length, 6);
+            assert.strictEqual(docs[0].tags.length, 6);
             const [xParam, yParam, tTemplate, uTemplate, returns, pretend] = docs[0].tags;
 
-            strictEqual(xParam.kind, SyntaxKind.DocParamTag as const);
-            strictEqual(xParam.tagName.sv, "param");
-            strictEqual(xParam.paramName.sv, "x");
-            strictEqual(xParam.content[0].text, "the param\nthat continues on another line");
+            assert.strictEqual(xParam.kind, SyntaxKind.DocParamTag as const);
+            assert.strictEqual(xParam.tagName.sv, "param");
+            assert.strictEqual(xParam.paramName.sv, "x");
+            assert.strictEqual(xParam.content[0].text, "the param\nthat continues on another line");
 
             // `y` has hyphen in doc string, which should be dropped
-            strictEqual(yParam.kind, SyntaxKind.DocParamTag as const);
-            strictEqual(yParam.tagName.sv, "param");
-            strictEqual(yParam.paramName.sv, "y");
-            strictEqual(yParam.content[0].text, "another param");
+            assert.strictEqual(yParam.kind, SyntaxKind.DocParamTag as const);
+            assert.strictEqual(yParam.tagName.sv, "param");
+            assert.strictEqual(yParam.paramName.sv, "y");
+            assert.strictEqual(yParam.content[0].text, "another param");
 
-            strictEqual(tTemplate.kind, SyntaxKind.DocTemplateTag as const);
-            strictEqual(tTemplate.tagName.sv, "template");
-            strictEqual(tTemplate.paramName.sv, "T");
-            strictEqual(tTemplate.content[0].text, "some template");
+            assert.strictEqual(tTemplate.kind, SyntaxKind.DocTemplateTag as const);
+            assert.strictEqual(tTemplate.tagName.sv, "template");
+            assert.strictEqual(tTemplate.paramName.sv, "T");
+            assert.strictEqual(tTemplate.content[0].text, "some template");
 
             // `U` has hyphen in doc string, which should be dropped
-            strictEqual(uTemplate.kind, SyntaxKind.DocTemplateTag as const);
-            strictEqual(uTemplate.tagName.sv, "template");
-            strictEqual(uTemplate.paramName.sv, "U");
-            strictEqual(uTemplate.content[0].text, "another template");
+            assert.strictEqual(uTemplate.kind, SyntaxKind.DocTemplateTag as const);
+            assert.strictEqual(uTemplate.tagName.sv, "template");
+            assert.strictEqual(uTemplate.paramName.sv, "U");
+            assert.strictEqual(uTemplate.content[0].text, "another template");
 
-            strictEqual(returns.kind, SyntaxKind.DocReturnsTag as const);
-            strictEqual(returns.tagName.sv, "returns");
-            strictEqual(returns.content[0].text, "something");
+            assert.strictEqual(returns.kind, SyntaxKind.DocReturnsTag as const);
+            assert.strictEqual(returns.tagName.sv, "returns");
+            assert.strictEqual(returns.content[0].text, "something");
 
-            strictEqual(pretend.kind, SyntaxKind.DocUnknownTag as const);
-            strictEqual(pretend.tagName.sv, "pretend");
-            strictEqual(pretend.content[0].text, "this an unknown tag");
+            assert.strictEqual(pretend.kind, SyntaxKind.DocUnknownTag as const);
+            assert.strictEqual(pretend.tagName.sv, "pretend");
+            assert.strictEqual(pretend.content[0].text, "this an unknown tag");
           },
         ],
         [
@@ -1065,9 +1057,9 @@ describe("compiler: parser", () => {
           `,
           (script) => {
             const docs = script.statements[0].docs;
-            strictEqual(docs?.length, 1);
-            strictEqual(docs[0].content.length, 1);
-            strictEqual(
+            assert.strictEqual(docs?.length, 1);
+            assert.strictEqual(docs[0].content.length, 1);
+            assert.strictEqual(
               docs[0].content[0].text,
               "Lines that end with \\\ndon't create an extra star.",
             );
@@ -1087,8 +1079,8 @@ describe("compiler: parser", () => {
           { docs: true, comments: true },
         );
         const comments = script.comments;
-        strictEqual(comments[0].kind, SyntaxKind.BlockComment);
-        strictEqual(comments[0].parsedAsDocs, true);
+        assert.strictEqual(comments[0].kind, SyntaxKind.BlockComment);
+        assert.strictEqual(comments[0].parsedAsDocs, true);
       });
 
       it("other comments are not marked with parsedAsDocs", () => {
@@ -1100,8 +1092,8 @@ describe("compiler: parser", () => {
           { docs: true, comments: true },
         );
         const comments = script.comments;
-        strictEqual(comments[0].kind, SyntaxKind.BlockComment);
-        ok(!comments[0].parsedAsDocs);
+        assert.strictEqual(comments[0].kind, SyntaxKind.BlockComment);
+        assert.ok(!comments[0].parsedAsDocs);
       });
 
       it("doc comment syntax not attached to any node are not marked with parsedAsDocs", () => {
@@ -1112,8 +1104,8 @@ describe("compiler: parser", () => {
           { docs: true, comments: true },
         );
         const comments = script.comments;
-        strictEqual(comments[0].kind, SyntaxKind.BlockComment);
-        ok(!comments[0].parsedAsDocs);
+        assert.strictEqual(comments[0].kind, SyntaxKind.BlockComment);
+        assert.ok(!comments[0].parsedAsDocs);
       });
     });
 
@@ -1121,43 +1113,19 @@ describe("compiler: parser", () => {
       [
         [
           "/** @42 */ model M {}",
-          [
-            {
-              code: "doc-invalid-identifier",
-              message: /tag/,
-              severity: "warning",
-            },
-          ],
+          [{ code: "doc-invalid-identifier", message: /tag/, severity: "warning" }],
         ],
         [
           "/** @ */ model M {}",
-          [
-            {
-              code: "doc-invalid-identifier",
-              message: /tag/,
-              severity: "warning",
-            },
-          ],
+          [{ code: "doc-invalid-identifier", message: /tag/, severity: "warning" }],
         ],
         [
           "/** @template 42 */ model M {}",
-          [
-            {
-              code: "doc-invalid-identifier",
-              message: /template parameter/,
-              severity: "warning",
-            },
-          ],
+          [{ code: "doc-invalid-identifier", message: /template parameter/, severity: "warning" }],
         ],
         [
           "/** @template */ model M {}",
-          [
-            {
-              code: "doc-invalid-identifier",
-              message: /template parameter/,
-              severity: "warning",
-            },
-          ],
+          [{ code: "doc-invalid-identifier", message: /template parameter/, severity: "warning" }],
         ],
         [
           "/** @param 42 */ model M {}",
@@ -1180,10 +1148,7 @@ describe("compiler: parser", () => {
           ],
         ],
       ],
-      {
-        docs: true,
-        strict: true,
-      },
+      { docs: true, strict: true },
     );
   });
 
@@ -1198,26 +1163,22 @@ describe("compiler: parser", () => {
   describe("annotations order", () => {
     function expectHasDocComment(script: TypeSpecScriptNode, content: string, index: number = 0) {
       const docs = script.statements[0].docs;
-      strictEqual(docs?.[index].content[0].text, content);
+      assert.strictEqual(docs?.[index].content[0].text, content);
     }
 
     function expectHasDirective(script: TypeSpecScriptNode, id: string) {
       const directives = script.statements[0].directives;
-      ok(
+      assert.ok(
         directives?.some((x) => x.target.sv === id),
-        `Should have found a directive with id ${id} but only has ${directives?.map(
-          (x) => x.target.sv,
-        )}`,
+        `Should have found a directive with id ${id} but only has ${directives?.map((x) => x.target.sv)}`,
       );
     }
 
     function expectHasDecorator(script: TypeSpecScriptNode, id: string) {
       const decorators = (script.statements[0] as DecorableNode).decorators;
-      ok(
+      assert.ok(
         decorators?.some((x) => (x.target as IdentifierNode).sv === id),
-        `Should have found a directive with id ${id} but only has ${decorators?.map(
-          (x) => (x.target as IdentifierNode).sv,
-        )}`,
+        `Should have found a directive with id ${id} but only has ${decorators?.map((x) => (x.target as IdentifierNode).sv)}`,
       );
     }
 
@@ -1393,7 +1354,7 @@ function parseEach(cases: (string | [string, Callback])[], options?: ParseOption
         assert.fail("Unexpected parse errors in test:\n" + diagnostics);
       }
 
-      assert(astNode.printable, "Parse tree with no errors should be printable");
+      assert.ok(astNode.printable, "Parse tree with no errors should be printable");
 
       checkInvariants(astNode);
     });
@@ -1429,7 +1390,7 @@ function checkVisitChildren(node: Node, file: SourceFile) {
   dynamicVisitChildren(node, (key, child) => visited.set(child, key));
   visitChildren(node, (child) => void visited.delete(child));
 
-  deepStrictEqual(
+  assert.deepStrictEqual(
     Array.from(visited.values()),
     [],
     `Nodes not visited by visitChildren of ${SyntaxKind[node.kind]}`,
@@ -1516,12 +1477,12 @@ function parseErrorEach(
       expectDiagnostics(astNode.parseDiagnostics, expected, options);
 
       if (astNode.parseDiagnostics.some((e) => e.severity !== "warning")) {
-        assert(
+        assert.ok(
           hasParseError(astNode),
           "node claims to have no parse errors, but above were reported.",
         );
 
-        assert(
+        assert.ok(
           !astNode.printable ||
             !astNode.parseDiagnostics.some((d) => !/^'[,;:{}()]' expected\.$/.test(d.message)),
           "parse tree with errors other than missing punctuation should not be printable",

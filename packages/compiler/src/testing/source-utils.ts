@@ -1,4 +1,4 @@
-import { ok } from "assert";
+import { assert } from "./system-assert.js";
 
 /**
  * Takes source code with a cursor position indicated by the given marker
@@ -10,7 +10,7 @@ export function extractCursor(
   marker = "┆",
 ): { source: string; pos: number } {
   const pos = sourceWithCursor.indexOf(marker);
-  ok(pos >= 0, "marker not found");
+  assert.ok(pos >= 0, "marker not found");
   const source = sourceWithCursor.replace(marker, "");
   return { source, pos };
 }

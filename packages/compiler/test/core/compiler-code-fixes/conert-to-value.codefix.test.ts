@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { assert } from "../../../src/testing/system-assert.js";
 import { it } from "vitest";
 import { SyntaxKind } from "../../../src/ast/index.js";
 import {
@@ -15,7 +15,7 @@ it("it change model expression to an object value", async () => {
       }
     `,
     (node) => {
-      strictEqual(node.kind, SyntaxKind.ModelExpression);
+      assert.strictEqual(node.kind, SyntaxKind.ModelExpression);
       return createModelToObjectValueCodeFix(node);
     },
   ).toChangeTo(`
@@ -33,7 +33,7 @@ it("it recursively changes the model expression to the corresponding object valu
       model Bar { Baz : string }
     `,
     (node) => {
-      strictEqual(node.kind, SyntaxKind.ModelExpression);
+      assert.strictEqual(node.kind, SyntaxKind.ModelExpression);
       return createModelToObjectValueCodeFix(node);
     },
   ).toChangeTo(`
@@ -51,7 +51,7 @@ it("it recursively changes the complex model expression to the corresponding obj
       model Bar { Baz : string }
     `,
     (node) => {
-      strictEqual(node.kind, SyntaxKind.ModelExpression);
+      assert.strictEqual(node.kind, SyntaxKind.ModelExpression);
       return createModelToObjectValueCodeFix(node);
     },
   ).toChangeTo(`
@@ -69,7 +69,7 @@ it("it change tuple to a array value", async () => {
       }
     `,
     (node) => {
-      strictEqual(node.kind, SyntaxKind.TupleExpression);
+      assert.strictEqual(node.kind, SyntaxKind.TupleExpression);
       return createTupleToArrayValueCodeFix(node);
     },
   ).toChangeTo(`
@@ -87,7 +87,7 @@ it("it recursively changes tuple to the corresponding array value", async () => 
       }
     `,
     (node) => {
-      strictEqual(node.kind, SyntaxKind.TupleExpression);
+      assert.strictEqual(node.kind, SyntaxKind.TupleExpression);
       return createTupleToArrayValueCodeFix(node);
     },
   ).toChangeTo(`
@@ -106,7 +106,7 @@ it("it recursively changes the complex tuple to the corresponding object value o
       }
     `,
     (node) => {
-      strictEqual(node.kind, SyntaxKind.TupleExpression);
+      assert.strictEqual(node.kind, SyntaxKind.TupleExpression);
       return createTupleToArrayValueCodeFix(node);
     },
   ).toChangeTo(`

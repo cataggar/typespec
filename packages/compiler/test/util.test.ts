@@ -1,6 +1,6 @@
-import { deepStrictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { RekeyableMap } from "../src/index.js";
+import { assert } from "../src/testing/system-assert.js";
 import { createRekeyableMap } from "../src/utils/misc.js";
 
 describe("compiler: util", () => {
@@ -12,7 +12,7 @@ describe("compiler: util", () => {
         ["c", "pos 3"],
       ]);
 
-      deepStrictEqual(
+      assert.deepStrictEqual(
         [...map.entries()],
         [
           ["a", "pos 1"],
@@ -33,7 +33,7 @@ describe("compiler: util", () => {
         map.set("aa", "pos 4");
       });
       it("entries() return items in order", () => {
-        deepStrictEqual(
+        assert.deepStrictEqual(
           [...map.entries()],
           [
             ["a", "pos 1"],
@@ -45,11 +45,11 @@ describe("compiler: util", () => {
       });
 
       it("keys() return keys in order", () => {
-        deepStrictEqual([...map.keys()], ["a", "b", "c", "aa"]);
+        assert.deepStrictEqual([...map.keys()], ["a", "b", "c", "aa"]);
       });
 
       it("values() return values in order", () => {
-        deepStrictEqual([...map.values()], ["pos 1", "pos 2", "pos 3", "pos 4"]);
+        assert.deepStrictEqual([...map.values()], ["pos 1", "pos 2", "pos 3", "pos 4"]);
       });
     });
 
@@ -63,7 +63,7 @@ describe("compiler: util", () => {
 
       map.rekey("b", "renamed");
 
-      deepStrictEqual(
+      assert.deepStrictEqual(
         [...map.entries()],
         [
           ["a", "pos 1"],
@@ -84,7 +84,7 @@ describe("compiler: util", () => {
 
       map.rekey("c", "b");
 
-      deepStrictEqual(
+      assert.deepStrictEqual(
         [...map.entries()],
         [
           ["a", "pos 1"],

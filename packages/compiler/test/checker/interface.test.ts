@@ -1,4 +1,3 @@
-import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { isTemplateDeclaration } from "../../src/core/type-utils.js";
 import { Interface, Model, Operation, Type } from "../../src/core/types.js";
@@ -10,6 +9,7 @@ import {
   createTestRunner,
   expectDiagnostics,
 } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: interfaces", () => {
   let testHost: TestHost;
@@ -41,15 +41,15 @@ describe("compiler: interfaces", () => {
       Foo: Interface;
     };
 
-    strictEqual(Foo.namespace, testHost.program.checker.getGlobalNamespaceType());
-    strictEqual(Foo.name, "Foo");
-    strictEqual(Foo.operations.size, 1);
+    assert.strictEqual(Foo.namespace, testHost.program.checker.getGlobalNamespaceType());
+    assert.strictEqual(Foo.name, "Foo");
+    assert.strictEqual(Foo.operations.size, 1);
     const bar = Foo.operations.get("bar");
-    ok(bar);
-    strictEqual(bar.name, "bar");
-    strictEqual(bar.kind, "Operation");
-    ok(blues.has(bar));
-    ok(blues.has(Foo));
+    assert.ok(bar);
+    assert.strictEqual(bar.name, "bar");
+    assert.strictEqual(bar.kind, "Operation");
+    assert.ok(blues.has(bar));
+    assert.ok(blues.has(Foo));
   });
 
   it("throws diagnostics for duplicate properties", async () => {
@@ -86,10 +86,10 @@ describe("compiler: interfaces", () => {
       Foo: Interface;
     };
 
-    strictEqual(Foo.operations.size, 1);
+    assert.strictEqual(Foo.operations.size, 1);
     const returnType = Foo.operations.get("bar")!.returnType;
-    strictEqual(returnType.kind, "Scalar" as const);
-    strictEqual(returnType.name, "int32");
+    assert.strictEqual(returnType.kind, "Scalar" as const);
+    assert.strictEqual(returnType.name, "int32");
   });
 
   it("can extend one other interfaces", async () => {
@@ -108,14 +108,14 @@ describe("compiler: interfaces", () => {
     const { Foo } = (await testHost.compile("./")) as {
       Foo: Interface;
     };
-    deepStrictEqual(
+    assert.deepStrictEqual(
       Foo.sourceInterfaces.map((i) => i.name),
       ["Bar"],
     );
-    strictEqual(Foo.operations.size, 2);
-    ok(Foo.operations.get("foo"));
-    ok(Foo.operations.get("bar"));
-    strictEqual((Foo.operations.get("bar")!.returnType as Model).name, "int32");
+    assert.strictEqual(Foo.operations.size, 2);
+    assert.ok(Foo.operations.get("foo"));
+    assert.ok(Foo.operations.get("bar"));
+    assert.strictEqual((Foo.operations.get("bar")!.returnType as Model).name, "int32");
   });
 
   it("can extend two other interfaces", async () => {
@@ -135,15 +135,15 @@ describe("compiler: interfaces", () => {
     const { Foo } = (await testHost.compile("./")) as {
       Foo: Interface;
     };
-    deepStrictEqual(
+    assert.deepStrictEqual(
       Foo.sourceInterfaces.map((i) => i.name),
       ["Bar", "Baz"],
     );
-    strictEqual(Foo.operations.size, 3);
-    ok(Foo.operations.get("foo"));
-    ok(Foo.operations.get("bar"));
-    ok(Foo.operations.get("baz"));
-    strictEqual((Foo.operations.get("bar")!.returnType as Model).name, "int32");
+    assert.strictEqual(Foo.operations.size, 3);
+    assert.ok(Foo.operations.get("foo"));
+    assert.ok(Foo.operations.get("bar"));
+    assert.ok(Foo.operations.get("baz"));
+    assert.strictEqual((Foo.operations.get("bar")!.returnType as Model).name, "int32");
   });
 
   it("doesn't copy interface decorators down when using extends", async () => {
@@ -169,8 +169,8 @@ describe("compiler: interfaces", () => {
       Bar: Interface;
     };
 
-    ok(!blues.has(Bar));
-    strictEqual(Bar.operations.size, 2);
+    assert.ok(!blues.has(Bar));
+    assert.strictEqual(Bar.operations.size, 2);
   });
 
   it("clones extended operations", async () => {
@@ -196,8 +196,8 @@ describe("compiler: interfaces", () => {
       Bar: Interface;
     };
 
-    strictEqual(calls, 2);
-    ok(blues.has(Bar.operations.get("foo")!));
+    assert.strictEqual(calls, 2);
+    assert.ok(blues.has(Bar.operations.get("foo")!));
   });
 
   it("doesn't allow extensions to contain duplicate members", async () => {
@@ -229,9 +229,9 @@ describe("compiler: interfaces", () => {
     const { Foo } = (await testHost.compile("./")) as {
       Foo: Interface;
     };
-    strictEqual(Foo.operations.size, 1);
-    ok(Foo.operations.get("bar"));
-    strictEqual((Foo.operations.get("bar")!.returnType as Model).name, "string");
+    assert.strictEqual(Foo.operations.size, 1);
+    assert.ok(Foo.operations.get("bar"));
+    assert.strictEqual((Foo.operations.get("bar")!.returnType as Model).name, "string");
   });
 
   it("doesn't allow extending non-interfaces", async () => {
@@ -263,12 +263,12 @@ describe("compiler: interfaces", () => {
         bar: Operation;
       };
 
-      strictEqual(Foo.operations.size, 1);
-      ok(isTemplateDeclaration(Foo.operations.get("bar")!));
+      assert.strictEqual(Foo.operations.size, 1);
+      assert.ok(isTemplateDeclaration(Foo.operations.get("bar")!));
 
       const returnType = bar.returnType;
-      strictEqual(returnType.kind, "Scalar" as const);
-      strictEqual(returnType.name, "int32");
+      assert.strictEqual(returnType.kind, "Scalar" as const);
+      assert.strictEqual(returnType.name, "int32");
     });
 
     it("can instantiate template operation inside templated interface", async () => {
@@ -284,15 +284,15 @@ describe("compiler: interfaces", () => {
         bar: Operation;
       };
 
-      strictEqual(Foo.operations.size, 1);
+      assert.strictEqual(Foo.operations.size, 1);
 
       const input = bar.parameters.properties.get("input")!.type;
-      strictEqual(input.kind, "Scalar" as const);
-      strictEqual(input.name, "string");
+      assert.strictEqual(input.kind, "Scalar" as const);
+      assert.strictEqual(input.name, "string");
 
       const returnType = bar.returnType;
-      strictEqual(returnType.kind, "Scalar" as const);
-      strictEqual(returnType.name, "int32");
+      assert.strictEqual(returnType.kind, "Scalar" as const);
+      assert.strictEqual(returnType.name, "int32");
     });
 
     it("can instantiate template operation inside templated interface (inverted order)", async () => {
@@ -309,14 +309,14 @@ describe("compiler: interfaces", () => {
         bar: Operation;
       };
 
-      strictEqual(Foo.operations.size, 1);
+      assert.strictEqual(Foo.operations.size, 1);
       const input = bar.parameters.properties.get("input")!.type;
-      strictEqual(input.kind, "Scalar" as const);
-      strictEqual(input.name, "string");
+      assert.strictEqual(input.kind, "Scalar" as const);
+      assert.strictEqual(input.name, "string");
 
       const returnType = bar.returnType;
-      strictEqual(returnType.kind, "Scalar" as const);
-      strictEqual(returnType.name, "int32");
+      assert.strictEqual(returnType.kind, "Scalar" as const);
+      assert.strictEqual(returnType.name, "int32");
     });
 
     it("cache templated operations", async () => {
@@ -335,10 +335,10 @@ describe("compiler: interfaces", () => {
       };
       const a = Index.properties.get("a");
       const b = Index.properties.get("b");
-      ok(a);
-      ok(b);
+      assert.ok(a);
+      assert.ok(b);
 
-      strictEqual(a.type, b.type);
+      assert.strictEqual(a.type, b.type);
     });
 
     it("templated interface with different args but templated operations with the same arg shouldn't be the same", async () => {
@@ -358,10 +358,10 @@ describe("compiler: interfaces", () => {
       };
       const a = Index.properties.get("a");
       const b = Index.properties.get("b");
-      ok(a);
-      ok(b);
+      assert.ok(a);
+      assert.ok(b);
 
-      notStrictEqual(a.type, b.type);
+      assert.notStrictEqual(a.type, b.type);
     });
 
     it("can extend an interface with templated operations", async () => {
@@ -379,15 +379,15 @@ describe("compiler: interfaces", () => {
         myBar: Operation;
       };
 
-      strictEqual(Foo.operations.size, 1);
+      assert.strictEqual(Foo.operations.size, 1);
 
       const input = bar.parameters.properties.get("input")!.type;
-      strictEqual(input.kind, "Scalar" as const);
-      strictEqual(input.name, "string");
+      assert.strictEqual(input.kind, "Scalar" as const);
+      assert.strictEqual(input.name, "string");
 
       const returnType = bar.returnType;
-      strictEqual(returnType.kind, "Scalar" as const);
-      strictEqual(returnType.name, "int32");
+      assert.strictEqual(returnType.kind, "Scalar" as const);
+      assert.strictEqual(returnType.name, "int32");
     });
 
     it("instantiating an templated interface doesn't finish template operation inside", async () => {
@@ -472,12 +472,12 @@ describe("compiler: interfaces", () => {
       };
 
       const input = myBar.parameters.properties.get("input")!.type;
-      strictEqual(input.kind, "Scalar" as const);
-      strictEqual(input.name, "string");
+      assert.strictEqual(input.kind, "Scalar" as const);
+      assert.strictEqual(input.name, "string");
 
       const returnType = myBar.returnType;
-      strictEqual(returnType.kind, "Scalar" as const);
-      strictEqual(returnType.name, "int32");
+      assert.strictEqual(returnType.kind, "Scalar" as const);
+      assert.strictEqual(returnType.name, "int32");
     });
   });
 
@@ -494,7 +494,10 @@ describe("compiler: interfaces", () => {
       Base: Interface;
       Extending: Interface;
     };
-    strictEqual(getDoc(testHost.program, Extending.operations.get("one")!), "override for spread");
-    strictEqual(getDoc(testHost.program, Base.operations.get("one")!), "base doc");
+    assert.strictEqual(
+      getDoc(testHost.program, Extending.operations.get("one")!),
+      "override for spread",
+    );
+    assert.strictEqual(getDoc(testHost.program, Base.operations.get("one")!), "base doc");
   });
 });

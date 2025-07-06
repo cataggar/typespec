@@ -1,19 +1,19 @@
-import assert from "assert";
 import type { RmOptions } from "fs";
-import { readdir, readFile, stat } from "fs/promises";
-import { globby } from "globby";
-import { join } from "path";
-import { fileURLToPath, pathToFileURL } from "url";
 import { logDiagnostics, logVerboseTestOutput } from "../core/diagnostics.js";
 import { createLogger } from "../core/logger/logger.js";
-import { NodeHost } from "../core/node-host.js";
 import { CompilerOptions } from "../core/options.js";
 import { getAnyExtensionFromPath, resolvePath } from "../core/path-utils.js";
 import { compile as compileProgram, Program } from "../core/program.js";
+import { fsPromises } from "../core/system-fs-promises.js";
+import { getSystemUrl } from "../core/system-url.js";
 import type { CompilerHost, Diagnostic, StringLiteral, Type } from "../core/types.js";
+import { getCompilerHost } from "../core/types.js";
 import { createSourceFile, getSourceFileKindFromExt } from "../index.js";
 import { createStringMap } from "../utils/misc.js";
 import { expectDiagnosticEmpty } from "./expect.js";
+import { assert } from "./system-assert.js";
+import { systemGlobby } from "./system-globby.js";
+import { systemPath } from "./system-path.js";
 import { createTestWrapper, findTestPackageRoot, resolveVirtualPath } from "./test-utils.js";
 import {
   BasicTestRunner,
@@ -88,11 +88,11 @@ function createTestCompilerHost(
       }
     },
 
-    getLibDirs() {
+    async getLibDirs() {
       return libDirs;
     },
 
-    getExecutionRoot() {
+    async getExecutionRoot() {
       return resolveVirtualPath(".tsp");
     },
 
@@ -141,11 +141,11 @@ function createTestCompilerHost(
     },
     getSourceFileKind: getSourceFileKindFromExt,
 
-    logSink: { log: NodeHost.logSink.log },
+    logSink: { log: getCompilerHost().logSink.log },
     mkdirp: async (path: string) => path,
-    fileURLToPath,
+    fileURLToPath: getSystemUrl().fileURLToPath,
     pathToFileURL(path: string) {
-      return pathToFileURL(path).href;
+      return getSystemUrl().pathToFileURL(path).href;
     },
 
     ...options?.compilerHostOverrides,
@@ -179,15 +179,15 @@ export async function createTestFileSystem(options?: TestHostOptions): Promise<T
   }
 
   async function addRealTypeSpecFile(path: string, existingPath: string) {
-    virtualFs.set(resolveVirtualPath(path), await readFile(existingPath, "utf8"));
+    virtualFs.set(resolveVirtualPath(path), await fsPromises.readFile(existingPath, "utf8"));
   }
 
   async function addRealFolder(folder: string, existingFolder: string) {
-    const entries = await readdir(existingFolder);
+    const entries = await fsPromises.readdir(existingFolder);
     for (const entry of entries) {
-      const existingPath = join(existingFolder, entry);
-      const virtualPath = join(folder, entry);
-      const s = await stat(existingPath);
+      const existingPath = systemPath.join(existingFolder, entry);
+      const virtualPath = systemPath.join(folder, entry);
+      const s = await fsPromises.stat(existingPath);
       if (s.isFile()) {
         if (existingPath.endsWith(".js")) {
           await addRealJsFile(virtualPath, existingPath);
@@ -203,7 +203,7 @@ export async function createTestFileSystem(options?: TestHostOptions): Promise<T
 
   async function addRealJsFile(path: string, existingPath: string) {
     const key = resolveVirtualPath(path);
-    const exports = await import(pathToFileURL(existingPath).href);
+    const exports = await import(getSystemUrl().pathToFileURL(existingPath).href);
 
     virtualFs.set(key, "");
     jsImports.set(key, exports);
@@ -219,7 +219,7 @@ export async function createTestFileSystem(options?: TestHostOptions): Promise<T
         switch (getAnyExtensionFromPath(fileRealPath)) {
           case ".tsp":
           case ".json":
-            const contents = await readFile(fileRealPath, "utf-8");
+            const contents = await fsPromises.readFile(fileRealPath, "utf-8");
             addTypeSpecFile(fileVirtualPath, contents);
             break;
           case ".js":
@@ -232,18 +232,25 @@ export async function createTestFileSystem(options?: TestHostOptions): Promise<T
   }
 }
 
-export const StandardTestLibrary: TypeSpecTestLibrary = {
-  name: "@typespec/compiler",
-  packageRoot: await findTestPackageRoot(import.meta.url),
-  files: [
-    { virtualPath: "./.tsp/dist/src/lib", realDir: "./dist/src/lib", pattern: "**" },
-    { virtualPath: "./.tsp/lib", realDir: "./lib", pattern: "**" },
-  ],
-};
+let _standardTestLibrary: TypeSpecTestLibrary | undefined;
+export async function getStandardTestLibrary(): Promise<TypeSpecTestLibrary> {
+  if (!_standardTestLibrary) {
+    _standardTestLibrary = {
+      name: "@typespec/compiler",
+      packageRoot: await findTestPackageRoot(import.meta.url),
+      files: [
+        { virtualPath: "./.tsp/dist/src/lib", realDir: "./dist/src/lib", pattern: "**" },
+        { virtualPath: "./.tsp/lib", realDir: "./lib", pattern: "**" },
+      ],
+    };
+  }
+  return _standardTestLibrary;
+}
 
 export async function createTestHost(config: TestHostConfig = {}): Promise<TestHost> {
   const testHost = await createTestHostInternal();
-  await testHost.addTypeSpecLibrary(StandardTestLibrary);
+  const standardLib = await getStandardTestLibrary();
+  await testHost.addTypeSpecLibrary(standardLib);
   if (config.libraries) {
     for (const library of config.libraries) {
       await testHost.addTypeSpecLibrary(library);
@@ -294,7 +301,8 @@ async function createTestHostInternal(): Promise<TestHost> {
   return {
     ...fileSystem,
     addTypeSpecLibrary: async (lib) => {
-      if (lib !== StandardTestLibrary) {
+      const standardLib = await getStandardTestLibrary();
+      if (lib !== standardLib) {
         libraries.push(lib);
       }
       await fileSystem.addTypeSpecLibrary(lib);
@@ -305,7 +313,7 @@ async function createTestHostInternal(): Promise<TestHost> {
     testTypes,
     libraries,
     get program() {
-      assert(
+      assert.ok(
         program,
         "Program cannot be accessed without calling compile, diagnose, or compileAndDiagnose.",
       );
@@ -338,7 +346,7 @@ async function createTestHostInternal(): Promise<TestHost> {
 }
 
 export async function findFilesFromPattern(directory: string, pattern: string): Promise<string[]> {
-  return globby(pattern, {
+  return systemGlobby.globby(pattern, {
     cwd: directory,
     onlyFiles: true,
   });

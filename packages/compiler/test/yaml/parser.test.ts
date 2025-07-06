@@ -1,7 +1,7 @@
-import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
 import { expectDiagnosticEmpty, expectDiagnostics } from "../../src/testing/expect.js";
 import { extractCursor } from "../../src/testing/source-utils.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { parseYaml } from "../../src/yaml/parser.js";
 
 describe("compiler: yaml: parser", () => {
@@ -11,7 +11,7 @@ describe("compiler: yaml: parser", () => {
       bar: 456
     `);
     expectDiagnosticEmpty(diagnostics);
-    deepStrictEqual(yamlScript.value, { foo: 123, bar: 456 });
+    assert.deepStrictEqual(yamlScript.value, { foo: 123, bar: 456 });
   });
 
   it("report errors as diagnostics", () => {

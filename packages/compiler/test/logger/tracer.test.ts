@@ -1,7 +1,7 @@
-import { deepStrictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { createTracer } from "../../src/core/logger/tracer.js";
 import { LogInfo, Logger, Tracer } from "../../src/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: tracer", () => {
   let logger: Logger;
@@ -22,14 +22,14 @@ describe("compiler: tracer", () => {
       const tracer = createTracer(logger);
 
       tracer.trace("abc", "Should not be logged");
-      deepStrictEqual(logs, []);
+      assert.deepStrictEqual(logs, []);
     });
 
     it("log if the area match exactly", () => {
       const tracer = createTracer(logger, { filter: ["abc"] });
 
       tracer.trace("abc", "Should now have been logged");
-      deepStrictEqual(logs, [
+      assert.deepStrictEqual(logs, [
         { code: "abc", message: "Should now have been logged", level: "trace" },
       ]);
     });
@@ -38,7 +38,7 @@ describe("compiler: tracer", () => {
       const tracer = createTracer(logger, { filter: ["abc"] });
 
       tracer.trace("abc.def", "Should now have been logged");
-      deepStrictEqual(logs, [
+      assert.deepStrictEqual(logs, [
         { code: "abc.def", message: "Should now have been logged", level: "trace" },
       ]);
     });
@@ -47,7 +47,7 @@ describe("compiler: tracer", () => {
       const tracer = createTracer(logger, { filter: ["abc.*"] });
 
       tracer.trace("abc.def", "Should now have been logged");
-      deepStrictEqual(logs, [
+      assert.deepStrictEqual(logs, [
         { code: "abc.def", message: "Should now have been logged", level: "trace" },
       ]);
     });
@@ -56,7 +56,7 @@ describe("compiler: tracer", () => {
       const tracer = createTracer(logger, { filter: ["abc"] });
 
       tracer.trace("abc.def.ghi", "Should now have been logged");
-      deepStrictEqual(logs, [
+      assert.deepStrictEqual(logs, [
         { code: "abc.def.ghi", message: "Should now have been logged", level: "trace" },
       ]);
     });
@@ -70,12 +70,14 @@ describe("compiler: tracer", () => {
 
     it("prepend all trace with the subtracer area", () => {
       tracer.sub("abc").trace("def", "Should be in abc.def");
-      deepStrictEqual(logs, [{ code: "abc.def", message: "Should be in abc.def", level: "trace" }]);
+      assert.deepStrictEqual(logs, [
+        { code: "abc.def", message: "Should be in abc.def", level: "trace" },
+      ]);
     });
 
     it("prepend sub tracer area with parent sub tracer", () => {
       tracer.sub("abc").sub("def").trace("ghi", "Should be in abc.def.ghi");
-      deepStrictEqual(logs, [
+      assert.deepStrictEqual(logs, [
         { code: "abc.def.ghi", message: "Should be in abc.def.ghi", level: "trace" },
       ]);
     });

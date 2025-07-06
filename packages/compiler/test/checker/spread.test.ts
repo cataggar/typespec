@@ -1,4 +1,4 @@
-import { ok, strictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import { Model, Type } from "../../src/core/types.js";
 import {
@@ -31,11 +31,11 @@ describe("compiler: spread", () => {
       @test model C { ... A, ... B }
       `)) as { C: Model };
 
-    strictEqual(C.kind, "Model");
-    strictEqual(C.properties.size, 2);
+    assert.strictEqual(C.kind, "Model");
+    assert.strictEqual(C.properties.size, 2);
 
     for (const [_, prop] of C.properties) {
-      ok(blues.has(prop), prop.name + " is blue");
+      assert.ok(blues.has(prop), prop.name + " is blue");
     }
   });
 

@@ -1,16 +1,17 @@
-import { rejects } from "assert";
-import { normalize, resolve } from "path";
 import { describe, it } from "vitest";
 import { CompilerOptions } from "../../../src/core/options.js";
-import { NodeHost, Program, compile, resolvePath } from "../../../src/index.js";
+import { getCompilerHost } from "../../../src/core/types.js";
+import { Program, compile, resolvePath } from "../../../src/index.js";
 import { expectDiagnosticEmpty, expectDiagnostics } from "../../../src/testing/expect.js";
+import { assert } from "../../../src/testing/system-assert.js";
+import { systemPath } from "../../../src/testing/system-path.js";
 import { findTestPackageRoot } from "../../../src/testing/test-utils.js";
 
 const scenarioRoot = resolvePath(await findTestPackageRoot(import.meta.url), "test/e2e/scenarios");
 
 describe("compiler: entrypoints", () => {
   async function compileScenario(name: string, options: CompilerOptions = {}): Promise<Program> {
-    return compile(NodeHost, resolve(scenarioRoot, name), { ...options });
+    return compile(getCompilerHost(), systemPath.resolve(scenarioRoot, name), { ...options });
   }
 
   describe("compile library", () => {
@@ -67,7 +68,7 @@ describe("compiler: entrypoints", () => {
       });
       expectDiagnostics(program.diagnostics, {
         code: "js-error",
-        message: `Failed to load ${scenarioRoot}/import-library-js-error/node_modules/my-lib/index.js due to the following JS error: Cannot find module '${normalize(`${scenarioRoot}/import-library-js-error/node_modules/my-lib/invalid-file-not-exists.js`)}' imported from ${normalize(`${scenarioRoot}/import-library-js-error/node_modules/my-lib/index.js`)}`,
+        message: `Failed to load ${scenarioRoot}/import-library-js-error/node_modules/my-lib/index.js due to the following JS error: Cannot find module '${systemPath.normalize(`${scenarioRoot}/import-library-js-error/node_modules/my-lib/index.js`)}'`,
       });
     });
 
@@ -77,7 +78,7 @@ describe("compiler: entrypoints", () => {
       });
       expectDiagnostics(program.diagnostics, {
         code: "js-error",
-        message: `Failed to load ${scenarioRoot}/import-library-js-error/node_modules/my-lib/index.js due to the following JS error: Cannot find module '${normalize(`${scenarioRoot}/import-library-js-error/node_modules/my-lib/invalid-file-not-exists.js`)}' imported from ${normalize(`${scenarioRoot}/import-library-js-error/node_modules/my-lib/index.js`)}`,
+        message: `Failed to load ${scenarioRoot}/import-library-js-error/node_modules/my-lib/index.js due to the following JS error: Cannot find module '${systemPath.normalize(`${scenarioRoot}/import-library-js-error/node_modules/my-lib/index.js`)}'`,
       });
     });
 
@@ -92,7 +93,7 @@ describe("compiler: entrypoints", () => {
     });
 
     it("report error if emitter fail unexpectedly", async () => {
-      await rejects(
+      await assert.rejects(
         () =>
           compileScenario("emitter-throw-error", {
             emit: ["@typespec/my-emitter"],
@@ -109,7 +110,7 @@ describe("compiler: entrypoints", () => {
     });
 
     it("report error if onValidate fail unexpectedly", async () => {
-      await rejects(
+      await assert.rejects(
         () => compileScenario("validator-throw-error"),
         new RegExp(
           [

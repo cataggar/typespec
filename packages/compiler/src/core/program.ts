@@ -43,6 +43,7 @@ import {
 } from "./source-loader.js";
 import { createStateAccessors } from "./state-accessors.js";
 import { ComplexityStats, RuntimeStats, Stats, startTimer, time, timeAsync } from "./stats.js";
+import { getSystemUrl } from "./system-url.js";
 import {
   CompilerHost,
   Diagnostic,
@@ -335,7 +336,7 @@ async function createProgram(
     // Check all the files that were loaded
     for (const fileUrl of getLibraryUrlsLoaded()) {
       if (fileUrl.startsWith("file:")) {
-        const root = await findProjectRoot(host.stat, host.fileURLToPath(fileUrl));
+        const root = await findProjectRoot(host.stat, getSystemUrl().fileURLToPath(fileUrl));
         if (root) {
           loadedRoots.add(root);
         }
@@ -423,7 +424,7 @@ async function createProgram(
   async function loadIntrinsicTypes(loader: SourceLoader) {
     const locationContext: LocationContext = { type: "compiler" };
     return loader.importFile(
-      resolvePath(host.getExecutionRoot(), "lib/intrinsics.tsp"),
+      resolvePath(await host.getExecutionRoot(), "lib/intrinsics.tsp"),
       NoTarget,
       locationContext,
     );
@@ -431,7 +432,7 @@ async function createProgram(
 
   async function loadStandardLibrary(loader: SourceLoader) {
     const locationContext: LocationContext = { type: "compiler" };
-    for (const dir of host.getLibDirs()) {
+    for (const dir of await host.getLibDirs()) {
       await loader.importFile(resolvePath(dir, "main.tsp"), NoTarget, locationContext);
     }
   }
@@ -745,7 +746,7 @@ async function createProgram(
       throw err;
     }
 
-    const expected = host.getExecutionRoot();
+    const expected = await host.getExecutionRoot();
 
     if (actual.path !== expected && MANIFEST.version !== actual.manifest.version) {
       const betterTypeSpecServerPath = actual.path;

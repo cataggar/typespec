@@ -1,10 +1,10 @@
-import { ok, strictEqual } from "assert";
 import { applyCodeFix } from "../core/code-fixes.js";
 import { getNodeAtPosition, parse, visitChildren } from "../core/parser.js";
 import { createSourceFile } from "../core/source-file.js";
 import type { CodeFix, Node } from "../core/types.js";
 import { mutate } from "../utils/misc.js";
 import { extractCursor } from "./source-utils.js";
+import { assert } from "./system-assert.js";
 import { createTestHost } from "./test-host.js";
 import { trimBlankLines } from "./test-utils.js";
 
@@ -46,7 +46,7 @@ export function expectCodeFixOnAst(code: string, callback: (node: Node) => CodeF
     const script = parse(virtualFile);
     linkAstParents(script);
     const node = getNodeAtPosition(script, pos);
-    ok(node, "Expected node at cursor. Make sure to have ┆ to mark which node.");
+    assert.ok(node, "Expected node at cursor. Make sure to have ┆ to mark which node.");
     const codefix = callback(node);
     const host = await createTestHost();
     let updatedContent: string | undefined;
@@ -54,14 +54,14 @@ export function expectCodeFixOnAst(code: string, callback: (node: Node) => CodeF
       {
         ...host.compilerHost,
         writeFile: async (path, value) => {
-          strictEqual(path, "test.tsp");
+          assert.strictEqual(path, "test.tsp");
           updatedContent = value;
         },
       },
       codefix,
     );
-    ok(updatedContent);
-    strictEqual(trimBlankLines(updatedContent), trimBlankLines(expectedCode));
+    assert.ok(updatedContent);
+    assert.strictEqual(trimBlankLines(updatedContent), trimBlankLines(expectedCode));
   }
 }
 

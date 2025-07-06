@@ -1,6 +1,6 @@
-import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
 import { DocumentSymbol, SymbolKind } from "vscode-languageserver/node.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestServerHost } from "../../src/testing/test-server-host.js";
 
 type SimplifiedSymbol = {
@@ -43,7 +43,7 @@ describe("compiler: server: SymbolInformation", () => {
         ${code1}
         ${code2}
       `);
-      deepStrictEqual(symbols, [
+      assert.deepStrictEqual(symbols, [
         { kind: SymbolKind[kind], name: "Foo" },
         { kind: SymbolKind[kind], name: "Bar" },
       ]);
@@ -57,7 +57,7 @@ describe("compiler: server: SymbolInformation", () => {
         age: number
       }
     `);
-    deepStrictEqual(symbols, [
+    assert.deepStrictEqual(symbols, [
       {
         kind: SymbolKind.Struct,
         name: "Pet",
@@ -76,7 +76,7 @@ describe("compiler: server: SymbolInformation", () => {
         meow: boolean;
       }
     `);
-    deepStrictEqual(symbols, [
+    assert.deepStrictEqual(symbols, [
       {
         kind: SymbolKind.Struct,
         name: "Cat",
@@ -95,7 +95,7 @@ describe("compiler: server: SymbolInformation", () => {
         Down
       }
     `);
-    deepStrictEqual(symbols, [
+    assert.deepStrictEqual(symbols, [
       {
         kind: SymbolKind.Enum,
         name: "Direction",
@@ -115,7 +115,7 @@ describe("compiler: server: SymbolInformation", () => {
         Right
       }
     `);
-    deepStrictEqual(symbols, [
+    assert.deepStrictEqual(symbols, [
       {
         kind: SymbolKind.Enum,
         name: "Direction2D",
@@ -135,7 +135,7 @@ describe("compiler: server: SymbolInformation", () => {
         dog: Dog,
       }
     `);
-    deepStrictEqual(symbols, [
+    assert.deepStrictEqual(symbols, [
       {
         kind: SymbolKind.Enum,
         name: "Pet",
@@ -154,7 +154,7 @@ describe("compiler: server: SymbolInformation", () => {
         get(): void;
       }
     `);
-    deepStrictEqual(symbols, [
+    assert.deepStrictEqual(symbols, [
       {
         kind: SymbolKind.Interface,
         name: "Store",
@@ -174,7 +174,7 @@ describe("compiler: server: SymbolInformation", () => {
         enum Bar {}
       }
     `);
-      deepStrictEqual(symbols, [
+      assert.deepStrictEqual(symbols, [
         {
           kind: SymbolKind.Namespace,
           name: "MyService",
@@ -191,7 +191,7 @@ describe("compiler: server: SymbolInformation", () => {
       namespace MyService.Models {
       }
     `);
-      deepStrictEqual(symbols, [
+      assert.deepStrictEqual(symbols, [
         {
           kind: SymbolKind.Namespace,
           name: "MyService.Models",
@@ -205,7 +205,7 @@ describe("compiler: server: SymbolInformation", () => {
         namespace Models {}
       }
     `);
-      deepStrictEqual(symbols, [
+      assert.deepStrictEqual(symbols, [
         {
           kind: SymbolKind.Namespace,
           name: "MyService",
@@ -224,7 +224,7 @@ describe("compiler: server: SymbolInformation", () => {
         model Pet {}
       }
     `);
-      deepStrictEqual(symbols, [
+      assert.deepStrictEqual(symbols, [
         {
           kind: SymbolKind.Namespace,
           name: "MyOrg.MyService",

@@ -1,5 +1,5 @@
 /* eslint-disable vitest/valid-describe-callback */
-import { ok, strictEqual } from "assert";
+import { assert } from "../../src/testing/system-assert.js";
 import { beforeEach, describe, it } from "vitest";
 import { Enum, Interface, Model, Operation, Type } from "../../src/core/types.js";
 import {
@@ -257,7 +257,7 @@ describe("compiler: references", () => {
         const { Foo } = (await testHost.compile("./main.tsp")) as {
           Foo: Model;
         };
-        strictEqual(Foo.properties.get("a")!.type, Foo.properties.get("b"));
+        assert.strictEqual(Foo.properties.get("a")!.type, Foo.properties.get("b"));
       });
     });
   });
@@ -342,11 +342,11 @@ describe("compiler: references", () => {
 
         const { MyEnum } = (await testHost.compile("./main.tsp")) as { MyEnum: Enum };
 
-        ok(taggedValue);
-        const t = taggedValue.properties.get("t")?.type;
-        strictEqual(t?.kind, "Model" as const);
-        strictEqual(t.properties.get("type")?.type.kind, "EnumMember" as const);
-        strictEqual(t.properties.get("type")?.type, MyEnum.members.get("b"));
+        assert.ok(taggedValue);
+        const t = taggedValue?.properties.get("t")?.type;
+        assert.strictEqual(t?.kind, "Model" as const);
+        assert.strictEqual(t?.properties.get("type")?.type.kind, "EnumMember" as const);
+        assert.strictEqual(t?.properties.get("type")?.type, MyEnum.members.get("b"));
       });
 
       it("alias don't conflict", async () => {
@@ -376,7 +376,7 @@ describe("compiler: references", () => {
           Foo: Enum;
         };
 
-        strictEqual(taggedValue, Foo.members.get("a"));
+        assert.strictEqual(taggedValue, Foo.members.get("a"));
       });
     });
   });
@@ -501,7 +501,7 @@ describe("compiler: references", () => {
         const { Foo } = (await testHost.compile("./main.tsp")) as {
           Foo: Interface;
         };
-        strictEqual(linkedValue, Foo.operations.get("a"));
+        assert.strictEqual(linkedValue, Foo.operations.get("a"));
       });
 
       it("defined after", async () => {
@@ -520,7 +520,7 @@ describe("compiler: references", () => {
         const { Foo } = (await testHost.compile("./main.tsp")) as {
           Foo: Interface;
         };
-        strictEqual(linkedValue, Foo.operations.get("a"));
+        assert.strictEqual(linkedValue, Foo.operations.get("a"));
       });
     });
   });
@@ -701,8 +701,8 @@ describe("compiler: references", () => {
       );
 
       const { Spread } = (await testHost.compile("./main.tsp")) as { Spread: Model };
-      strictEqual(Spread.properties.size, 1);
-      ok(Spread.properties.get("name"));
+      assert.strictEqual(Spread.properties.size, 1);
+      assert.ok(Spread.properties.get("name"));
     });
 
     it("the Johan test case", async () => {
@@ -723,10 +723,10 @@ describe("compiler: references", () => {
         azureVersion: Operation;
       };
       const existingNames = [...azureVersion.parameters.properties.values()].map((v) => v.name);
-      strictEqual(existingNames.length, 3);
-      ok(existingNames.includes("model"));
-      ok(existingNames.includes("top_n"));
-      ok(existingNames.includes("dataSources"));
+      assert.strictEqual(existingNames.length, 3);
+      assert.ok(existingNames.includes("model"));
+      assert.ok(existingNames.includes("top_n"));
+      assert.ok(existingNames.includes("dataSources"));
     });
   });
 });

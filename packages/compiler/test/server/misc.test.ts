@@ -1,9 +1,9 @@
-import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { SyntaxKind, TypeSpecScriptNode, parse } from "../../src/ast/index.js";
 import type { PositionDetail } from "../../src/index.js";
 import { getCompletionNodeAtPosition } from "../../src/server/serverlib.js";
 import { extractCursor } from "../../src/testing/source-utils.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { dumpAST } from "../ast-test-utils.js";
 
 describe("compiler: server: misc", () => {
@@ -24,9 +24,9 @@ describe("compiler: server: misc", () => {
         }
       `);
       const node = detail?.node;
-      ok(node);
-      strictEqual(node.kind, SyntaxKind.Identifier as const);
-      strictEqual(node.sv, "string");
+      assert.ok(node);
+      assert.strictEqual(node.kind, SyntaxKind.Identifier as const);
+      assert.strictEqual(node.sv, "string");
     });
 
     it("return missing identifier node when at the position for model property type", async () => {
@@ -36,9 +36,9 @@ describe("compiler: server: misc", () => {
         }
       `);
       const node = detail?.getPositionDetailAfterTrivia()?.node;
-      ok(node);
-      strictEqual(node.kind, SyntaxKind.Identifier as const);
-      strictEqual(node.sv, "<missing identifier>1");
+      assert.ok(node);
+      assert.strictEqual(node.kind, SyntaxKind.Identifier as const);
+      assert.strictEqual(node.sv, "<missing identifier>1");
     });
 
     it("return string literal when in non completed string", async () => {
@@ -46,8 +46,8 @@ describe("compiler: server: misc", () => {
         import "┆
       `);
       const node = detail?.node;
-      ok(node);
-      strictEqual(node.kind, SyntaxKind.StringLiteral);
+      assert.ok(node);
+      assert.strictEqual(node.kind, SyntaxKind.StringLiteral);
     });
 
     it("return string literal when in non completed multi line string", async () => {
@@ -57,8 +57,8 @@ describe("compiler: server: misc", () => {
         }
       `);
       const node = detail?.node;
-      ok(node);
-      strictEqual(node.kind, SyntaxKind.StringLiteral);
+      assert.ok(node);
+      assert.strictEqual(node.kind, SyntaxKind.StringLiteral);
     });
 
     it("return missing identifier between dot and close paren", async () => {
@@ -66,9 +66,9 @@ describe("compiler: server: misc", () => {
         @myDecN.┆)
       `);
       const node = detail?.node;
-      ok(node);
-      strictEqual(node.kind, SyntaxKind.Identifier as const);
-      strictEqual(node.sv, "<missing identifier>1");
+      assert.ok(node);
+      assert.strictEqual(node.kind, SyntaxKind.Identifier as const);
+      assert.strictEqual(node.sv, "<missing identifier>1");
     });
 
     describe("resolve real node when no potential identifier", () => {
@@ -79,9 +79,9 @@ describe("compiler: server: misc", () => {
         }
       `);
         const node = detail?.node;
-        ok(node);
-        strictEqual(node.kind, SyntaxKind.NamespaceStatement as const);
-        strictEqual(node.id.sv, "Foo");
+        assert.ok(node);
+        assert.strictEqual(node.kind, SyntaxKind.NamespaceStatement as const);
+        assert.strictEqual(node.id.sv, "Foo");
       });
     });
   });

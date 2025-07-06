@@ -1,3 +1,6 @@
+export { setSystemFsPromises } from "../core/system-fs-promises.js";
+export type { SystemFsPromises } from "../core/system-fs-promises.js";
+export { setSystemUrl } from "../core/system-url.js";
 export { expectCodeFixOnAst } from "./code-fix-testing.js";
 export { expectDiagnosticEmpty, expectDiagnostics, type DiagnosticMatch } from "./expect.js";
 export {
@@ -7,12 +10,18 @@ export {
   type LinterRuleTester,
 } from "./rule-tester.js";
 export { extractCursor, extractSquiggles } from "./source-utils.js";
+export { setSystemAssert } from "./system-assert.js";
+export type { SystemAssert } from "./system-assert.js";
+export { setSystemGlobby } from "./system-globby.js";
+export type { SystemGlobby } from "./system-globby.js";
+export { setSystemPath } from "./system-path.js";
+export type { SystemPath } from "./system-path.js";
 export {
-  StandardTestLibrary,
   createTestFileSystem,
   createTestHost,
   createTestRunner,
   findFilesFromPattern,
+  getStandardTestLibrary,
   type TestHostOptions,
 } from "./test-host.js";
 export {

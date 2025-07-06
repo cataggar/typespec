@@ -1,7 +1,7 @@
-import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { expectDiagnostics } from "../../src/testing/expect.js";
 import { extractSquiggles } from "../../src/testing/source-utils.js";
+import { assert } from "../../src/testing/system-assert.js";
 import { createTestHost, createTestRunner } from "../../src/testing/test-host.js";
 import { BasicTestRunner } from "../../src/testing/types.js";
 import { defineTest } from "../test-utils.js";
@@ -16,8 +16,8 @@ const { compile: compileTypeOf, diagnose: diagnoseTypeOf } = defineTest(
         @test target: ${typeofCode};
       }
     `);
-    ok(target, `Expected a property tagged with @test("target")`);
-    strictEqual(target.kind, "ModelProperty");
+    assert.ok(target, `Expected a property tagged with @test("target")`);
+    assert.strictEqual(target.kind, "ModelProperty");
     return [target.type, diagnostics];
   },
 );
@@ -25,14 +25,14 @@ const { compile: compileTypeOf, diagnose: diagnoseTypeOf } = defineTest(
 describe("get the type of a const", () => {
   it("const without an explicit type return the precise type of the value", async () => {
     const type = await compileTypeOf(`typeof a`, `const a = 123;`);
-    strictEqual(type.kind, "Number");
-    strictEqual(type.value, 123);
+    assert.strictEqual(type.kind, "Number");
+    assert.strictEqual(type.value, 123);
   });
 
   it("const with an explicit type return const type", async () => {
     const type = await compileTypeOf(`typeof a`, `const a: int32 = 123;`);
-    strictEqual(type.kind, "Scalar");
-    strictEqual(type.name, "int32");
+    assert.strictEqual(type.kind, "Scalar");
+    assert.strictEqual(type.name, "int32");
   });
 });
 
@@ -97,9 +97,9 @@ describe("typeof can be used to force sending a type to a decorator that accept 
     @foo(typeof "abc")
     model A {}
   `);
-    ok(called);
-    strictEqual(called.kind, "String");
-    strictEqual(called.value, "abc");
+    assert.ok(called);
+    assert.strictEqual(called.kind, "String");
+    assert.strictEqual(called.value, "abc");
   });
 
   it("via template", async () => {
@@ -111,8 +111,8 @@ describe("typeof can be used to force sending a type to a decorator that accept 
     @foo(T)
     model A<T extends string | valueof string> {}
   `);
-    ok(called);
-    strictEqual(called.kind, "String");
-    strictEqual(called.value, "abc");
+    assert.ok(called);
+    assert.strictEqual(called.kind, "String");
+    assert.strictEqual(called.value, "abc");
   });
 });

@@ -1,7 +1,7 @@
-import { deepStrictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { Namespace, getService, listServices } from "../../src/index.js";
 import { BasicTestRunner, createTestRunner, expectDiagnostics } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: service", () => {
   let runner: BasicTestRunner;
@@ -15,7 +15,7 @@ describe("compiler: service", () => {
       op test(): string;
     `);
 
-    deepStrictEqual(listServices(runner.program), []);
+    assert.deepStrictEqual(listServices(runner.program), []);
   });
 
   it("allows a single service", async () => {
@@ -24,7 +24,7 @@ describe("compiler: service", () => {
 
     `);
 
-    deepStrictEqual(listServices(runner.program), [{ type: S }]);
+    assert.deepStrictEqual(listServices(runner.program), [{ type: S }]);
   });
 
   it("get a service", async () => {
@@ -34,8 +34,8 @@ describe("compiler: service", () => {
     @test @service namespace S2 {}
   `)) as { S1: Namespace; S2: Namespace };
 
-    deepStrictEqual(getService(runner.program, S1), { type: S1 });
-    deepStrictEqual(getService(runner.program, S2), { type: S2 });
+    assert.deepStrictEqual(getService(runner.program, S1), { type: S1 });
+    assert.deepStrictEqual(getService(runner.program, S2), { type: S2 });
   });
 
   it("allows multiple services", async () => {
@@ -45,7 +45,7 @@ describe("compiler: service", () => {
       @test @service namespace S2 {}
     `);
 
-    deepStrictEqual(listServices(runner.program), [{ type: S1 }, { type: S2 }]);
+    assert.deepStrictEqual(listServices(runner.program), [{ type: S1 }, { type: S2 }]);
   });
 
   it("customize service title", async () => {
@@ -54,7 +54,7 @@ describe("compiler: service", () => {
 
     `);
 
-    deepStrictEqual(listServices(runner.program), [{ type: S, title: "My Service" }]);
+    assert.deepStrictEqual(listServices(runner.program), [{ type: S, title: "My Service" }]);
   });
 
   it("emit diagnostic if service title is not a string", async () => {

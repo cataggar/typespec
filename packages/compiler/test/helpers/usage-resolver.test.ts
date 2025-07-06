@@ -1,8 +1,8 @@
-import { deepStrictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { UsageFlags, resolveUsages } from "../../src/core/helpers/usage-resolver.js";
 import { getTypeName } from "../../src/index.js";
 import { BasicTestRunner, createTestRunner } from "../../src/testing/index.js";
+import { assert } from "../../src/testing/system-assert.js";
 
 describe("compiler: helpers: usage resolver", () => {
   let runner: BasicTestRunner;
@@ -38,7 +38,7 @@ describe("compiler: helpers: usage resolver", () => {
       op test(input: Foo): void;
     `);
 
-    deepStrictEqual(usages, { inputs: ["Foo"], outputs: [] });
+    assert.deepStrictEqual(usages, { inputs: ["Foo"], outputs: [] });
   });
 
   it("track model used as operation returnType as output", async () => {
@@ -47,7 +47,7 @@ describe("compiler: helpers: usage resolver", () => {
       op test(): Foo;
     `);
 
-    deepStrictEqual(usages, { inputs: [], outputs: ["Foo"] });
+    assert.deepStrictEqual(usages, { inputs: [], outputs: ["Foo"] });
   });
 
   it("track model used as operation returnType inside interface as output", async () => {
@@ -58,7 +58,7 @@ describe("compiler: helpers: usage resolver", () => {
       }
     `);
 
-    deepStrictEqual(usages, { inputs: [], outputs: ["Foo"] });
+    assert.deepStrictEqual(usages, { inputs: [], outputs: ["Foo"] });
   });
 
   it("track model used as operation returnType inside namespace as output", async () => {
@@ -69,7 +69,7 @@ describe("compiler: helpers: usage resolver", () => {
       }
     `);
 
-    deepStrictEqual(usages, { inputs: [], outputs: ["Foo"] });
+    assert.deepStrictEqual(usages, { inputs: [], outputs: ["Foo"] });
   });
 
   it("track model used as operation parameter and returnType as both input and output", async () => {
@@ -78,7 +78,7 @@ describe("compiler: helpers: usage resolver", () => {
       op test(input: Foo): Foo;
     `);
 
-    deepStrictEqual(usages, { inputs: ["Foo"], outputs: ["Foo"] });
+    assert.deepStrictEqual(usages, { inputs: ["Foo"], outputs: ["Foo"] });
   });
 
   it("track model referenced via property in returnType", async () => {
@@ -90,7 +90,7 @@ describe("compiler: helpers: usage resolver", () => {
       op test(): Foo;
     `);
 
-    deepStrictEqual(usages, { inputs: [], outputs: ["Foo", "Bar"] });
+    assert.deepStrictEqual(usages, { inputs: [], outputs: ["Foo", "Bar"] });
   });
 
   it("doesn't track model referenced via base model in returnType", async () => {
@@ -100,7 +100,7 @@ describe("compiler: helpers: usage resolver", () => {
       op test(): Foo;
     `);
 
-    deepStrictEqual(usages, { inputs: [], outputs: ["Foo"] });
+    assert.deepStrictEqual(usages, { inputs: [], outputs: ["Foo"] });
   });
 
   it("track model referenced via child model in returnType", async () => {
@@ -110,7 +110,7 @@ describe("compiler: helpers: usage resolver", () => {
       op test(): Foo;
     `);
 
-    deepStrictEqual(usages, { inputs: [], outputs: ["Foo", "Bar"] });
+    assert.deepStrictEqual(usages, { inputs: [], outputs: ["Foo", "Bar"] });
   });
 
   it("track model referenced in union in returnType", async () => {
@@ -120,7 +120,7 @@ describe("compiler: helpers: usage resolver", () => {
       op test(): Foo | Bar;
     `);
 
-    deepStrictEqual(usages, { inputs: [], outputs: ["Foo", "Bar"] });
+    assert.deepStrictEqual(usages, { inputs: [], outputs: ["Foo", "Bar"] });
   });
 
   it("track type used in array", async () => {
@@ -129,7 +129,7 @@ describe("compiler: helpers: usage resolver", () => {
       op test(): Bar[];
     `);
 
-    deepStrictEqual(usages, { inputs: [], outputs: ["Bar[]", "Bar"] });
+    assert.deepStrictEqual(usages, { inputs: [], outputs: ["Bar[]", "Bar"] });
   });
 
   it("track type used in Record", async () => {
@@ -138,7 +138,7 @@ describe("compiler: helpers: usage resolver", () => {
       op test(): Record<Bar>;
     `);
 
-    deepStrictEqual(usages, { inputs: [], outputs: ["Record<Bar>", "Bar"] });
+    assert.deepStrictEqual(usages, { inputs: [], outputs: ["Record<Bar>", "Bar"] });
   });
 
   it("track enum referenced in returnType", async () => {
@@ -147,7 +147,7 @@ describe("compiler: helpers: usage resolver", () => {
       op test(): MyEnum;
     `);
 
-    deepStrictEqual(usages, { inputs: [], outputs: ["MyEnum"] });
+    assert.deepStrictEqual(usages, { inputs: [], outputs: ["MyEnum"] });
   });
 
   describe("scope", () => {
@@ -163,7 +163,7 @@ describe("compiler: helpers: usage resolver", () => {
           "get",
         );
 
-        deepStrictEqual(usages, { inputs: [], outputs: ["Foo"] });
+        assert.deepStrictEqual(usages, { inputs: [], outputs: ["Foo"] });
       });
 
       it("only collect specific usage(input/output) for that operation", async () => {
@@ -176,7 +176,7 @@ describe("compiler: helpers: usage resolver", () => {
           "get",
         );
 
-        deepStrictEqual(usages, { inputs: [], outputs: ["Foo"] });
+        assert.deepStrictEqual(usages, { inputs: [], outputs: ["Foo"] });
       });
     });
 
@@ -197,7 +197,7 @@ describe("compiler: helpers: usage resolver", () => {
           "Two",
         );
 
-        deepStrictEqual(usages, { inputs: ["Bar"], outputs: ["Foo"] });
+        assert.deepStrictEqual(usages, { inputs: ["Bar"], outputs: ["Foo"] });
       });
     });
 
@@ -218,7 +218,7 @@ describe("compiler: helpers: usage resolver", () => {
           ["set", "other"],
         );
 
-        deepStrictEqual(usages, { inputs: ["Foo", "Bar"], outputs: [] });
+        assert.deepStrictEqual(usages, { inputs: ["Foo", "Bar"], outputs: [] });
       });
     });
   });

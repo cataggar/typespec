@@ -1,6 +1,6 @@
 import { describe, it } from "vitest";
-import { NodeHost } from "../../src/core/node-host.js";
 import { compile } from "../../src/core/program.js";
+import { getCompilerHost } from "../../src/core/types.js";
 import { resolvePath } from "../../src/index.js";
 import { MANIFEST } from "../../src/manifest.js";
 import {
@@ -21,7 +21,7 @@ describe("compiler: libraries", () => {
     describe(lib, () => {
       it("compiles without error", async () => {
         const mainFile = resolvePath(pkgRoot, `test/libraries/${lib}/main.tsp`);
-        const program = await compile(NodeHost, mainFile, { noEmit: true });
+        const program = await compile(getCompilerHost(), mainFile, { noEmit: true });
         expectDiagnosticEmpty(program.diagnostics);
       });
     });

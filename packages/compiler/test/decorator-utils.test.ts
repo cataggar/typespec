@@ -1,4 +1,3 @@
-import { deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { Type } from "../src/core/types.js";
 import {
@@ -15,6 +14,7 @@ import {
   expectDiagnosticEmpty,
   expectDiagnostics,
 } from "../src/testing/index.js";
+import { assert } from "../src/testing/system-assert.js";
 
 describe("compiler: decorator utils", () => {
   describe("typespecTypeToJson", () => {
@@ -46,8 +46,8 @@ describe("compiler: decorator utils", () => {
         model Foo {}
       `);
 
-      strictEqual(data, "string");
-      strictEqual(diagnostics.length, 0);
+      assert.strictEqual(data, "string");
+      assert.strictEqual(diagnostics.length, 0);
     });
 
     it("can convert a number", async () => {
@@ -56,8 +56,8 @@ describe("compiler: decorator utils", () => {
         model Foo {}
       `);
 
-      strictEqual(data, 123);
-      strictEqual(diagnostics.length, 0);
+      assert.strictEqual(data, 123);
+      assert.strictEqual(diagnostics.length, 0);
     });
 
     it("can convert a boolean", async () => {
@@ -66,8 +66,8 @@ describe("compiler: decorator utils", () => {
         model Foo {}
       `);
 
-      strictEqual(data, true);
-      strictEqual(diagnostics.length, 0);
+      assert.strictEqual(data, true);
+      assert.strictEqual(diagnostics.length, 0);
     });
 
     it("can convert a tuple", async () => {
@@ -76,8 +76,8 @@ describe("compiler: decorator utils", () => {
         model Foo {}
       `);
 
-      deepStrictEqual(data, ["string", 123, true]);
-      strictEqual(diagnostics.length, 0);
+      assert.deepStrictEqual(data, ["string", 123, true]);
+      assert.strictEqual(diagnostics.length, 0);
     });
 
     it("can convert a model", async () => {
@@ -86,8 +86,8 @@ describe("compiler: decorator utils", () => {
         model Foo {}
       `);
 
-      deepStrictEqual(data, { string: "string", number: 123, bool: true });
-      strictEqual(diagnostics.length, 0);
+      assert.deepStrictEqual(data, { string: "string", number: 123, bool: true });
+      assert.strictEqual(diagnostics.length, 0);
     });
 
     it("can convert a named model", async () => {
@@ -97,8 +97,8 @@ describe("compiler: decorator utils", () => {
         model Foo {}
       `);
 
-      deepStrictEqual(data, { string: "string", number: 123, bool: true });
-      strictEqual(diagnostics.length, 0);
+      assert.deepStrictEqual(data, { string: "string", number: 123, bool: true });
+      assert.strictEqual(diagnostics.length, 0);
     });
 
     it("can a nested model", async () => {
@@ -107,8 +107,8 @@ describe("compiler: decorator utils", () => {
         model Foo {}
       `);
 
-      deepStrictEqual(data, { string: "string", nested: { foo: "bar" }, bool: true });
-      strictEqual(diagnostics.length, 0);
+      assert.deepStrictEqual(data, { string: "string", nested: { foo: "bar" }, bool: true });
+      assert.strictEqual(diagnostics.length, 0);
     });
 
     it("emit diagnostic if value it not serializable", async () => {
@@ -117,7 +117,7 @@ describe("compiler: decorator utils", () => {
         model Foo {}
       `);
 
-      deepStrictEqual(data, undefined);
+      assert.deepStrictEqual(data, undefined);
       expectDiagnostics(diagnostics, {
         code: "invalid-value",
         message: "Type 'Union' is not a value type.",
@@ -130,7 +130,7 @@ describe("compiler: decorator utils", () => {
         model Foo {}
       `);
 
-      deepStrictEqual(data, undefined);
+      assert.deepStrictEqual(data, undefined);
       expectDiagnostics(diagnostics, {
         code: "invalid-value",
         message: "Type 'Union' of 'some' is not a value type.",
@@ -148,9 +148,7 @@ describe("compiler: decorator utils", () => {
         validateDecoratorUniqueOnNode(context, target, $bar);
       }
       // add test decorators
-      host.addJsFile("lib.js", {
-        $bar,
-      });
+      host.addJsFile("lib.js", { $bar });
     });
 
     it("emit diagnostics if using the same decorator on the same node", async () => {
@@ -218,10 +216,7 @@ describe("compiler: decorator utils", () => {
         validateDecoratorNotOnType(context, target, $red, $blue);
       }
       // add test decorators
-      host.addJsFile("lib.js", {
-        $red,
-        $blue,
-      });
+      host.addJsFile("lib.js", { $red, $blue });
     });
 
     it("emit diagnostics if using the decorator has a conflict", async () => {
@@ -232,12 +227,8 @@ describe("compiler: decorator utils", () => {
       `);
 
       expectDiagnostics(diagnostics, [
-        {
-          code: "decorator-conflict",
-        },
-        {
-          code: "decorator-conflict",
-        },
+        { code: "decorator-conflict" },
+        { code: "decorator-conflict" },
       ]);
     });
 
@@ -250,12 +241,8 @@ describe("compiler: decorator utils", () => {
       `);
 
       expectDiagnostics(diagnostics, [
-        {
-          code: "decorator-conflict",
-        },
-        {
-          code: "decorator-conflict",
-        },
+        { code: "decorator-conflict" },
+        { code: "decorator-conflict" },
       ]);
     });
 
@@ -267,11 +254,7 @@ describe("compiler: decorator utils", () => {
         model Foo extends Bar {};
       `);
 
-      expectDiagnostics(diagnostics, [
-        {
-          code: "decorator-conflict",
-        },
-      ]);
+      expectDiagnostics(diagnostics, [{ code: "decorator-conflict" }]);
     });
 
     it("emit diagnostics if using the decorator has a conflict with scalar extends", async () => {
@@ -282,11 +265,7 @@ describe("compiler: decorator utils", () => {
         scalar bar extends foo;
       `);
 
-      expectDiagnostics(diagnostics, [
-        {
-          code: "decorator-conflict",
-        },
-      ]);
+      expectDiagnostics(diagnostics, [{ code: "decorator-conflict" }]);
     });
 
     it("should emit diagnostic if decorator conflict is created via augment decorator", async () => {
@@ -298,12 +277,8 @@ describe("compiler: decorator utils", () => {
       `);
 
       expectDiagnostics(diagnostics, [
-        {
-          code: "decorator-conflict",
-        },
-        {
-          code: "decorator-conflict",
-        },
+        { code: "decorator-conflict" },
+        { code: "decorator-conflict" },
       ]);
     });
   });
