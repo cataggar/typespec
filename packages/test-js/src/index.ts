@@ -1,11 +1,13 @@
 import {
   api,
+  setCompilerHost,
   setSystemAssert,
   setSystemFsPromises,
   setSystemGlobby,
   setSystemPath,
   setSystemUrl,
 } from "../../compiler-show/dist/index.js";
+import { NodeHost } from "../../compiler/dist/src/index.js";
 
 import { NodeUrl } from "./core/node-url.js";
 import { NodeAssert } from "./testing/node-assert.js";
@@ -19,6 +21,7 @@ async function main() {
   setSystemGlobby(NodeGlobby);
   setSystemPath(NodePath);
   setSystemUrl(NodeUrl);
+  setCompilerHost(NodeHost);
 
   console.log("version:", api.version());
   await api.test();

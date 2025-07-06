@@ -1,6 +1,7 @@
 import { MANIFEST } from "@typespec/compiler";
 import { createTestRunner } from "@typespec/compiler/testing";
 // Re-export system setup functions for Node/test environments
+export { setCompilerHost } from "@typespec/compiler";
 export type { SystemUrl } from "@typespec/compiler";
 export {
   setSystemAssert,
@@ -22,9 +23,11 @@ function version(): string {
 
 export async function test() {
   console.log(`TypeSpec Compiler ${version()}`);
+  console.log("do createTestRunner");
   const runner = await createTestRunner();
+  console.log("tsp compile");
   const diagnostics = await runner.compile("model Bar {}");
-  console.log(diagnostics);
+  console.log(`Diagnostics: ${JSON.stringify(diagnostics, null, 2)}`);
 }
 
 export const api = { version, test };
