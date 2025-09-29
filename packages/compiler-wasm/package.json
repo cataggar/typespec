@@ -1,0 +1,32 @@
+{
+  "name": "@typespec/compiler-wasm",
+  "version": "1.4.0",
+  "private": true,
+  "description": "WebAssembly Component packaging of the TypeSpec compiler using jco",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "clean": "rimraf dist/ build/ temp/",
+    "build": "pnpm build:bundle && pnpm build:wasm",
+    "build:bundle": "esbuild src/index.ts --bundle --format=esm --platform=browser --target=es2022 --tree-shaking=true --sourcemap --outdir=dist --external:fs --external:path --external:os --external:crypto --external:perf_hooks --external:worker_threads --external:process --external:util --external:url --external:stream --external:buffer --external:picocolors --external:@babel/code-frame",
+    "build:wasm": "mkdir -p build && jco componentize dist/index.js --wit tools/wasm/typespec.wit --world-name typespec -o build/typespec-compiler.wasm",
+    "build:wasm:opt": "wasm-tools component optimize build/typespec-compiler.wasm -o build/typespec-compiler.opt.wasm",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:wasm": "cd test-rs && cargo test"
+  },
+  "dependencies": {
+    "@typespec/compiler": "workspace:~"
+  },
+  "devDependencies": {
+    "@bytecodealliance/jco": "^1.6.3",
+    "esbuild": "^0.23.0",
+    "rimraf": "~6.0.1",
+    "vitest": "^3.1.2"
+  },
+  "files": [
+    "dist/**",
+    "build/**",
+    "tools/**"
+  ]
+}

@@ -1,0 +1,43 @@
+// TypeSpec WebAssembly Component Interface
+// Version: 1.0.0
+package typespec:component@1.0.0;
+
+world typespec {
+    // Basic data structures for TypeSpec compilation
+    record source-file {
+        path: string,
+        contents: string,
+    }
+
+    record compile-options {
+        emitters: list<string>,
+        output-dir: string,
+        arguments: list<string>,
+    }
+
+    record diagnostic {
+        code: string,
+        message: string,
+        severity: string,
+        file: string,
+        start: u32,
+        end: u32,
+    }
+
+    record emitted-file {
+        path: string,
+        contents: string,
+    }
+
+    record compile-result {
+        success: bool,
+        diagnostics: list<diagnostic>,
+        emitted: list<emitted-file>,
+    }
+
+    // Compile TypeSpec from in-memory sources
+    export compile-virtual: func(files: list<source-file>, entry: string, options: compile-options) -> compile-result;
+    
+    // Compile TypeSpec from filesystem root
+    export compile-root: func(root-path: string, entry: string, options: compile-options) -> compile-result;
+}
