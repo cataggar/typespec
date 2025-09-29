@@ -48,14 +48,17 @@
       "default": "./dist/react/viewers/index.js"
     },
     "./style.css": "./dist/style.css",
-    "./styles.css": "./dist/style.css"
+    "./styles.css": "./dist/style.css",
+    "./types": {
+      "default": "./dist/types.js"
+    }
   },
   "engines": {
     "node": ">=20.0.0"
   },
   "scripts": {
     "clean": "rimraf ./dist ./dist-dev ./temp ./typespecContents.json",
-    "build": "vite build",
+    "build": "vite build && vite build --config vite.types.config.ts && node ./scripts/rename-types.js",
     "watch": "vite build --watch",
     "storybook": "sb dev",
     "build:storybook": "sb build",

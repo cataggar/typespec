@@ -1478,6 +1478,12 @@ importers:
         specifier: 4.5.4
         version: 4.5.4(@types/node@24.3.1)(rollup@4.49.0)(typescript@5.9.2)(vite@7.1.5(@types/node@24.3.1)(tsx@4.20.5)(yaml@2.8.1))
 
+  packages/playground-compiler-test:
+    dependencies:
+      '@typespec/playground':
+        specifier: workspace:^
+        version: link:../playground
+
   packages/playground-website:
     dependencies:
       '@fluentui/react-components':

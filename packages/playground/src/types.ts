@@ -5,6 +5,11 @@ import type {
   PackageJson,
   TypeSpecLibrary,
 } from "@typespec/compiler";
+export * from "@typespec/compiler/testing";
+import { createTestRunner as _createTestRunner } from "@typespec/compiler/testing";
+export function createTestRunner(...args: any[]) {
+  return _createTestRunner(...args);
+}
 
 export interface PlaygroundSample {
   filename: string;
