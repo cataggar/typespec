@@ -156,6 +156,8 @@ function buildCompilerOptions(options: CompileOptions): CompilerOptions {
   for (const arg of options.arguments) {
     if (arg.startsWith("--output-dir=")) {
       compilerOptions.outputDir = arg.substring("--output-dir=".length);
+    } else if (arg === "--nostdlib") {
+      compilerOptions.noStdLib = true;
     }
     // Add more argument parsing as needed
   }

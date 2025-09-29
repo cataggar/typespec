@@ -32,21 +32,8 @@ export function createVirtualFsHost(files: VirtualFile[], logSink?: LogSink): Co
     virtualFs.set(path, content);
   }
 
-  // Add a basic package.json at root to satisfy project structure expectations
-  virtualFs.set("/package.json", JSON.stringify({
-    name: "wasm-project",
-    version: "1.0.0",
-    private: true
-  }));
-
-  // Add current working directory package.json if not present
-  if (!virtualFs.has("./package.json") && !virtualFs.has("package.json")) {
-    virtualFs.set("package.json", JSON.stringify({
-      name: "wasm-project",
-      version: "1.0.0",
-      private: true
-    }));
-  }
+  // Add essential package.json files that the compiler expects
+  addPackageStructure();
 
   const wasiLogSink: LogSink = logSink || {
     log: (entry) => {
@@ -155,7 +142,8 @@ export function createVirtualFsHost(files: VirtualFile[], logSink?: LogSink): Co
     },
 
     getLibDirs(): string[] {
-      return ["/embedded/std"];
+      // Return the path to our embedded standard library
+      return ["/node_modules/@typespec/compiler/lib/std"];
     },
 
     async getJsImport(path: string): Promise<Record<string, any>> {
@@ -187,6 +175,55 @@ export function createVirtualFsHost(files: VirtualFile[], logSink?: LogSink): Co
     }));
   }
 
+  // Helper to add required package structure
+  function addPackageStructure() {
+    // Add a basic package.json at root to satisfy project structure expectations
+    virtualFs.set("/package.json", JSON.stringify({
+      name: "wasm-project",
+      version: "1.0.0",
+      private: true,
+      dependencies: {
+        "@typespec/compiler": "^1.4.0"
+      }
+    }));
+
+    // Add current working directory package.json if not present
+    if (!virtualFs.has("./package.json") && !virtualFs.has("package.json")) {
+      virtualFs.set("package.json", JSON.stringify({
+        name: "wasm-project",
+        version: "1.0.0",
+        private: true,
+        dependencies: {
+          "@typespec/compiler": "^1.4.0"
+        }
+      }));
+    }
+
+    // Add TypeSpec compiler package.json in expected location
+    virtualFs.set("/node_modules/@typespec/compiler/package.json", JSON.stringify({
+      name: "@typespec/compiler",
+      version: "1.4.0",
+      main: "dist/src/index.js",
+      type: "module",
+      exports: {
+        ".": {
+          "types": "./dist/src/index.d.ts",
+          "default": "./dist/src/index.js"
+        }
+      }
+    }));
+
+    // Add other expected directories and files
+    virtualFs.set("/node_modules/@typespec/compiler/dist/src/index.js", "// Stub");
+    
+    // Make sure intrinsics is also available at the root lib level
+    const embeddedStdLib = getEmbeddedStdLib();
+    const intrinsics = embeddedStdLib.get("/node_modules/@typespec/compiler/lib/intrinsics.tsp");
+    if (intrinsics) {
+      virtualFs.set("/node_modules/@typespec/compiler/lib/intrinsics.tsp", intrinsics);
+    }
+  }
+
   // Extend the host with a method to retrieve emitted files
   (globalThis as any).__getEmittedFiles = getEmittedFiles;
 }
@@ -198,36 +235,266 @@ function normalizePath(path: string): string {
 function getEmbeddedStdLib(): Map<string, string> {
   const stdLib = new Map<string, string>();
   
-  // Minimal standard library content
-  stdLib.set("/embedded/std/main.tsp", `
-// TypeSpec Standard Library - Embedded Version
-// This is a minimal version for WebAssembly component usage
+  // Main standard library file
+  stdLib.set("/node_modules/@typespec/compiler/lib/std/main.tsp", `
+// TypeSpec standard library. Everything in here can be omitted by using \`--nostdlib\` cli flag or \`nostdlib\` in the config.
+import "./types.tsp";
+import "./decorators.tsp";
+import "./reflection.tsp";
+import "./visibility.tsp";
+`);
 
+  // Types
+  stdLib.set("/node_modules/@typespec/compiler/lib/std/types.tsp", `
+namespace TypeSpec;
+
+/**
+ * Represent a URL string as described by https://url.spec.whatwg.org/
+ */
+scalar url extends string;
+
+/**
+ * Represents a collection of optional properties.
+ *
+ * @template Source An object whose spread properties are all optional.
+ */
+@doc("The template for adding optional properties.")
+@withOptionalProperties
+model OptionalProperties<Source> {
+  ...Source;
+}
+`);
+
+  // Minimal decorators
+  stdLib.set("/node_modules/@typespec/compiler/lib/std/decorators.tsp", `
+namespace TypeSpec;
+
+/**
+ * Specify that property is optional.
+ */
+extern dec optional(target: ModelProperty): void;
+
+/**
+ * Attach a documentation string.
+ */
+extern dec doc(target: unknown, doc: string): void;
+
+/**
+ * Mark this type as deprecated.
+ */
+extern dec deprecated(target: unknown, message: string): void;
+`);
+
+  // Minimal reflection
+  stdLib.set("/node_modules/@typespec/compiler/lib/std/reflection.tsp", `
+namespace TypeSpec.Reflection;
+
+/**
+ * Represents a model.
+ */
+model Model {
+  name: string;
+}
+`);
+
+  // Minimal visibility
+  stdLib.set("/node_modules/@typespec/compiler/lib/std/visibility.tsp", `
+namespace TypeSpec;
+
+/**
+ * Indicates that a property is only considered when serializing for the given visibilities.
+ */
+extern dec visibility(...visibilities: string[]): void;
+`);
+
+  // Core intrinsics
+  stdLib.set("/node_modules/@typespec/compiler/lib/intrinsics.tsp", `
 namespace TypeSpec {
   /**
-   * A string type
+   * The most primitive value.
    */
+  @doc("A value, but not further specified.")
+  scalar unknown;
+
+  /**
+   * Represents any type
+   */
+  @doc("Represents any type")
+  scalar never;
+
+  /**
+   * A value that can be one of several different types.
+   */
+  @doc("A value that can be one of several different types.")
+  scalar void;
+  
+  /**
+   * A 8-bit string.
+   */
+  @doc("A sequence of textual characters.")
   scalar string;
 
   /**
    * A numeric type
    */
+  @doc("A numeric type")
   scalar numeric;
 
   /**
-   * A boolean type
+   * A boolean value
    */
+  @doc("A boolean value")
   scalar boolean;
 
   /**
-   * An integer type
+   * A 32-bit integer.
    */
+  @doc("A whole number.")
   scalar integer extends numeric;
 
   /**
-   * A floating-point numeric type
+   * A floating-point number.
    */
+  @doc("A number with a fractional component")
   scalar float extends numeric;
+
+  /**
+   * A 64-bit floating point number.
+   */
+  @doc("A 64-bit floating point number.")
+  scalar float64 extends float;
+
+  /**
+   * A 32-bit floating point number.
+   */
+  @doc("A 32-bit floating point number.")
+  scalar float32 extends float;
+
+  /**
+   * A 8-bit integer.
+   */
+  @doc("A 8-bit integer")
+  scalar int8 extends integer;
+
+  /**
+   * A 16-bit integer.
+   */
+  @doc("A 16-bit integer")
+  scalar int16 extends integer;
+
+  /**
+   * A 32-bit integer.
+   */
+  @doc("A 32-bit integer")
+  scalar int32 extends integer;
+
+  /**
+   * A 64-bit integer.
+   */
+  @doc("A 64-bit integer")
+  scalar int64 extends integer;
+
+  /**
+   * An integer that can be serialized to JSON
+   */
+  @doc("An integer that can be serialized to JSON")
+  scalar safeint extends integer;
+
+  /**
+   * A 8-bit unsigned integer.
+   */
+  @doc("A 8-bit unsigned integer")
+  scalar uint8 extends integer;
+
+  /**
+   * A 16-bit unsigned integer.
+   */
+  @doc("A 16-bit unsigned integer")
+  scalar uint16 extends integer;
+
+  /**
+   * A 32-bit unsigned integer.
+   */
+  @doc("A 32-bit unsigned integer")
+  scalar uint32 extends integer;
+
+  /**
+   * A 64-bit unsigned integer.
+   */
+  @doc("A 64-bit unsigned integer")
+  scalar uint64 extends integer;
+
+  /**
+   * A sequence of bytes.
+   */
+  @doc("A sequence of bytes")
+  scalar bytes;
+
+  /**
+   * A date on a calendar without a time zone, e.g. "April 10th"
+   */
+  @doc("A date on a calendar without a time zone")
+  scalar plainDate;
+
+  /**
+   * A time on a clock without a date and without a time zone, e.g. "3:00 am"
+   */
+  @doc("A time on a clock without a date and without a time zone")
+  scalar plainTime;
+
+  /**
+   * A date and time in a particular time zone, e.g. "April 10th at 3:00am in PST"
+   */
+  @doc("A date and time in a particular time zone")
+  scalar offsetDateTime;
+
+  /**
+   * A date and time without a time zone, e.g. "April 10th at 3:00am"
+   */
+  @doc("A date and time without a time zone")
+  scalar utcDateTime;
+
+  /**
+   * A duration/time period. e.g 5s, 10h
+   */
+  @doc("A duration/time period")
+  scalar duration;
+
+  /**
+   * A decimal number with any precision and scale
+   */
+  @doc("A decimal number with any precision and scale")
+  scalar decimal extends numeric;
+
+  /**
+   * A 128-bit decimal number
+   */
+  @doc("A 128-bit decimal number")
+  scalar decimal128 extends decimal;
+
+  /**
+   * Represents an array of items.
+   */
+  @doc("An array of items")
+  model Array<T> {
+    @doc("Array items")
+    items: T[];
+  }
+
+  /**
+   * Represents a record/object.
+   */
+  @doc("A record/object type")
+  model Record<T> {
+    @doc("Record properties")
+    properties: T;
+  }
+
+  /**
+   * Represents null
+   */
+  @doc("Represents a null value")
+  scalar null;
 }
 `);
 

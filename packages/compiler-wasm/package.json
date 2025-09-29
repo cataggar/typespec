@@ -8,7 +8,7 @@
   "scripts": {
     "clean": "rimraf dist/ build/ temp/",
     "build": "pnpm build:bundle && pnpm build:wasm",
-    "build:bundle": "esbuild src/index.ts --bundle --format=esm --platform=browser --target=es2022 --tree-shaking=true --sourcemap --outdir=dist --external:fs --external:path --external:os --external:crypto --external:perf_hooks --external:worker_threads --external:process --external:util --external:url --external:stream --external:buffer --external:picocolors --external:@babel/code-frame",
+    "build:bundle": "esbuild src/index.ts --bundle --format=esm --platform=browser --target=es2022 --tree-shaking=true --sourcemap --outdir=dist --external:fs --external:path --external:os --external:crypto --external:perf_hooks --external:worker_threads --external:process --external:util --external:url --external:stream --external:buffer --external:picocolors --external:@babel/code-frame --external:change-case",
     "build:wasm": "mkdir -p build && jco componentize dist/index.js --wit tools/wasm/typespec.wit --world-name typespec -o build/typespec-compiler.wasm",
     "build:wasm:opt": "wasm-tools component optimize build/typespec-compiler.wasm -o build/typespec-compiler.opt.wasm",
     "test": "vitest run",

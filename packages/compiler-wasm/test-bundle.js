@@ -5,9 +5,7 @@ const files = [
   {
     path: "main.tsp",
     contents: `
-namespace Test {
-  op ping(): void;
-}
+scalar MyString extends string;
 `
   }
 ];
@@ -15,11 +13,11 @@ namespace Test {
 const options = {
   emitters: [],
   outputDir: "./temp",
-  arguments: []
+  arguments: ["--nostdlib"]
 };
 
 try {
-  console.log("Testing virtual compilation...");
+  console.log("Testing virtual compilation with minimal example...");
   const result = await compileVirtual(files, "main.tsp", options);
   console.log("Result:", {
     success: result.success,
@@ -28,8 +26,10 @@ try {
   });
   
   if (result.diagnostics.length > 0) {
-    console.log("Diagnostics:", result.diagnostics);
+    console.log("Diagnostics:");
+    result.diagnostics.forEach(d => console.log(`  ${d.severity}: ${d.message}`));
   }
 } catch (error) {
   console.error("Error:", error.message);
+  console.error("Stack:", error.stack);
 }
