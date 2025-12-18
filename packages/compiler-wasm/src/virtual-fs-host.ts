@@ -1,6 +1,5 @@
 import type { CompilerHost, LogSink, SourceFile } from "@typespec/compiler";
 import { createSourceFile, getSourceFileKindFromExt } from "@typespec/compiler";
-import { createConsoleSink } from "@typespec/compiler/internals";
 
 export interface VirtualFile {
   path: string;
@@ -148,10 +147,37 @@ export function createVirtualFsHost(
       return `file://${normalized}`;
     },
 
-    logSink: logSink ?? createConsoleSink(),
+    logSink: logSink ?? createSimpleLogSink(),
   };
 
   return host;
+}
+
+/**
+ * Creates a simple log sink for the virtual host
+ */
+function createSimpleLogSink(): LogSink {
+  return {
+    log(log) {
+      // In WASM context, we might not have console, but for now just no-op
+      if (typeof console !== "undefined") {
+        const level = log.level;
+        const message = log.message;
+         
+        if (level === "error") {
+          // eslint-disable-next-line no-console
+          console.error(message);
+           
+        } else if (level === "warning") {
+          // eslint-disable-next-line no-console
+          console.warn(message);
+        } else {
+          // eslint-disable-next-line no-console
+          console.log(message);
+        }
+      }
+    },
+  };
 }
 
 /**

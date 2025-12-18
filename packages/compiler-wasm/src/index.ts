@@ -1,4 +1,4 @@
-import { compile, CompilerOptions, Diagnostic, resolvePath } from "@typespec/compiler";
+import { compile, CompilerOptions, Diagnostic } from "@typespec/compiler";
 import { createVirtualFsHost, VirtualFile } from "./virtual-fs-host.js";
 
 // WIT types mapping
@@ -61,27 +61,25 @@ export async function compileVirtual(
     // Prepare compiler options
     const compilerOptions: CompilerOptions = {
       outputDir: options.outputDir,
-      emitters: {},
+      emit: options.emitters,
+      options: {},
     };
 
     // Parse emitter-specific options from arguments
     for (const [key, value] of options.arguments) {
       if (key.startsWith("emitter-option-")) {
-        const emitterName = key.substring("emitter-option-".length);
-        if (!compilerOptions.emitters![emitterName]) {
-          compilerOptions.emitters![emitterName] = {};
+        const parts = key.substring("emitter-option-".length).split(".");
+        const emitterName = parts[0];
+        if (!compilerOptions.options![emitterName]) {
+          compilerOptions.options![emitterName] = {};
         }
         // Simple key=value parsing - in real impl would need more sophistication
+        if (parts.length > 1) {
+          compilerOptions.options![emitterName][parts[1]] = value;
+        }
       } else {
         // Set global compiler option
         (compilerOptions as any)[key] = value;
-      }
-    }
-
-    // Configure emitters
-    for (const emitterName of options.emitters) {
-      if (!compilerOptions.emitters![emitterName]) {
-        compilerOptions.emitters![emitterName] = {};
       }
     }
 
