@@ -30,10 +30,10 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp ./build",
-    "build": "pnpm compile && pnpm bundle",
+    "build": "pnpm -C ../compiler build && pnpm compile && pnpm bundle",
     "compile": "tsc -p .",
     "bundle": "node scripts/bundle.js",
-    "componentize": "jco componentize dist/bundle.js -w typespec.wit -o build/typespec-compiler.wasm --name typespec:component",
+    "componentize": "node -e \"require('fs').mkdirSync('build',{recursive:true})\" && jco componentize dist/bundle.js -w typespec.wit --world-name typespec -o build/typespec-compiler.wasm",
     "build:wasm": "pnpm build && pnpm componentize",
     "watch": "tsc -p . --watch",
     "test": "vitest run",
@@ -52,7 +52,7 @@
     "@typespec/compiler": "workspace:^"
   },
   "devDependencies": {
-    "@bytecodealliance/jco": "^1.5.4",
+    "@bytecodealliance/jco": "^1.15.4",
     "@types/node": "~25.0.2",
     "@vitest/coverage-v8": "^4.0.15",
     "@vitest/ui": "^4.0.15",

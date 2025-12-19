@@ -19,7 +19,7 @@ The package leverages TypeSpec's existing `CompilerHost` abstraction to isolate 
 
 - **Virtual FS Host**: In-memory filesystem for `compile-virtual` function
 - **WASI Host**: (Planned) WASI-backed filesystem for `compile-root` function
-- **ESM Bundle**: Tree-shaken bundle of TypeSpec compiler + stdlib
+- **ESM Bundle**: Tree-shaken bundle of the TypeSpec compiler runtime (standard library source files are not bundled yet)
 - **WIT Interface**: Component Model interface definition
 
 ## WIT Interface
@@ -66,6 +66,7 @@ pnpm build:wasm
 ```
 
 This produces:
+
 - `dist/bundle.js` - ESM bundle of the compiler
 - `build/typespec-compiler.wasm` - WebAssembly component
 
@@ -93,15 +94,17 @@ const result = await compileVirtual(
   [
     {
       path: "/main.tsp",
-      contents: 'namespace MyService { op test(): void; }'
-    }
+      contents: "namespace MyService { op test(): void; }",
+    },
+    // NOTE: You must also provide the TypeSpec standard library files (at minimum `/lib/intrinsics.tsp`).
+    // For now, this package does not bundle stdlib sources.
   ],
   "/main.tsp",
   {
     emitters: ["@typespec/openapi3"],
     outputDir: "/output",
-    arguments: []
-  }
+    arguments: [],
+  },
 );
 
 console.log(result.success);
@@ -157,6 +160,7 @@ pnpm test
 ### Bundle Analysis
 
 The build process includes bundle analysis. Check for:
+
 - No Node.js built-ins in the bundle (except via CompilerHost)
 - Reasonable bundle size
 - Proper tree-shaking

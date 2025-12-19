@@ -3,56 +3,60 @@
 
 package typespec:component@0.1.0;
 
-/// Represents a source file in memory
-record source-file {
-  path: string,
-  contents: string,
-}
+interface types {
+  /// Represents a source file in memory
+  record source-file {
+    path: string,
+    contents: string,
+  }
 
-/// Compilation options
-record compile-options {
-  /// List of emitter names to run (e.g., "@typespec/openapi3")
-  emitters: list<string>,
-  /// Output directory path
-  output-dir: string,
-  /// Additional compiler arguments
-  arguments: list<tuple<string, string>>,
-}
+  /// Compilation options
+  record compile-options {
+    /// List of emitter names to run (e.g., "@typespec/openapi3")
+    emitters: list<string>,
+    /// Output directory path
+    output-dir: string,
+    /// Additional compiler arguments
+    arguments: list<tuple<string, string>>,
+  }
 
-/// Diagnostic severity levels
-enum severity {
-  error,
-  warning,
-  info,
-}
+  /// Diagnostic severity levels
+  enum severity {
+    error,
+    warning,
+    info,
+  }
 
-/// A single diagnostic message
-record diagnostic {
-  code: string,
-  message: string,
-  severity: severity,
-  file: string,
-  /// Byte offset start position in the file
-  start: u32,
-  /// Byte offset end position in the file
-  end: u32,
-}
+  /// A single diagnostic message
+  record diagnostic {
+    code: string,
+    message: string,
+    severity: severity,
+    file: string,
+    /// Byte offset start position in the file
+    start: u32,
+    /// Byte offset end position in the file
+    end: u32,
+  }
 
-/// An emitted output file
-record emitted-file {
-  path: string,
-  contents: string,
-}
+  /// An emitted output file
+  record emitted-file {
+    path: string,
+    contents: string,
+  }
 
-/// Result of compilation
-record compile-result {
-  success: bool,
-  diagnostics: list<diagnostic>,
-  emitted: list<emitted-file>,
+  /// Result of compilation
+  record compile-result {
+    success: bool,
+    diagnostics: list<diagnostic>,
+    emitted: list<emitted-file>,
+  }
 }
 
 /// Main TypeSpec component world
 world typespec {
+  use types.{source-file, compile-options, compile-result};
+
   /// Compile TypeSpec from in-memory source files
   /// 
   /// Parameters:

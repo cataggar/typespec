@@ -1,5 +1,8 @@
 import type { CompilerHost, LogSink, SourceFile } from "@typespec/compiler";
-import { createSourceFile, getSourceFileKindFromExt } from "@typespec/compiler";
+import {
+  createSourceFile,
+  getSourceFileKindFromExt,
+} from "../../compiler/dist/src/core/source-file.js";
 
 export interface VirtualFile {
   path: string;
@@ -22,6 +25,12 @@ export function createVirtualFsHost(
     fileMap.set(normalizedPath, file.contents);
   }
 
+  // Some compiler flows probe for a package.json at the execution root.
+  // Provide a minimal one by default to avoid surfacing missing-file probes as internal errors.
+  if (!fileMap.has("/package.json")) {
+    fileMap.set("/package.json", JSON.stringify({ name: "virtual-project", private: true }));
+  }
+
   // In-memory directory structure
   const dirs = new Set<string>();
   for (const path of fileMap.keys()) {
@@ -37,7 +46,7 @@ export function createVirtualFsHost(
       const normalizedPath = normalizePath(path);
       const contents = fileMap.get(normalizedPath);
       if (contents === undefined) {
-        throw new Error(`File not found: ${path}`);
+        throw createFsError("ENOENT", `File not found: ${path}`, path);
       }
       return createSourceFile(contents, normalizedPath);
     },
@@ -49,7 +58,7 @@ export function createVirtualFsHost(
     async writeFile(path: string, content: string): Promise<void> {
       const normalizedPath = normalizePath(path);
       fileMap.set(normalizedPath, content);
-      
+
       // Ensure directory exists
       let dir = getDirectoryPath(normalizedPath);
       while (dir && dir !== "/" && dir !== ".") {
@@ -61,7 +70,7 @@ export function createVirtualFsHost(
     async readDir(path: string): Promise<string[]> {
       const normalizedPath = normalizePath(path);
       const result: string[] = [];
-      
+
       for (const filePath of fileMap.keys()) {
         const fileDir = getDirectoryPath(filePath);
         if (fileDir === normalizedPath) {
@@ -71,7 +80,7 @@ export function createVirtualFsHost(
           }
         }
       }
-      
+
       for (const dir of dirs) {
         const dirParent = getDirectoryPath(dir);
         if (dirParent === normalizedPath) {
@@ -81,7 +90,7 @@ export function createVirtualFsHost(
           }
         }
       }
-      
+
       return result;
     },
 
@@ -105,11 +114,11 @@ export function createVirtualFsHost(
       const normalizedPath = normalizePath(path);
       const isFile = fileMap.has(normalizedPath);
       const isDirectory = dirs.has(normalizedPath);
-      
+
       if (!isFile && !isDirectory) {
-        throw new Error(`Path not found: ${path}`);
+        throw createFsError("ENOENT", `Path not found: ${path}`, path);
       }
-      
+
       return {
         isDirectory: () => isDirectory,
         isFile: () => isFile,
@@ -163,11 +172,10 @@ function createSimpleLogSink(): LogSink {
       if (typeof console !== "undefined") {
         const level = log.level;
         const message = log.message;
-         
+
         if (level === "error") {
           // eslint-disable-next-line no-console
           console.error(message);
-           
         } else if (level === "warning") {
           // eslint-disable-next-line no-console
           console.warn(message);
@@ -195,6 +203,13 @@ function getDirectoryPath(path: string): string {
  */
 function normalizePath(path: string): string {
   return path.replace(/\\/g, "/");
+}
+
+function createFsError(code: string, message: string, path: string): Error {
+  const error = new Error(message) as Error & { code?: string; path?: string };
+  error.code = code;
+  error.path = path;
+  return error;
 }
 
 /**
