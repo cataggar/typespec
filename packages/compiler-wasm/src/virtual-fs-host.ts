@@ -3,6 +3,8 @@ import {
   createSourceFile,
   getSourceFileKindFromExt,
 } from "../../compiler/dist/src/core/source-file.js";
+import * as intrinsicTspIndex from "../../compiler/dist/src/lib/intrinsic/tsp-index.js";
+import * as stdTspIndex from "../../compiler/dist/src/lib/tsp-index.js";
 
 export interface VirtualFile {
   path: string;
@@ -18,11 +20,23 @@ export function createVirtualFsHost(
   libDirs: string[],
   logSink?: LogSink,
 ): CompilerHost {
+  const jsImportMap = new Map<string, Record<string, any>>([
+    ["/dist/src/lib/tsp-index.js", stdTspIndex as unknown as Record<string, any>],
+    ["/dist/src/lib/intrinsic/tsp-index.js", intrinsicTspIndex as unknown as Record<string, any>],
+  ]);
+
   const fileMap = new Map<string, string>();
   for (const file of files) {
     // Normalize paths to POSIX style
     const normalizedPath = file.path.replace(/\\/g, "/");
     fileMap.set(normalizedPath, file.contents);
+  }
+
+  // Ensure the JS stdlib indexes imported by compiler/lib/*.tsp appear to exist.
+  for (const jsPath of jsImportMap.keys()) {
+    if (!fileMap.has(jsPath)) {
+      fileMap.set(jsPath, "");
+    }
   }
 
   // Some compiler flows probe for a package.json at the execution root.
@@ -112,7 +126,7 @@ export function createVirtualFsHost(
 
     async stat(path: string): Promise<{ isDirectory(): boolean; isFile(): boolean }> {
       const normalizedPath = normalizePath(path);
-      const isFile = fileMap.has(normalizedPath);
+      const isFile = fileMap.has(normalizedPath) || jsImportMap.has(normalizedPath);
       const isDirectory = dirs.has(normalizedPath);
 
       if (!isFile && !isDirectory) {
@@ -138,7 +152,12 @@ export function createVirtualFsHost(
     },
 
     async getJsImport(path: string): Promise<Record<string, any>> {
-      throw new Error("JS imports not supported in virtual filesystem");
+      const normalizedPath = normalizePath(path);
+      const module = jsImportMap.get(normalizedPath);
+      if (!module) {
+        throw createFsError("ENOENT", `JS import not found: ${path}`, path);
+      }
+      return module;
     },
 
     getSourceFileKind(path: string) {
