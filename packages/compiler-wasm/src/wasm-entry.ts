@@ -47,6 +47,16 @@ export interface InterfaceListResult {
   diagnostics: DiagnosticOutput[];
 }
 
+export interface InterfaceInfo {
+  name: string;
+  operations: string[];
+}
+
+export interface InterfaceDetailsResult {
+  interfaces: InterfaceInfo[];
+  diagnostics: DiagnosticOutput[];
+}
+
 /**
  * Compile TypeSpec from in-memory source files.
  */
@@ -281,6 +291,183 @@ export async function listInterfacesVirtual(
   };
 }
 
+/**
+ * List interface declarations (with operation names) by parsing TypeSpec files from an in-memory
+ * source set.
+ *
+ * This uses the TypeSpec parser AST and follows relative imports ("./" and "../") as long as
+ * the imported files are present in the virtual file set.
+ */
+export async function listInterfacesDetailsVirtual(
+  files: SourceFile[],
+  entry: string,
+): Promise<InterfaceDetailsResult> {
+  const virtualFiles: VirtualFile[] = files.map((f) => ({
+    path: f.path,
+    contents: f.contents,
+  }));
+
+  const host = createVirtualFsHost(virtualFiles, []);
+
+  const diagnostics: DiagnosticOutput[] = [];
+  const interfaceMap = new Map<string, Set<string>>();
+  const visitedFiles = new Set<string>();
+
+  const normalize = (p: string) => p.replace(/\\/g, "/");
+
+  const dirname = (p: string) => {
+    const n = normalize(p);
+    const idx = n.lastIndexOf("/");
+    if (idx === -1) return ".";
+    if (idx === 0) return "/";
+    return n.slice(0, idx);
+  };
+
+  const joinAndNormalize = (baseDir: string, rel: string) => {
+    const base = normalize(baseDir);
+    const joined = (base.endsWith("/") ? base : base + "/") + rel;
+    const isAbs = joined.startsWith("/");
+    const parts = joined.split("/").filter((x) => x !== "" && x !== ".");
+    const out: string[] = [];
+    for (const part of parts) {
+      if (part === "..") {
+        if (out.length > 0) out.pop();
+      } else {
+        out.push(part);
+      }
+    }
+    return (isAbs ? "/" : "") + out.join("/");
+  };
+
+  function reportError(code: string, message: string, file: string) {
+    diagnostics.push({
+      code,
+      message,
+      severity: Severity.Error,
+      file,
+      start: 0,
+      end: 0,
+    });
+  }
+
+  function qualifyName(namespace: string[], name: string): string {
+    return namespace.length === 0 ? name : `${namespace.join(".")}.${name}`;
+  }
+
+  function addInterfaceOperation(ifaceName: string, opName: string) {
+    let ops = interfaceMap.get(ifaceName);
+    if (!ops) {
+      ops = new Set<string>();
+      interfaceMap.set(ifaceName, ops);
+    }
+    ops.add(opName);
+  }
+
+  function ensureInterface(ifaceName: string) {
+    if (!interfaceMap.has(ifaceName)) {
+      interfaceMap.set(ifaceName, new Set<string>());
+    }
+  }
+
+  function collectFromStatement(stmt: any, namespace: string[], imports: string[]) {
+    if (!stmt || typeof stmt !== "object") return;
+
+    switch (stmt.kind) {
+      case SyntaxKind.InterfaceStatement: {
+        const name = stmt.id?.sv;
+        if (typeof name === "string" && name.length > 0) {
+          const qualifiedName = qualifyName(namespace, name);
+          ensureInterface(qualifiedName);
+
+          const ops: any[] = Array.isArray(stmt.operations) ? stmt.operations : [];
+          for (const op of ops) {
+            const opName = op?.id?.sv;
+            if (typeof opName === "string" && opName.length > 0) {
+              addInterfaceOperation(qualifiedName, opName);
+            }
+          }
+        }
+        return;
+      }
+      case SyntaxKind.NamespaceStatement: {
+        const ns = stmt.id?.sv;
+        const nextNs = typeof ns === "string" && ns.length > 0 ? [...namespace, ns] : namespace;
+
+        const inner = stmt.statements;
+        if (Array.isArray(inner)) {
+          for (const s of inner) {
+            collectFromStatement(s, nextNs, imports);
+          }
+        } else if (inner && typeof inner === "object") {
+          // `namespace A.B {}` parses into nested NamespaceStatements.
+          collectFromStatement(inner, nextNs, imports);
+        }
+        return;
+      }
+      case SyntaxKind.ImportStatement: {
+        const spec = stmt.path?.value;
+        if (typeof spec === "string") {
+          imports.push(spec);
+        }
+        return;
+      }
+      default:
+        return;
+    }
+  }
+
+  async function visitFile(filePath: string) {
+    const normalizedPath = normalize(filePath);
+    if (visitedFiles.has(normalizedPath)) return;
+    visitedFiles.add(normalizedPath);
+
+    let source: any;
+    try {
+      source = await host.readFile(normalizedPath);
+    } catch (e) {
+      reportError("file-not-found", e instanceof Error ? e.message : String(e), normalizedPath);
+      return;
+    }
+
+    let ast: any;
+    try {
+      ast = parse(source);
+    } catch (e) {
+      reportError("parse-failed", e instanceof Error ? e.message : String(e), normalizedPath);
+      return;
+    }
+
+    const imports: string[] = [];
+    if (Array.isArray(ast?.statements)) {
+      for (const stmt of ast.statements) {
+        collectFromStatement(stmt, [], imports);
+      }
+    }
+
+    const baseDir = dirname(normalizedPath);
+    for (const specifier of imports) {
+      if (specifier.startsWith("./") || specifier.startsWith("../")) {
+        const resolved = joinAndNormalize(baseDir, specifier);
+        await visitFile(resolved);
+      }
+    }
+  }
+
+  await visitFile(entry);
+
+  const interfaces: InterfaceInfo[] = [...interfaceMap.entries()]
+    .map(([name, operations]) => ({
+      name,
+      operations: [...operations].sort(),
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  return {
+    interfaces,
+    diagnostics,
+  };
+}
+
 function convertDiagnostics(diagnostics: readonly Diagnostic[]): DiagnosticOutput[] {
   return diagnostics.map((d) => {
     let file = "";
@@ -310,4 +497,5 @@ export const exports = {
   compileVirtual,
   compileRoot,
   listInterfacesVirtual,
+  listInterfacesDetailsVirtual,
 };

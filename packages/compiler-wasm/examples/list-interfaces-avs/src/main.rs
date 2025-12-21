@@ -146,18 +146,21 @@ fn main() -> Result<()> {
         .context("failed to instantiate typespec component")?;
 
     let result = typespec
-        .call_list_interfaces_virtual(&mut store, &files, &entry_virtual)
-        .context("list-interfaces-virtual trapped")?;
+        .call_list_interfaces_details_virtual(&mut store, &files, &entry_virtual)
+        .context("list-interfaces-details-virtual trapped")?;
 
     if !result.diagnostics.is_empty() {
         eprintln!("diagnostics: {}", result.diagnostics.len());
-        for d in result.diagnostics.iter().take(50) {
+        for d in result.diagnostics.iter() {
             eprintln!("{:?} {}: {}", d.severity, d.code, d.message);
         }
     }
 
-    for name in result.interfaces {
-        println!("{name}");
+    for iface in result.interfaces {
+        println!("{}", iface.name);
+        for op in iface.operations {
+            println!("  - {}", op);
+        }
     }
 
     Ok(())
