@@ -53,6 +53,7 @@
   },
   "devDependencies": {
     "@bytecodealliance/jco": "^1.15.4",
+    "@typespec/node-builtins-shim": "workspace:^",
     "@types/node": "~25.0.2",
     "@vitest/coverage-v8": "^4.0.15",
     "@vitest/ui": "^4.0.15",

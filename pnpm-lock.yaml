@@ -421,6 +421,9 @@ importers:
       '@types/node':
         specifier: ~25.0.2
         version: 25.0.2
+      '@typespec/node-builtins-shim':
+        specifier: workspace:^
+        version: link:../node-builtins-shim
       '@vitest/coverage-v8':
         specifier: ^4.0.15
         version: 4.0.15(vitest@4.0.15)
@@ -1278,6 +1281,8 @@ importers:
       prettier:
         specifier: ~3.7.4
         version: 3.7.4
+
+  packages/node-builtins-shim: {}
 
   packages/openapi:
     devDependencies:
