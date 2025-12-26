@@ -1,4 +1,4 @@
-import type { CompilerOptions, Diagnostic } from "@typespec/compiler";
+import type { CompilerOptions, Diagnostic, Program as TypeSpecProgram } from "@typespec/compiler";
 import { parse } from "../../compiler/dist/src/core/parser.js";
 import { compile } from "../../compiler/dist/src/core/program.js";
 import { SyntaxKind } from "../../compiler/dist/src/core/types.js";
@@ -58,13 +58,53 @@ export interface InterfaceDetailsResult {
 }
 
 /**
+ * WIT resource wrapper for TypeSpec Program.
+ * This class wraps the internal Program instance and exposes methods as WIT resource methods.
+ */
+export class Program {
+  #program: TypeSpecProgram | null;
+  #diagnostics: DiagnosticOutput[];
+  #success: boolean;
+
+  constructor(program: TypeSpecProgram | null, diagnostics: DiagnosticOutput[], success: boolean) {
+    this.#program = program;
+    this.#diagnostics = diagnostics;
+    this.#success = success;
+  }
+
+  /**
+   * Check if the program has any errors
+   */
+  hasError(): boolean {
+    if (this.#program) {
+      return this.#program.hasError();
+    }
+    return !this.#success;
+  }
+
+  /**
+   * Get all diagnostics from the program
+   */
+  getDiagnostics(): DiagnosticOutput[] {
+    return this.#diagnostics;
+  }
+
+  /**
+   * Check if compilation was successful (no errors)
+   */
+  isSuccess(): boolean {
+    return this.#success;
+  }
+}
+
+/**
  * Compile TypeSpec from in-memory source files.
  */
 export async function compileVirtual(
   files: SourceFile[],
   entry: string,
   options: CompileOptions,
-): Promise<CompileResult> {
+): Promise<Program> {
   try {
     const virtualFiles: VirtualFile[] = files.map((f) => ({
       path: f.path,
@@ -94,27 +134,22 @@ export async function compileVirtual(
     }
 
     const program = await compile(host as any, entry, compilerOptions as any);
+    const diagnostics = convertDiagnostics(program.diagnostics);
+    const success = !program.hasError();
 
-    return {
-      success: !program.hasError(),
-      diagnostics: convertDiagnostics(program.diagnostics),
-      emitted: [],
-    };
+    return new Program(program, diagnostics, success);
   } catch (error) {
-    return {
-      success: false,
-      diagnostics: [
-        {
-          code: "internal-compiler-error",
-          message: error instanceof Error ? error.message : String(error),
-          severity: Severity.Error,
-          file: entry,
-          start: 0,
-          end: 0,
-        },
-      ],
-      emitted: [],
-    };
+    const diagnostics = [
+      {
+        code: "internal-compiler-error",
+        message: error instanceof Error ? error.message : String(error),
+        severity: Severity.Error,
+        file: entry,
+        start: 0,
+        end: 0,
+      },
+    ];
+    return new Program(null, diagnostics, false);
   }
 }
 
