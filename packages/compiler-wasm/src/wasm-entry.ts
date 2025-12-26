@@ -777,6 +777,16 @@ export async function listInterfacesOperationsVirtual(
         }
         return;
       }
+      case SyntaxKind.OperationStatement: {
+        // Handle operations at namespace level
+        if (namespace.length > 0) {
+          const namespaceName = namespace.join(".");
+          ensureInterface(namespaceName);
+          const operations = interfaceMap.get(namespaceName)!;
+          operations.push(extractOperationDetails(stmt));
+        }
+        return;
+      }
       case SyntaxKind.NamespaceStatement: {
         const ns = stmt.id?.sv;
         const nextNs = typeof ns === "string" && ns.length > 0 ? [...namespace, ns] : namespace;

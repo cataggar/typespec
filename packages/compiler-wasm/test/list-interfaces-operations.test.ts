@@ -36,7 +36,24 @@ model Pet {
     );
 
     expect(result.diagnostics).toHaveLength(0);
-    expect(result.interfaces).toHaveLength(0); // Pets is a namespace, not an interface
+    expect(result.interfaces).toHaveLength(1); // Pets namespace with operations
+    
+    const petsNs = result.interfaces[0];
+    expect(petsNs.name).toBe("Pets");
+    expect(petsNs.operations).toHaveLength(3);
+    
+    // Check 'list' operation
+    const listOp = petsNs.operations.find((op) => op.name === "list");
+    expect(listOp).toBeDefined();
+    expect(listOp!.parameters).toHaveLength(2);
+    expect(listOp!.parameters[0].name).toBe("skip");
+    expect(listOp!.parameters[0].location).toBe(ParameterLocation.Query);
+    
+    // Check 'create' operation
+    const createOp = petsNs.operations.find((op) => op.name === "create");
+    expect(createOp).toBeDefined();
+    expect(createOp!.httpMethod).toBe(HttpMethod.Post);
+    expect(createOp!.body).toBeDefined();
   });
 
   it("should extract operation details from interface with decorators", async () => {
