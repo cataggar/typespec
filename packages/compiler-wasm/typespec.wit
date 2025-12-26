@@ -69,11 +69,23 @@ interface types {
     interfaces: list<interface-info>,
     diagnostics: list<diagnostic>,
   }
+
+  /// A TypeSpec Program resource that holds a compiled program instance
+  resource program {
+    /// Check if the program has any errors
+    has-error: func() -> bool;
+
+    /// Get all diagnostics from the program
+    get-diagnostics: func() -> list<diagnostic>;
+
+    /// Check if compilation was successful (no errors)
+    is-success: func() -> bool;
+  }
 }
 
 /// Main TypeSpec component world
 world typespec {
-  use types.{source-file, compile-options, compile-result, interface-list-result, interface-details-result};
+  use types.{source-file, compile-options, compile-result, interface-list-result, interface-details-result, program};
 
   /// Compile TypeSpec from in-memory source files
   /// 
@@ -81,11 +93,14 @@ world typespec {
   /// - files: List of source files (TypeSpec and imported files)
   /// - entry: Path to the main entry file (must be in files list)
   /// - options: Compilation options
+  /// 
+  /// Returns:
+  /// - A program resource instance
   export compile-virtual: func(
     files: list<source-file>,
     entry: string,
     options: compile-options
-  ) -> compile-result;
+  ) -> program;
 
   /// Compile TypeSpec from a filesystem root
   /// 
