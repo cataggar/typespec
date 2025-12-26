@@ -1,6 +1,6 @@
 # list-interfaces-avs
 
-Rust + wasmtime example that runs the TypeSpec WASI component and prints `interface` declarations using the TypeSpec parser API.
+Rust + wasmtime example that runs the TypeSpec WASI component and prints `interface` declarations with detailed operation information including parameters, HTTP verbs, request body, and responses using the TypeSpec parser API.
 
 ## Run
 

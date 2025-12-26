@@ -146,8 +146,8 @@ fn main() -> Result<()> {
         .context("failed to instantiate typespec component")?;
 
     let result = typespec
-        .call_list_interfaces_details_virtual(&mut store, &files, &entry_virtual)
-        .context("list-interfaces-details-virtual trapped")?;
+        .call_list_interfaces_operations_virtual(&mut store, &files, &entry_virtual)
+        .context("list-interfaces-operations-virtual trapped")?;
 
     if !result.diagnostics.is_empty() {
         eprintln!("diagnostics: {}", result.diagnostics.len());
@@ -157,9 +157,56 @@ fn main() -> Result<()> {
     }
 
     for iface in result.interfaces {
-        println!("{}", iface.name);
+        println!("\nInterface: {}", iface.name);
+        println!("{}", "=".repeat(iface.name.len() + 11));
+        
         for op in iface.operations {
-            println!("  - {}", op);
+            println!("\n  Operation: {}", op.name);
+            
+            // Display HTTP method if present
+            if let Some(method) = &op.http_method {
+                println!("    HTTP Method: {:?}", method);
+            }
+            
+            // Display parameters
+            if !op.parameters.is_empty() {
+                println!("    Parameters:");
+                for param in &op.parameters {
+                    let optional_str = if param.optional { "?" } else { "" };
+                    println!(
+                        "      - {} ({}): {}{}",
+                        param.name,
+                        format!("{:?}", param.location).to_lowercase(),
+                        param.param_type,
+                        optional_str
+                    );
+                }
+            }
+            
+            // Display body parameter
+            if let Some(body) = &op.body {
+                println!("    Body:");
+                let optional_str = if body.optional { "?" } else { "" };
+                println!("      - {}: {}{}", body.name, body.param_type, optional_str);
+            }
+            
+            // Display responses
+            if !op.responses.is_empty() {
+                println!("    Responses:");
+                for resp in &op.responses {
+                    println!("      Status {}", resp.status_code);
+                    if !resp.body_type.is_empty() {
+                        println!("        Body: {}", resp.body_type);
+                    }
+                    if !resp.headers.is_empty() {
+                        println!("        Headers:");
+                        for header in &resp.headers {
+                            let optional_str = if header.optional { "?" } else { "" };
+                            println!("          - {}: {}{}", header.name, header.param_type, optional_str);
+                        }
+                    }
+                }
+            }
         }
     }
 
