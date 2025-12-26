@@ -43,27 +43,32 @@ async function main() {
     },
   ];
 
-  const result = await compileVirtual(files, "/main.tsp", {
+  const program = await compileVirtual(files, "/main.tsp", {
     emitters: [],
     outputDir: "/output",
     arguments: [],
   });
 
-  console.log(`success: ${result.success}`);
-  console.log(`diagnostics: ${result.diagnostics.length}`);
+  // eslint-disable-next-line no-console
+  console.log(`success: ${program.isSuccess()}`);
+  // eslint-disable-next-line no-console
+  console.log(`diagnostics: ${program.getDiagnostics().length}`);
 
-  for (const d of result.diagnostics.slice(0, 20)) {
+  for (const d of program.getDiagnostics().slice(0, 20)) {
     const loc = d.file ? `${d.file}:${d.start}-${d.end}` : "";
+    // eslint-disable-next-line no-console
     console.log(`${d.severity} ${d.code} ${loc}`);
+    // eslint-disable-next-line no-console
     console.log(`  ${d.message}`);
   }
 
-  if (!result.success) {
+  if (!program.isSuccess()) {
     process.exitCode = 1;
   }
 }
 
 main().catch((e) => {
+  // eslint-disable-next-line no-console
   console.error(e);
   process.exitCode = 1;
 });
