@@ -34,6 +34,10 @@ message DeleteShelfRequest {
   string name = 1;
 }
 
+message ArchiveShelfRequest {
+  string name = 1;
+}
+
 service LibraryService {
   rpc GetBook(GetBookRequest) returns (Book);
   // Imports books into the library.
@@ -47,6 +51,12 @@ service LibraryService {
     option (google.longrunning.operation_info) = {
       response_type: "google.protobuf.Empty"
       metadata_type: "example.shared.OperationMetadata"
+    };
+  }
+  rpc ArchiveShelf(ArchiveShelfRequest) returns (google.longrunning.Operation) {
+    option (google.longrunning.operation_info) = {
+      response_type: "Book"
+      metadata_type: "google.protobuf.Empty"
     };
   }
 }

@@ -44,6 +44,48 @@ model Widget is Extern<"path/to/test.proto", "test.Widget">;
 | ------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _extern | `never` | Never present. This property exists only so that `getEffectiveModelType` has something to look<br />up: without it, an `Extern` model spread into an operation parameter yields an empty model that<br />cannot be related back to its original definition. |
 
+### `LongRunning` {#TypeSpec.Protobuf.LongRunning}
+
+A long-running operation ([AIP-151](https://google.aip.dev/151)) whose `response` is a `Response` and whose
+`metadata` is a `Metadata`. Return it from an operation that starts work the client polls until it is done.
+
+This model references `google.longrunning.Operation` from `google/longrunning/operations.proto`. The emitter writes
+both types in the operation's `google.longrunning.operation_info` method option, naming each relative to the
+operation's package (or fully qualified when it is declared in another package), and emits and imports them like any
+other message the operation refers to.
+
+```typespec
+model TypeSpec.Protobuf.LongRunning<Response, Metadata>
+```
+
+#### Template Parameters
+
+| Name     | Description                                                                                                                                                  |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Response | the message in the `response` of a successful operation, such as<br />[`WellKnown.Empty`](./data-types#TypeSpec.Protobuf.WellKnown.Empty) when there is none |
+| Metadata | the message in the `metadata` of the operation, describing its progress (defaults to<br />`WellKnown.Empty`)                                                 |
+
+#### Examples
+
+```typespec
+op importBooks(...ImportBooksRequest): LongRunning<ImportBooksResponse, ImportBooksMetadata>;
+```
+
+```protobuf
+rpc ImportBooks(ImportBooksRequest) returns (google.longrunning.Operation) {
+  option (google.longrunning.operation_info) = {
+    response_type: "ImportBooksResponse"
+    metadata_type: "ImportBooksMetadata"
+  };
+}
+```
+
+#### Properties
+
+| Name    | Type    | Description                                                                                                                                                                                                                                                 |
+| ------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _extern | `never` | Never present. This property exists only so that `getEffectiveModelType` has something to look<br />up: without it, an `Extern` model spread into an operation parameter yields an empty model that<br />cannot be related back to its original definition. |
+
 ### `Map` {#TypeSpec.Protobuf.Map}
 
 A type representing a Protobuf `map`. Instances of this type in models will be converted to the built-in `map` type
@@ -230,9 +272,9 @@ model TypeSpec.Protobuf.WellKnown.LatLng
 
 A long-running operation ([AIP-151](https://google.aip.dev/151)).
 
-This model references `google.longrunning.Operation` from `google/longrunning/operations.proto`. Return it from an
-operation decorated with [`@operationInfo`](./decorators#%40TypeSpec.Protobuf.operationInfo) to declare the types of
-the operation's response and metadata.
+This model references `google.longrunning.Operation` from `google/longrunning/operations.proto`. To declare the
+types of a long-running operation's response and metadata, return
+[`LongRunning`](./data-types#TypeSpec.Protobuf.LongRunning) instead.
 
 ```typespec
 model TypeSpec.Protobuf.WellKnown.Operation

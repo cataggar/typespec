@@ -3,7 +3,6 @@
 
 import type {
   DecoratorContext,
-  DiagnosticTarget,
   EmitContext,
   EmitOptionsFor,
   Interface,
@@ -21,12 +20,14 @@ import { resolvePath } from "@typespec/compiler";
 import type {
   FieldDecorator,
   MessageDecorator,
-  OperationInfoDecorator,
   PackageDecorator,
   ReserveDecorator,
   StreamDecorator,
 } from "../generated-defs/TypeSpec.Protobuf.js";
-import type { ExternRefDecorator } from "../generated-defs/TypeSpec.Protobuf.Private.js";
+import type {
+  ExternRefDecorator,
+  LongRunningDecorator,
+} from "../generated-defs/TypeSpec.Protobuf.Private.js";
 import { StreamingMode } from "./ast.js";
 import type { ProtobufEmitterOptions, TypeSpecProtobufLibrary } from "./lib.js";
 import { reportDiagnostic, state } from "./lib.js";
@@ -146,38 +147,25 @@ export const $stream: StreamDecorator = (ctx: DecoratorContext, target: Operatio
 };
 
 /**
- * The response and metadata types of a long-running operation, with the `@operationInfo` arguments that declared them.
+ * The response and metadata types of a long-running operation, the arguments of a `LongRunning` instance.
  */
-export interface OperationInfo {
+export interface LongRunningInfo {
   responseType: Model;
   metadataType: Model;
-  /**
-   * The diagnostic targets of the `responseType` and `metadataType` arguments.
-   */
-  targets: [DiagnosticTarget | undefined, DiagnosticTarget | undefined];
 }
 
 /**
- * Declare the response and metadata types of a long-running operation. The emitter validates them and writes the
- * `google.longrunning.operation_info` method option.
- *
- * @param ctx - decorator context
- * @param target - the decorated operation
- * @param responseType - the type of the operation's response
- * @param metadataType - the type of the operation's metadata
+ * Binds the response and metadata types of a `LongRunning` instance.
+ * @internal
  */
-export const $operationInfo: OperationInfoDecorator = (
+export const $longRunning: LongRunningDecorator = (
   ctx: DecoratorContext,
-  target: Operation,
+  target: Model,
   responseType: Model,
   metadataType: Model,
 ) => {
-  const info: OperationInfo = {
-    responseType,
-    metadataType,
-    targets: [ctx.getArgumentTarget(0), ctx.getArgumentTarget(1)],
-  };
-  ctx.program.stateMap(state.operationInfo).set(target, info);
+  const info: LongRunningInfo = { responseType, metadataType };
+  ctx.program.stateMap(state.longRunning).set(target, info);
 };
 
 export type Reservation = string | number | ([number, number] & { type: Type });

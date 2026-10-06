@@ -68,7 +68,6 @@ When set to `enum-name`, enum values are prefixed with the enum name in UPPER_SN
 
 - [`@field`](#@field)
 - [`@message`](#@message)
-- [`@operationInfo`](#@operationinfo)
 - [`@package`](#@package)
 - [`@reserve`](#@reserve)
 - [`@service`](#@service)
@@ -166,47 +165,6 @@ emitted as a wrapper message containing a `oneof value`.
 ##### Parameters
 
 None
-
-#### `@operationInfo`
-
-Declares the response and metadata types of a long-running operation
-([AIP-151](https://google.aip.dev/151)). The operation must return
-[`WellKnown.Operation`](./data-types#TypeSpec.Protobuf.WellKnown.Operation), which the client polls until it is done.
-
-The emitter writes the `google.longrunning.operation_info` method option, naming each type relative to the
-operation's package (or fully qualified when it is declared in another package), and emits and imports both types
-like any other message the operation refers to.
-
-```typespec
-@TypeSpec.Protobuf.operationInfo(responseType: Model, metadataType: Model)
-```
-
-##### Target
-
-`Operation`
-
-##### Parameters
-
-| Name         | Type    | Description                                                                                                                                                   |
-| ------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| responseType | `Model` | The message in the `response` of a successful operation, such as<br />[`WellKnown.Empty`](./data-types#TypeSpec.Protobuf.WellKnown.Empty) when there is none. |
-| metadataType | `Model` | The message in the `metadata` of the operation, describing its progress.                                                                                      |
-
-##### Examples
-
-```typespec
-@operationInfo(Book, ImportBooksMetadata)
-op importBooks(...ImportBooksRequest): WellKnown.Operation;
-```
-
-```protobuf
-rpc ImportBooks(ImportBooksRequest) returns (google.longrunning.Operation) {
-  option (google.longrunning.operation_info) = {
-    response_type: "Book"
-    metadata_type: "ImportBooksMetadata"
-  };
-}
-```
 
 #### `@package`
 

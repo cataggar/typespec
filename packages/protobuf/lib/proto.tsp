@@ -70,9 +70,9 @@ namespace WellKnown {
   /**
    * A long-running operation ([AIP-151](https://google.aip.dev/151)).
    *
-   * This model references `google.longrunning.Operation` from `google/longrunning/operations.proto`. Return it from an
-   * operation decorated with [`@operationInfo`](./decorators#%40TypeSpec.Protobuf.operationInfo) to declare the types of
-   * the operation's response and metadata.
+   * This model references `google.longrunning.Operation` from `google/longrunning/operations.proto`. To declare the
+   * types of a long-running operation's response and metadata, return
+   * [`LongRunning`](./data-types#TypeSpec.Protobuf.LongRunning) instead.
    */
   model Operation is Extern<"google/longrunning/operations.proto", "google.longrunning.Operation">;
 }
@@ -148,6 +148,41 @@ alias integral = int32 | int64 | uint32 | uint64 | boolean;
  */
 @Private._map
 model Map<Key extends integral | string, Value> {}
+
+/**
+ * A long-running operation ([AIP-151](https://google.aip.dev/151)) whose `response` is a `Response` and whose
+ * `metadata` is a `Metadata`. Return it from an operation that starts work the client polls until it is done.
+ *
+ * This model references `google.longrunning.Operation` from `google/longrunning/operations.proto`. The emitter writes
+ * both types in the operation's `google.longrunning.operation_info` method option, naming each relative to the
+ * operation's package (or fully qualified when it is declared in another package), and emits and imports them like any
+ * other message the operation refers to.
+ *
+ * @template Response the message in the `response` of a successful operation, such as
+ * [`WellKnown.Empty`](./data-types#TypeSpec.Protobuf.WellKnown.Empty) when there is none
+ * @template Metadata the message in the `metadata` of the operation, describing its progress (defaults to
+ * `WellKnown.Empty`)
+ *
+ * @example
+ *
+ * ```typespec
+ * op importBooks(...ImportBooksRequest): LongRunning<ImportBooksResponse, ImportBooksMetadata>;
+ * ```
+ *
+ * ```protobuf
+ * rpc ImportBooks(ImportBooksRequest) returns (google.longrunning.Operation) {
+ *   option (google.longrunning.operation_info) = {
+ *     response_type: "ImportBooksResponse"
+ *     metadata_type: "ImportBooksMetadata"
+ *   };
+ * }
+ * ```
+ */
+@Private.longRunning(Response, Metadata)
+model LongRunning<
+  Response extends Reflection.Model,
+  Metadata extends Reflection.Model = WellKnown.Empty
+> is Extern<"google/longrunning/operations.proto", "google.longrunning.Operation">;
 
 /**
  * Declares that a model is a Protobuf message.
@@ -353,42 +388,12 @@ enum StreamMode {
  */
 extern dec stream(target: TypeSpec.Reflection.Operation, mode: StreamMode);
 
-/**
- * Declares the response and metadata types of a long-running operation
- * ([AIP-151](https://google.aip.dev/151)). The operation must return
- * [`WellKnown.Operation`](./data-types#TypeSpec.Protobuf.WellKnown.Operation), which the client polls until it is done.
- *
- * The emitter writes the `google.longrunning.operation_info` method option, naming each type relative to the
- * operation's package (or fully qualified when it is declared in another package), and emits and imports both types
- * like any other message the operation refers to.
- *
- * @param responseType The message in the `response` of a successful operation, such as
- * [`WellKnown.Empty`](./data-types#TypeSpec.Protobuf.WellKnown.Empty) when there is none.
- * @param metadataType The message in the `metadata` of the operation, describing its progress.
- *
- * @example
- *
- * ```typespec
- * @operationInfo(Book, ImportBooksMetadata)
- * op importBooks(...ImportBooksRequest): WellKnown.Operation;
- * ```
- *
- * ```protobuf
- * rpc ImportBooks(ImportBooksRequest) returns (google.longrunning.Operation) {
- *   option (google.longrunning.operation_info) = {
- *     response_type: "Book"
- *     metadata_type: "ImportBooksMetadata"
- *   };
- * }
- * ```
- */
-extern dec operationInfo(
-  target: TypeSpec.Reflection.Operation,
-  responseType: TypeSpec.Reflection.Model,
-  metadataType: TypeSpec.Reflection.Model
-);
-
 namespace Private {
   extern dec externRef(target: Reflection.Model, path: string, name: string);
   extern dec _map(target: Reflection.Model);
+  extern dec longRunning(
+    target: Reflection.Model,
+    response: Reflection.Model,
+    metadata: Reflection.Model
+  );
 }

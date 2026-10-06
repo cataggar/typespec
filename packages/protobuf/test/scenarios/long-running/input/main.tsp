@@ -15,19 +15,23 @@ namespace Library {
     @field(1) source_uri: string;
   }
 
+  // Only `LongRunning` refers to the response and metadata; they are emitted even with
+  // `omit-unreachable-types`.
   model ImportBooksResponse {
     @field(1) books: Book[];
+  }
+
+  model ImportBooksMetadata {
+    @field(1) common: Shared.OperationMetadata;
+    @field(2) imported_count: int32;
   }
 
   model DeleteShelfRequest {
     @field(1) name: string;
   }
 
-  // Only `@operationInfo` refers to the metadata and response; they are emitted even with
-  // `omit-unreachable-types`.
-  model ImportBooksMetadata {
-    @field(1) common: Shared.OperationMetadata;
-    @field(2) imported_count: int32;
+  model ArchiveShelfRequest {
+    @field(1) name: string;
   }
 
   @Protobuf.service
@@ -37,11 +41,13 @@ namespace Library {
     /**
      * Imports books into the library.
      */
-    @operationInfo(ImportBooksResponse, ImportBooksMetadata)
-    importBooks(...ImportBooksRequest): WellKnown.Operation;
+    importBooks(...ImportBooksRequest): LongRunning<ImportBooksResponse, ImportBooksMetadata>;
 
-    @operationInfo(WellKnown.Empty, Shared.OperationMetadata)
-    deleteShelf(...DeleteShelfRequest): WellKnown.Operation;
+    // A type in another package is fully qualified.
+    deleteShelf(...DeleteShelfRequest): LongRunning<WellKnown.Empty, Shared.OperationMetadata>;
+
+    // The metadata defaults to `google.protobuf.Empty`.
+    archiveShelf(...ArchiveShelfRequest): LongRunning<Book>;
   }
 }
 

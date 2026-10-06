@@ -55,18 +55,13 @@ import type {
 import { map, matchType, ref, scalar, StreamingMode, unreachable } from "../ast.js";
 import type { ProtobufEmitterOptions } from "../lib.js";
 import { reportDiagnostic, state } from "../lib.js";
-import type { OperationInfo, Reservation } from "../proto.js";
+import type { LongRunningInfo, Reservation } from "../proto.js";
 import { $field, isMap, PROTO_IDENT } from "../proto.js";
 import { writeProtoFile } from "../write.js";
 
 // Cache for scalar -> ProtoScalar map
 const _protoScalarsMap = new WeakMap<Program, Map<Type, ProtoScalar>>();
 const _protoExternMap = new WeakMap<Program, Map<string, [string, ProtoRef]>>();
-
-/**
- * The full name of the message that a long-running operation returns (AIP-151).
- */
-const LONG_RUNNING_OPERATION = "google.longrunning.Operation";
 
 /**
  * The name of the `oneof` declared within the wrapper message of a union used as a numbered field.
@@ -401,28 +396,20 @@ function tspToProto(program: Program, emitterOptions: ProtobufEmitterOptions): P
   }
 
   /**
-   * Converts an operation's `@operationInfo`, if any, to the `google.longrunning.operation_info` method option.
+   * Converts the `LongRunning` type an operation returns, if any, to the `google.longrunning.operation_info` method
+   * option.
    *
    * @param operation - the operation to convert
    * @returns the method's options
    */
   function toMethodOptions(operation: Operation): ProtoOption[] {
-    const info = program.stateMap(state.operationInfo).get(operation) as OperationInfo | undefined;
+    const info = program.stateMap(state.longRunning).get(operation.returnType) as
+      LongRunningInfo | undefined;
     if (!info) return [];
 
-    const returnExtern = program.stateMap(state.externRef).get(operation.returnType) as
-      [string, string] | undefined;
-    if (returnExtern?.[1] !== LONG_RUNNING_OPERATION) {
-      reportDiagnostic(program, {
-        code: "operation-info",
-        target: getOperationReturnSyntaxTarget(operation),
-      });
-      return [];
-    }
-
     const [responseType, metadataType] = [
-      toOperationInfoTypeName(operation, info.responseType, info.targets[0], "response"),
-      toOperationInfoTypeName(operation, info.metadataType, info.targets[1], "metadata"),
+      toLongRunningTypeName(operation, info.responseType, 0, "response"),
+      toLongRunningTypeName(operation, info.metadataType, 1, "metadata"),
     ];
     if (responseType === undefined || metadataType === undefined) return [];
 
@@ -440,22 +427,21 @@ function tspToProto(program: Program, emitterOptions: ProtobufEmitterOptions): P
    *
    * @param operation - the long-running operation
    * @param t - the response or metadata type
-   * @param target - the `@operationInfo` argument that declared `t`, for diagnostics
+   * @param index - the index of `t` among the template arguments of `LongRunning`
    * @param role - `response` or `metadata`, for diagnostics
    * @returns the type's name, or `undefined` if it cannot be emitted as a message
    */
-  function toOperationInfoTypeName(
+  function toLongRunningTypeName(
     operation: Operation,
     t: Model,
-    target: DiagnosticTarget | undefined,
+    index: number,
     role: "response" | "metadata",
   ): string | undefined {
     if (t.name === "" || isArrayModelType(t) || isRecordModelType(t) || isMap(program, t)) {
       reportDiagnostic(program, {
-        code: "operation-info",
-        messageId: "invalid-type",
+        code: "long-running-type",
         format: { role },
-        target: target ?? operation,
+        target: getLongRunningArgumentTarget(operation, t, index, role),
       });
       return undefined;
     }
@@ -468,6 +454,36 @@ function tspToProto(program: Program, emitterOptions: ProtobufEmitterOptions): P
       scalar: () => undefined,
       map: () => undefined,
     });
+  }
+
+  /**
+   * Gets the syntactic target of the response or metadata type of the `LongRunning` an operation returns: the template
+   * argument written in the return type whose type is `t`, preferring the one in the parameter's own position or named
+   * after it, or else the whole return type, such as when the return type is an alias that wraps `LongRunning`.
+   *
+   * @param operation - the long-running operation
+   * @param t - the response or metadata type
+   * @param index - the position of `t`'s parameter in `LongRunning`
+   * @param role - `response` or `metadata`, the parameter's name in lower case
+   */
+  function getLongRunningArgumentTarget(
+    operation: Operation,
+    t: Model,
+    index: number,
+    role: "response" | "metadata",
+  ): DiagnosticTarget {
+    const target = getOperationReturnSyntaxTarget(operation);
+    if (!("kind" in target) || target.kind !== SyntaxKind.TypeReference) return target;
+
+    const matches = target.arguments.filter(
+      (arg) => program.checker.getTypeForNode(arg.argument) === t,
+    );
+    return (
+      matches.find((arg) => arg.name?.sv.toLowerCase() === role) ??
+      matches.find((arg) => !arg.name && target.arguments.indexOf(arg) === index) ??
+      matches[0] ??
+      target
+    );
   }
 
   /**

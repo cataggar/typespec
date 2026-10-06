@@ -298,7 +298,7 @@ The Protobuf emitter supports the declaration of an operation's streaming mode u
 
 #### Long-running operations
 
-A long-running operation ([AIP-151](https://google.aip.dev/151)) returns a [`WellKnown.Operation`][protobuf-operation], a `google.longrunning.Operation` that the client polls through the standard `google.longrunning.Operations` service until it is done. The [`TypeSpec.Protobuf.operationInfo` decorator][protobuf-operation-info] declares the types of the operation's `response` and `metadata`:
+A long-running operation ([AIP-151](https://google.aip.dev/151)) returns a `google.longrunning.Operation` that the client polls through the standard `google.longrunning.Operations` service until it is done. Return [`LongRunning<Response, Metadata>`][protobuf-long-running] to declare the types of the operation's `response` and `metadata`:
 
 ```typespec
 model ImportBooksResponse {
@@ -311,8 +311,7 @@ model ImportBooksMetadata {
 
 @Protobuf.service
 interface Library {
-  @operationInfo(ImportBooksResponse, ImportBooksMetadata)
-  importBooks(...ImportBooksRequest): WellKnown.Operation;
+  importBooks(...ImportBooksRequest): LongRunning<ImportBooksResponse, ImportBooksMetadata>;
 }
 ```
 
@@ -331,7 +330,7 @@ service Library {
 }
 ```
 
-Use [`WellKnown.Empty`][protobuf-empty] as the response type of an operation that has no response. Code generators need `google/longrunning/operations.proto` and its imports from [googleapis](https://github.com/googleapis/googleapis) on their include path.
+Use [`WellKnown.Empty`][protobuf-empty] as the response type of an operation that has no response; the metadata type defaults to it. Code generators need `google/longrunning/operations.proto` and its imports from [googleapis](https://github.com/googleapis/googleapis) on their include path.
 
 [native-service]: ../../../standard-library/built-in-decorators/#@service
 [protobuf-service]: ../reference/decorators/#@TypeSpec.Protobuf.service
@@ -340,6 +339,5 @@ Use [`WellKnown.Empty`][protobuf-empty] as the response type of an operation tha
 [protobuf-stream]: ../reference/decorators/#@TypeSpec.Protobuf.stream
 [protobuf-stream-mode]: ../reference/data-types/#TypeSpec.Protobuf.StreamMode
 [protobuf-message]: ../reference/decorators/#@TypeSpec.Protobuf.message
-[protobuf-operation-info]: ../reference/decorators/#@TypeSpec.Protobuf.operationInfo
-[protobuf-operation]: ../reference/data-types/#TypeSpec.Protobuf.WellKnown.Operation
+[protobuf-long-running]: ../reference/data-types/#TypeSpec.Protobuf.LongRunning
 [protobuf-empty]: ../reference/data-types/#TypeSpec.Protobuf.WellKnown.Empty
