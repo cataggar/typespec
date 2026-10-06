@@ -160,8 +160,8 @@ model Map<Key extends integral | string, Value> {}
  *
  * @template Response the message in the `response` of a successful operation, such as
  * [`WellKnown.Empty`](./data-types#TypeSpec.Protobuf.WellKnown.Empty) when there is none
- * @template Metadata the message in the `metadata` of the operation, describing its progress (defaults to
- * `WellKnown.Empty`)
+ * @template Metadata the message in the `metadata` of the operation, describing its progress. AIP-151 asks for a
+ * message of the operation's own, even an empty one, rather than `WellKnown.Empty`
  *
  * @example
  *
@@ -181,7 +181,7 @@ model Map<Key extends integral | string, Value> {}
 @Private.longRunning(Response, Metadata)
 model LongRunningOperation<
   Response extends Reflection.Model,
-  Metadata extends Reflection.Model = WellKnown.Empty
+  Metadata extends Reflection.Model
 > is Extern<"google/longrunning/operations.proto", "google.longrunning.Operation">;
 
 /**

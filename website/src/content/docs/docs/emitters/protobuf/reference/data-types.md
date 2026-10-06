@@ -60,10 +60,10 @@ model TypeSpec.Protobuf.LongRunningOperation<Response, Metadata>
 
 #### Template Parameters
 
-| Name     | Description                                                                                                                                                  |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Response | the message in the `response` of a successful operation, such as<br />[`WellKnown.Empty`](./data-types#TypeSpec.Protobuf.WellKnown.Empty) when there is none |
-| Metadata | the message in the `metadata` of the operation, describing its progress (defaults to<br />`WellKnown.Empty`)                                                 |
+| Name     | Description                                                                                                                                                                       |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Response | the message in the `response` of a successful operation, such as<br />[`WellKnown.Empty`](./data-types#TypeSpec.Protobuf.WellKnown.Empty) when there is none                      |
+| Metadata | the message in the `metadata` of the operation, describing its progress. AIP-151 asks for a<br />message of the operation's own, even an empty one, rather than `WellKnown.Empty` |
 
 #### Examples
 

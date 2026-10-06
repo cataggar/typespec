@@ -333,7 +333,7 @@ service Library {
 }
 ```
 
-Use [`WellKnown.Empty`][protobuf-empty] as the response type of an operation that has no response; the metadata type defaults to it. Code generators need `google/longrunning/operations.proto` and its imports from [googleapis](https://github.com/googleapis/googleapis) on their include path.
+Use [`WellKnown.Empty`][protobuf-empty] as the response type of an operation that has no response. AIP-151 asks for a metadata message of the operation's own, even an empty one, rather than `WellKnown.Empty`. Code generators need `google/longrunning/operations.proto` and its imports from [googleapis](https://github.com/googleapis/googleapis) on their include path.
 
 [native-service]: ../../../standard-library/built-in-decorators/#@service
 [protobuf-service]: ../reference/decorators/#@TypeSpec.Protobuf.service

@@ -34,6 +34,9 @@ namespace Library {
     @field(1) name: string;
   }
 
+  // AIP-151 asks for a metadata message of the operation's own, even an empty one.
+  model ArchiveShelfMetadata {}
+
   @Protobuf.service
   interface LibraryService {
     getBook(@field(1) name: string): Book;
@@ -52,8 +55,7 @@ namespace Library {
       Shared.OperationMetadata
     >;
 
-    // The metadata defaults to `google.protobuf.Empty`.
-    archiveShelf(...ArchiveShelfRequest): LongRunningOperation<Book>;
+    archiveShelf(...ArchiveShelfRequest): LongRunningOperation<Book, ArchiveShelfMetadata>;
   }
 }
 
