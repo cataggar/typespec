@@ -4,10 +4,10 @@ packages:
   - "@typespec/protobuf"
 ---
 
-Add `LongRunning<Response, Metadata>` for long-running operations ([AIP-151](https://google.aip.dev/151)), and `WellKnown.Operation`. An operation that returns `LongRunning` returns a `google.longrunning.Operation`, and the emitter writes its response and metadata types in the method's `google.longrunning.operation_info` option.
+Add `LongRunningOperation<Response, Metadata>` for long-running operations ([AIP-151](https://google.aip.dev/151)), and `WellKnown.Operation`. An operation that returns `LongRunningOperation` returns a `google.longrunning.Operation`, and the emitter writes its response and metadata types in the method's `google.longrunning.operation_info` option.
 
 ```tsp
-importBooks(...ImportBooksRequest): LongRunning<ImportBooksResponse, ImportBooksMetadata>;
+importBooks(...ImportBooksRequest): LongRunningOperation<ImportBooksResponse, ImportBooksMetadata>;
 ```
 
 ```proto

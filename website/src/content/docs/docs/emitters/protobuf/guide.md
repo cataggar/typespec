@@ -298,7 +298,7 @@ The Protobuf emitter supports the declaration of an operation's streaming mode u
 
 #### Long-running operations
 
-A long-running operation ([AIP-151](https://google.aip.dev/151)) returns a `google.longrunning.Operation` that the client polls through the standard `google.longrunning.Operations` service until it is done. Return [`LongRunning<Response, Metadata>`][protobuf-long-running] to declare the types of the operation's `response` and `metadata`:
+A long-running operation ([AIP-151](https://google.aip.dev/151)) returns a `google.longrunning.Operation` that the client polls through the standard `google.longrunning.Operations` service until it is done. Return [`LongRunningOperation<Response, Metadata>`][protobuf-long-running] to declare the types of the operation's `response` and `metadata`:
 
 ```typespec
 model ImportBooksResponse {
@@ -311,7 +311,10 @@ model ImportBooksMetadata {
 
 @Protobuf.service
 interface Library {
-  importBooks(...ImportBooksRequest): LongRunning<ImportBooksResponse, ImportBooksMetadata>;
+  importBooks(...ImportBooksRequest): LongRunningOperation<
+    ImportBooksResponse,
+    ImportBooksMetadata
+  >;
 }
 ```
 
@@ -339,5 +342,5 @@ Use [`WellKnown.Empty`][protobuf-empty] as the response type of an operation tha
 [protobuf-stream]: ../reference/decorators/#@TypeSpec.Protobuf.stream
 [protobuf-stream-mode]: ../reference/data-types/#TypeSpec.Protobuf.StreamMode
 [protobuf-message]: ../reference/decorators/#@TypeSpec.Protobuf.message
-[protobuf-long-running]: ../reference/data-types/#TypeSpec.Protobuf.LongRunning
+[protobuf-long-running]: ../reference/data-types/#TypeSpec.Protobuf.LongRunningOperation
 [protobuf-empty]: ../reference/data-types/#TypeSpec.Protobuf.WellKnown.Empty

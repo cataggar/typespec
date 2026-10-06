@@ -220,7 +220,7 @@ export const TypeSpecProtobufLibrary = createTypeSpecLibrary({
     "long-running-type": {
       severity: "error",
       messages: {
-        default: paramMessage`the ${"role"} type of 'LongRunning' must be a named model that is emitted as a message, not an array, map, or anonymous model`,
+        default: paramMessage`the ${"role"} type of 'LongRunningOperation' must be a named model that is emitted as a message, not an array, map, or anonymous model`,
       },
     },
   },

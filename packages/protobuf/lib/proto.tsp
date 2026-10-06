@@ -72,7 +72,7 @@ namespace WellKnown {
    *
    * This model references `google.longrunning.Operation` from `google/longrunning/operations.proto`. To declare the
    * types of a long-running operation's response and metadata, return
-   * [`LongRunning`](./data-types#TypeSpec.Protobuf.LongRunning) instead.
+   * [`LongRunningOperation`](./data-types#TypeSpec.Protobuf.LongRunningOperation) instead.
    */
   model Operation is Extern<"google/longrunning/operations.proto", "google.longrunning.Operation">;
 }
@@ -166,7 +166,7 @@ model Map<Key extends integral | string, Value> {}
  * @example
  *
  * ```typespec
- * op importBooks(...ImportBooksRequest): LongRunning<ImportBooksResponse, ImportBooksMetadata>;
+ * op importBooks(...ImportBooksRequest): LongRunningOperation<ImportBooksResponse, ImportBooksMetadata>;
  * ```
  *
  * ```protobuf
@@ -179,7 +179,7 @@ model Map<Key extends integral | string, Value> {}
  * ```
  */
 @Private.longRunning(Response, Metadata)
-model LongRunning<
+model LongRunningOperation<
   Response extends Reflection.Model,
   Metadata extends Reflection.Model = WellKnown.Empty
 > is Extern<"google/longrunning/operations.proto", "google.longrunning.Operation">;

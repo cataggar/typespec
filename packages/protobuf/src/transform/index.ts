@@ -396,7 +396,7 @@ function tspToProto(program: Program, emitterOptions: ProtobufEmitterOptions): P
   }
 
   /**
-   * Converts the `LongRunning` type an operation returns, if any, to the `google.longrunning.operation_info` method
+   * Converts the `LongRunningOperation` type an operation returns, if any, to the `google.longrunning.operation_info` method
    * option.
    *
    * @param operation - the operation to convert
@@ -427,7 +427,7 @@ function tspToProto(program: Program, emitterOptions: ProtobufEmitterOptions): P
    *
    * @param operation - the long-running operation
    * @param t - the response or metadata type
-   * @param index - the index of `t` among the template arguments of `LongRunning`
+   * @param index - the index of `t` among the template arguments of `LongRunningOperation`
    * @param role - `response` or `metadata`, for diagnostics
    * @returns the type's name, or `undefined` if it cannot be emitted as a message
    */
@@ -457,13 +457,13 @@ function tspToProto(program: Program, emitterOptions: ProtobufEmitterOptions): P
   }
 
   /**
-   * Gets the syntactic target of the response or metadata type of the `LongRunning` an operation returns: the template
+   * Gets the syntactic target of the response or metadata type of the `LongRunningOperation` an operation returns: the template
    * argument written in the return type whose type is `t`, preferring the one in the parameter's own position or named
-   * after it, or else the whole return type, such as when the return type is an alias that wraps `LongRunning`.
+   * after it, or else the whole return type, such as when the return type is an alias that wraps `LongRunningOperation`.
    *
    * @param operation - the long-running operation
    * @param t - the response or metadata type
-   * @param index - the position of `t`'s parameter in `LongRunning`
+   * @param index - the position of `t`'s parameter in `LongRunningOperation`
    * @param role - `response` or `metadata`, the parameter's name in lower case
    */
   function getLongRunningArgumentTarget(

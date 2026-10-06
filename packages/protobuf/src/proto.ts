@@ -147,7 +147,7 @@ export const $stream: StreamDecorator = (ctx: DecoratorContext, target: Operatio
 };
 
 /**
- * The response and metadata types of a long-running operation, the arguments of a `LongRunning` instance.
+ * The response and metadata types of a long-running operation, the arguments of a `LongRunningOperation` instance.
  */
 export interface LongRunningInfo {
   responseType: Model;
@@ -155,7 +155,7 @@ export interface LongRunningInfo {
 }
 
 /**
- * Binds the response and metadata types of a `LongRunning` instance.
+ * Binds the response and metadata types of a `LongRunningOperation` instance.
  * @internal
  */
 export const $longRunning: LongRunningDecorator = (

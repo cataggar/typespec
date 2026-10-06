@@ -44,7 +44,7 @@ model Widget is Extern<"path/to/test.proto", "test.Widget">;
 | ------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _extern | `never` | Never present. This property exists only so that `getEffectiveModelType` has something to look<br />up: without it, an `Extern` model spread into an operation parameter yields an empty model that<br />cannot be related back to its original definition. |
 
-### `LongRunning` {#TypeSpec.Protobuf.LongRunning}
+### `LongRunningOperation` {#TypeSpec.Protobuf.LongRunningOperation}
 
 A long-running operation ([AIP-151](https://google.aip.dev/151)) whose `response` is a `Response` and whose
 `metadata` is a `Metadata`. Return it from an operation that starts work the client polls until it is done.
@@ -55,7 +55,7 @@ operation's package (or fully qualified when it is declared in another package),
 other message the operation refers to.
 
 ```typespec
-model TypeSpec.Protobuf.LongRunning<Response, Metadata>
+model TypeSpec.Protobuf.LongRunningOperation<Response, Metadata>
 ```
 
 #### Template Parameters
@@ -68,7 +68,10 @@ model TypeSpec.Protobuf.LongRunning<Response, Metadata>
 #### Examples
 
 ```typespec
-op importBooks(...ImportBooksRequest): LongRunning<ImportBooksResponse, ImportBooksMetadata>;
+op importBooks(...ImportBooksRequest): LongRunningOperation<
+  ImportBooksResponse,
+  ImportBooksMetadata
+>;
 ```
 
 ```protobuf
@@ -274,7 +277,7 @@ A long-running operation ([AIP-151](https://google.aip.dev/151)).
 
 This model references `google.longrunning.Operation` from `google/longrunning/operations.proto`. To declare the
 types of a long-running operation's response and metadata, return
-[`LongRunning`](./data-types#TypeSpec.Protobuf.LongRunning) instead.
+[`LongRunningOperation`](./data-types#TypeSpec.Protobuf.LongRunningOperation) instead.
 
 ```typespec
 model TypeSpec.Protobuf.WellKnown.Operation
