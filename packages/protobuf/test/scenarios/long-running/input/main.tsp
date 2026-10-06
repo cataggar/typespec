@@ -3,7 +3,7 @@ import "@typespec/protobuf";
 using Protobuf;
 
 @package({
-  name: "example.library.v1",
+  name: "example",
 })
 namespace Library {
   model Book {

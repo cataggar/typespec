@@ -2,7 +2,7 @@
 
 syntax = "proto3";
 
-package example.library.v1;
+package example;
 
 import "google/longrunning/operations.proto";
 import "example/shared.proto";
