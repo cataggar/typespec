@@ -226,6 +226,24 @@ model TypeSpec.Protobuf.WellKnown.LatLng
 | ------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _extern | `never` | Never present. This property exists only so that `getEffectiveModelType` has something to look<br />up: without it, an `Extern` model spread into an operation parameter yields an empty model that<br />cannot be related back to its original definition. |
 
+### `Operation` {#TypeSpec.Protobuf.WellKnown.Operation}
+
+A long-running operation ([AIP-151](https://google.aip.dev/151)).
+
+This model references `google.longrunning.Operation` from `google/longrunning/operations.proto`. Return it from an
+operation decorated with [`@operationInfo`](./decorators#%40TypeSpec.Protobuf.operationInfo) to declare the types of
+the operation's response and metadata.
+
+```typespec
+model TypeSpec.Protobuf.WellKnown.Operation
+```
+
+#### Properties
+
+| Name    | Type    | Description                                                                                                                                                                                                                                                 |
+| ------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _extern | `never` | Never present. This property exists only so that `getEffectiveModelType` has something to look<br />up: without it, an `Extern` model spread into an operation parameter yields an empty model that<br />cannot be related back to its original definition. |
+
 ### `Timestamp` {#TypeSpec.Protobuf.WellKnown.Timestamp}
 
 A timestamp.

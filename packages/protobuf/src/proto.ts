@@ -3,6 +3,7 @@
 
 import type {
   DecoratorContext,
+  DiagnosticTarget,
   EmitContext,
   EmitOptionsFor,
   Interface,
@@ -20,6 +21,7 @@ import { resolvePath } from "@typespec/compiler";
 import type {
   FieldDecorator,
   MessageDecorator,
+  OperationInfoDecorator,
   PackageDecorator,
   ReserveDecorator,
   StreamDecorator,
@@ -141,6 +143,41 @@ export const $stream: StreamDecorator = (ctx: DecoratorContext, target: Operatio
   }[(mode as any).name as string];
 
   ctx.program.stateMap(state.stream).set(target, emitStreamingMode);
+};
+
+/**
+ * The response and metadata types of a long-running operation, with the `@operationInfo` arguments that declared them.
+ */
+export interface OperationInfo {
+  responseType: Model;
+  metadataType: Model;
+  /**
+   * The diagnostic targets of the `responseType` and `metadataType` arguments.
+   */
+  targets: [DiagnosticTarget | undefined, DiagnosticTarget | undefined];
+}
+
+/**
+ * Declare the response and metadata types of a long-running operation. The emitter validates them and writes the
+ * `google.longrunning.operation_info` method option.
+ *
+ * @param ctx - decorator context
+ * @param target - the decorated operation
+ * @param responseType - the type of the operation's response
+ * @param metadataType - the type of the operation's metadata
+ */
+export const $operationInfo: OperationInfoDecorator = (
+  ctx: DecoratorContext,
+  target: Operation,
+  responseType: Model,
+  metadataType: Model,
+) => {
+  const info: OperationInfo = {
+    responseType,
+    metadataType,
+    targets: [ctx.getArgumentTarget(0), ctx.getArgumentTarget(1)],
+  };
+  ctx.program.stateMap(state.operationInfo).set(target, info);
 };
 
 export type Reservation = string | number | ([number, number] & { type: Type });

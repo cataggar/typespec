@@ -217,6 +217,14 @@ export const TypeSpecProtobufLibrary = createTypeSpecLibrary({
         "disallowed-option-type": paramMessage`option '${"name"}' with type '${"type"}' is not allowed in a package declaration (only string, boolean, and numeric types are allowed)`,
       },
     },
+    "operation-info": {
+      severity: "error",
+      messages: {
+        default:
+          "an operation decorated with '@operationInfo' must return 'TypeSpec.Protobuf.WellKnown.Operation'",
+        "invalid-type": paramMessage`the ${"role"} type of '@operationInfo' must be a named model that is emitted as a message, not an array, map, or anonymous model`,
+      },
+    },
   },
   emitter: { options: EmitterOptionsSchema },
 });
@@ -270,6 +278,7 @@ const keys = [
   "service",
   "externRef",
   "stream",
+  "operationInfo",
   "reserve",
   "message",
   "_map",

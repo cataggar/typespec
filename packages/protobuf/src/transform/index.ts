@@ -27,6 +27,7 @@ import {
   getTypeName,
   isArrayModelType,
   isDeclaredInNamespace,
+  isRecordModelType,
   isTemplateInstance,
   isType,
   resolvePath,
@@ -44,6 +45,7 @@ import type {
   ProtoMessageDeclaration,
   ProtoMethodDeclaration,
   ProtoOneOfDeclaration,
+  ProtoOption,
   ProtoRef,
   ProtoScalar,
   ProtoTopLevelDeclaration,
@@ -53,13 +55,18 @@ import type {
 import { map, matchType, ref, scalar, StreamingMode, unreachable } from "../ast.js";
 import type { ProtobufEmitterOptions } from "../lib.js";
 import { reportDiagnostic, state } from "../lib.js";
-import type { Reservation } from "../proto.js";
+import type { OperationInfo, Reservation } from "../proto.js";
 import { $field, isMap, PROTO_IDENT } from "../proto.js";
 import { writeProtoFile } from "../write.js";
 
 // Cache for scalar -> ProtoScalar map
 const _protoScalarsMap = new WeakMap<Program, Map<Type, ProtoScalar>>();
 const _protoExternMap = new WeakMap<Program, Map<string, [string, ProtoRef]>>();
+
+/**
+ * The full name of the message that a long-running operation returns (AIP-151).
+ */
+const LONG_RUNNING_OPERATION = "google.longrunning.Operation";
 
 /**
  * The name of the `oneof` declared within the wrapper message of a union used as a numbered field.
@@ -388,8 +395,79 @@ function tspToProto(program: Program, emitterOptions: ProtobufEmitterOptions): P
         operation,
         operation.returnType as NamespaceTraversable,
       ),
+      options: toMethodOptions(operation),
       doc: getDoc(program, operation),
     };
+  }
+
+  /**
+   * Converts an operation's `@operationInfo`, if any, to the `google.longrunning.operation_info` method option.
+   *
+   * @param operation - the operation to convert
+   * @returns the method's options
+   */
+  function toMethodOptions(operation: Operation): ProtoOption[] {
+    const info = program.stateMap(state.operationInfo).get(operation) as OperationInfo | undefined;
+    if (!info) return [];
+
+    const returnExtern = program.stateMap(state.externRef).get(operation.returnType) as
+      [string, string] | undefined;
+    if (returnExtern?.[1] !== LONG_RUNNING_OPERATION) {
+      reportDiagnostic(program, {
+        code: "operation-info",
+        target: getOperationReturnSyntaxTarget(operation),
+      });
+      return [];
+    }
+
+    const [responseType, metadataType] = [
+      toOperationInfoTypeName(operation, info.responseType, info.targets[0], "response"),
+      toOperationInfoTypeName(operation, info.metadataType, info.targets[1], "metadata"),
+    ];
+    if (responseType === undefined || metadataType === undefined) return [];
+
+    return [
+      {
+        name: "(google.longrunning.operation_info)",
+        value: { response_type: responseType, metadata_type: metadataType },
+      },
+    ];
+  }
+
+  /**
+   * Adds the response or metadata type of a long-running operation like any other type the operation refers to, and
+   * returns its name relative to the operation's package.
+   *
+   * @param operation - the long-running operation
+   * @param t - the response or metadata type
+   * @param target - the `@operationInfo` argument that declared `t`, for diagnostics
+   * @param role - `response` or `metadata`, for diagnostics
+   * @returns the type's name, or `undefined` if it cannot be emitted as a message
+   */
+  function toOperationInfoTypeName(
+    operation: Operation,
+    t: Model,
+    target: DiagnosticTarget | undefined,
+    role: "response" | "metadata",
+  ): string | undefined {
+    if (t.name === "" || isArrayModelType(t) || isRecordModelType(t) || isMap(program, t)) {
+      reportDiagnostic(program, {
+        code: "operation-info",
+        messageId: "invalid-type",
+        format: { role },
+        target: target ?? operation,
+      });
+      return undefined;
+    }
+
+    const type = addImportSourceForProtoIfNeeded(program, addType(t, operation), operation, t);
+
+    return matchType(type, {
+      ref: (r) => r,
+      /* c8 ignore next 2 */
+      scalar: () => undefined,
+      map: () => undefined,
+    });
   }
 
   /**

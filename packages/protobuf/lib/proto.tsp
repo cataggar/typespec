@@ -66,6 +66,15 @@ namespace WellKnown {
    * This model references `google.type.LatLng` from `google/type/latlng.proto`.
    */
   model LatLng is Extern<"google/type/latlng.proto", "google.type.LatLng">;
+
+  /**
+   * A long-running operation ([AIP-151](https://google.aip.dev/151)).
+   *
+   * This model references `google.longrunning.Operation` from `google/longrunning/operations.proto`. Return it from an
+   * operation decorated with [`@operationInfo`](./decorators#%40TypeSpec.Protobuf.operationInfo) to declare the types of
+   * the operation's response and metadata.
+   */
+  model Operation is Extern<"google/longrunning/operations.proto", "google.longrunning.Operation">;
 }
 
 /**
@@ -343,6 +352,41 @@ enum StreamMode {
  * ```
  */
 extern dec stream(target: TypeSpec.Reflection.Operation, mode: StreamMode);
+
+/**
+ * Declares the response and metadata types of a long-running operation
+ * ([AIP-151](https://google.aip.dev/151)). The operation must return
+ * [`WellKnown.Operation`](./data-types#TypeSpec.Protobuf.WellKnown.Operation), which the client polls until it is done.
+ *
+ * The emitter writes the `google.longrunning.operation_info` method option, naming each type relative to the
+ * operation's package (or fully qualified when it is declared in another package), and emits and imports both types
+ * like any other message the operation refers to.
+ *
+ * @param responseType The message in the `response` of a successful operation, such as
+ * [`WellKnown.Empty`](./data-types#TypeSpec.Protobuf.WellKnown.Empty) when there is none.
+ * @param metadataType The message in the `metadata` of the operation, describing its progress.
+ *
+ * @example
+ *
+ * ```typespec
+ * @operationInfo(Book, ImportBooksMetadata)
+ * op importBooks(...ImportBooksRequest): WellKnown.Operation;
+ * ```
+ *
+ * ```protobuf
+ * rpc ImportBooks(ImportBooksRequest) returns (google.longrunning.Operation) {
+ *   option (google.longrunning.operation_info) = {
+ *     response_type: "Book"
+ *     metadata_type: "ImportBooksMetadata"
+ *   };
+ * }
+ * ```
+ */
+extern dec operationInfo(
+  target: TypeSpec.Reflection.Operation,
+  responseType: TypeSpec.Reflection.Model,
+  metadataType: TypeSpec.Reflection.Model
+);
 
 namespace Private {
   extern dec externRef(target: Reflection.Model, path: string, name: string);

@@ -1,0 +1,7 @@
+/test/main.tsp:20:41 - error @typespec/protobuf/operation-info: an operation decorated with '@operationInfo' must return 'TypeSpec.Protobuf.WellKnown.Operation'
+/test/main.tsp:22:18 - error @typespec/protobuf/operation-info: the response type of '@operationInfo' must be a named model that is emitted as a message, not an array, map, or anonymous model
+/test/main.tsp:25:26 - error @typespec/protobuf/operation-info: the metadata type of '@operationInfo' must be a named model that is emitted as a message, not an array, map, or anonymous model
+/test/main.tsp:28:18 - error @typespec/protobuf/operation-info: the response type of '@operationInfo' must be a named model that is emitted as a message, not an array, map, or anonymous model
+/test/main.tsp:28:22 - error @typespec/protobuf/operation-info: the metadata type of '@operationInfo' must be a named model that is emitted as a message, not an array, map, or anonymous model
+/test/main.tsp:32:18 - error @typespec/protobuf/operation-info: the response type of '@operationInfo' must be a named model that is emitted as a message, not an array, map, or anonymous model
+/test/main.tsp:44:44 - error @typespec/protobuf/operation-info: the metadata type of '@operationInfo' must be a named model that is emitted as a message, not an array, map, or anonymous model

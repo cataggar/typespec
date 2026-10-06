@@ -2,6 +2,7 @@ import type {
   DecoratorContext,
   DecoratorValidatorCallbacks,
   Interface,
+  Model,
   ModelProperty,
   Namespace,
   Operation,
@@ -164,6 +165,40 @@ export type StreamDecorator = (
   mode: Type,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * Declares the response and metadata types of a long-running operation
+ * ([AIP-151](https://google.aip.dev/151)). The operation must return
+ * [`WellKnown.Operation`](./data-types#TypeSpec.Protobuf.WellKnown.Operation), which the client polls until it is done.
+ *
+ * The emitter writes the `google.longrunning.operation_info` method option, naming each type relative to the
+ * operation's package (or fully qualified when it is declared in another package), and emits and imports both types
+ * like any other message the operation refers to.
+ *
+ * @param responseType The message in the `response` of a successful operation, such as
+ * [`WellKnown.Empty`](./data-types#TypeSpec.Protobuf.WellKnown.Empty) when there is none.
+ * @param metadataType The message in the `metadata` of the operation, describing its progress.
+ * @example
+ * ```typespec
+ * @operationInfo(Book, ImportBooksMetadata)
+ * op importBooks(...ImportBooksRequest): WellKnown.Operation;
+ * ```
+ *
+ * ```protobuf
+ * rpc ImportBooks(ImportBooksRequest) returns (google.longrunning.Operation) {
+ *   option (google.longrunning.operation_info) = {
+ *     response_type: "Book"
+ *     metadata_type: "ImportBooksMetadata"
+ *   };
+ * }
+ * ```
+ */
+export type OperationInfoDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  responseType: Model,
+  metadataType: Model,
+) => DecoratorValidatorCallbacks | void;
+
 export type TypeSpecProtobufDecorators = {
   message: MessageDecorator;
   field: FieldDecorator;
@@ -171,4 +206,5 @@ export type TypeSpecProtobufDecorators = {
   service: ServiceDecorator;
   package: PackageDecorator;
   stream: StreamDecorator;
+  operationInfo: OperationInfoDecorator;
 };

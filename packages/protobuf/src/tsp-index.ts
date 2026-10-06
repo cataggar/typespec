@@ -5,6 +5,7 @@ import {
   $externRef,
   $field,
   $message,
+  $operationInfo,
   $package,
   $reserve,
   $service,
@@ -21,6 +22,7 @@ export const $decorators = {
     service: $service,
     package: $package,
     stream: $stream,
+    operationInfo: $operationInfo,
   } satisfies TypeSpecProtobufDecorators,
   "TypeSpec.Protobuf.Private": {
     externRef: $externRef,
