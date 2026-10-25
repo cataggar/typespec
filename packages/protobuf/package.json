@@ -50,7 +50,13 @@
     "change-case": "catalog:"
   },
   "peerDependencies": {
-    "@typespec/compiler": "workspace:^"
+    "@typespec/compiler": "workspace:^",
+    "@typespec/versioning": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@typespec/versioning": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/micromatch": "catalog:",
@@ -58,6 +64,7 @@
     "@typespec/compiler": "workspace:^",
     "@typespec/library-linter": "workspace:^",
     "@typespec/tspd": "workspace:^",
+    "@typespec/versioning": "workspace:^",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
     "micromatch": "catalog:",
