@@ -1045,3 +1045,251 @@ describe("versioning: helper unit tests", () => {
     });
   });
 });
+
+describe("versioning: anonymous operation models, nested packages, LROs/streams/maps, and emitter options", () => {
+  it("synthesizes auto-reservations on anonymous operation request and response models", async () => {
+    const result = await VersioningTester.compile(`
+      @versioned(Versions)
+      @package({ name: "acme.library" })
+      namespace Acme.Library;
+
+      enum Versions {
+        v1,
+        v2,
+      }
+
+      @Protobuf.service
+      interface SearchService {
+        searchBooks(
+          @field(1) query: string,
+          @removed(Versions.v2) @field(2) include_drafts?: boolean,
+          @renamedFrom(Versions.v2, "old_limit") @field(3) page_size?: int32,
+        ): {
+          @field(1) items: string[];
+          @removed(Versions.v2) @field(2) debug_token?: string;
+          @renamedFrom(Versions.v2, "total") @field(3) total_count: int32;
+        };
+      }
+    `);
+
+    const v1 = result.outputs["acme/library/v1.proto"];
+    expect(v1).toContain(`message SearchBooksRequest {
+  string query = 1;
+  optional bool include_drafts = 2;
+  optional int32 old_limit = 3;
+}`);
+    expect(v1).toContain(`message SearchBooksResponse {
+  repeated string items = 1;
+  optional string debug_token = 2;
+  int32 total = 3;
+}`);
+
+    const v2 = result.outputs["acme/library/v2.proto"];
+    expect(v2).toContain(`message SearchBooksRequest {
+  reserved 2;
+  reserved "include_drafts", "old_limit";
+
+  string query = 1;
+  optional int32 page_size = 3;
+}`);
+    expect(v2).toContain(`message SearchBooksResponse {
+  reserved 2;
+  reserved "debug_token", "total";
+
+  repeated string items = 1;
+  int32 total_count = 3;
+}`);
+  });
+
+  it("supports nested @package namespaces sharing a parent @versioned namespace and subnamespaces inside a package", async () => {
+    const result = await VersioningTester.compile(`
+      @versioned(Versions)
+      namespace Acme {
+        enum Versions {
+          v1,
+          v2,
+        }
+
+        @package({ name: "acme.authors" })
+        namespace Authors {
+          model Author {
+            @field(1) id: string;
+            @removed(Versions.v2) @field(2) pen_name?: string;
+          }
+        }
+
+        @package({ name: "acme.books" })
+        namespace Books {
+          namespace Sub {
+            @message
+            model Chapter {
+              @field(1) title: string;
+              @renamedFrom(Versions.v2, "pages") @field(2) page_count: int32;
+            }
+          }
+
+          model Book {
+            @field(1) id: string;
+            @field(2) author: Acme.Authors.Author;
+            @field(3) first_chapter: Sub.Chapter;
+          }
+        }
+      }
+    `);
+
+    expect(Object.keys(result.outputs).sort()).toEqual([
+      "acme/authors/v1.proto",
+      "acme/authors/v2.proto",
+      "acme/books/v1.proto",
+      "acme/books/v2.proto",
+    ]);
+
+    expect(result.outputs["acme/authors/v2.proto"]).toContain(`message Author {
+  reserved 2;
+  reserved "pen_name";
+
+  string id = 1;
+}`);
+    expect(result.outputs["acme/books/v1.proto"]).toContain('import "acme/authors/v1.proto";');
+    expect(result.outputs["acme/books/v1.proto"]).toContain("acme.authors.v1.Author author = 2;");
+    expect(result.outputs["acme/books/v2.proto"]).toContain('import "acme/authors/v2.proto";');
+    expect(result.outputs["acme/books/v2.proto"]).toContain("acme.authors.v2.Author author = 2;");
+    expect(result.outputs["acme/books/v2.proto"]).toContain(`message Chapter {
+  reserved "pages";
+
+  string title = 1;
+  int32 page_count = 2;
+}`);
+  });
+
+  it("supports LongRunningOperation, @stream, and Protobuf.Map across version snapshots", async () => {
+    const result = await VersioningTester.compile(`
+      @versioned(Versions)
+      @package({ name: "acme.library" })
+      namespace Acme.Library;
+
+      enum Versions {
+        v1,
+        v2,
+      }
+
+      model TagInfo {
+        @field(1) label: string;
+      }
+
+      model ImportBooksRequest {
+        @field(1) source_uri: string;
+        @typeChangedFrom(Versions.v2, Protobuf.Map<string, string>)
+        @field(2)
+        tags: Protobuf.Map<string, TagInfo>;
+      }
+
+      model ImportBooksResponse {
+        @field(1) imported_count: int32;
+      }
+
+      model ImportBooksMetadata {
+        @field(1) progress_percent: int32;
+      }
+
+      @Protobuf.service
+      interface LibraryService {
+        #deprecated "Use streamImport in v2."
+        importBooks(...ImportBooksRequest): LongRunningOperation<
+          ImportBooksResponse,
+          ImportBooksMetadata
+        >;
+
+        @added(Versions.v2)
+        @stream(StreamMode.Duplex)
+        streamImport(...ImportBooksRequest): ImportBooksResponse;
+      }
+    `);
+
+    const v1 = result.outputs["acme/library/v1.proto"];
+    expect(v1).toContain("map<string, string> tags = 2;");
+    expect(v1)
+      .toContain(`  rpc ImportBooks(ImportBooksRequest) returns (google.longrunning.Operation) {
+    option deprecated = true;
+    option (google.longrunning.operation_info) = {
+      response_type: "ImportBooksResponse"
+      metadata_type: "ImportBooksMetadata"
+    };
+  }`);
+    expect(v1).not.toContain("rpc StreamImport");
+
+    const v2 = result.outputs["acme/library/v2.proto"];
+    expect(v2).toContain("map<string, TagInfo> tags = 2;");
+    expect(v2).toContain(
+      "rpc StreamImport(stream ImportBooksRequest) returns (stream ImportBooksResponse);",
+    );
+  });
+
+  it("respects omit-unreachable-types and enum-value-prefix emitter options per version", async () => {
+    const OmitAndPrefixTester = createTester(resolvePath(packageRoot), {
+      libraries: ["@typespec/protobuf", "@typespec/versioning"],
+    })
+      .importLibraries()
+      .using("Protobuf", "Versioning")
+      .emit("@typespec/protobuf", {
+        "omit-unreachable-types": true,
+        "enum-value-prefix": "enum-name",
+      });
+
+    const result = await OmitAndPrefixTester.compile(`
+      @versioned(Versions)
+      @package({ name: "acme.library" })
+      namespace Acme.Library;
+
+      enum Versions {
+        v1,
+        v2,
+      }
+
+      @renamedFrom(Versions.v2, "LegacyState")
+      enum BookState {
+        UNSPECIFIED: 0,
+        #deprecated "Draft state is deprecated."
+        @removed(Versions.v2)
+        DRAFT: 1,
+        @added(Versions.v2)
+        PUBLISHED: 2,
+      }
+
+      model LegacyReport {
+        @field(1) summary: string;
+      }
+
+      model Book {
+        @field(1) id: string;
+        @field(2) state: BookState;
+      }
+
+      model GetBookRequest {
+        @field(1) id: string;
+      }
+
+      @Protobuf.service
+      interface LibraryService {
+        getBook(...GetBookRequest): Book;
+
+        @removed(Versions.v2)
+        getLegacyReport(...GetBookRequest): LegacyReport;
+      }
+    `);
+
+    const v1 = result.outputs["acme/library/v1.proto"];
+    expect(v1).toContain("message LegacyReport {");
+    expect(v1).toContain(`enum LegacyState {
+  LEGACY_STATE_UNSPECIFIED = 0;
+  LEGACY_STATE_DRAFT = 1 [deprecated = true];
+}`);
+
+    const v2 = result.outputs["acme/library/v2.proto"];
+    expect(v2).not.toContain("message LegacyReport");
+    expect(v2).toContain(`enum BookState {
+  BOOK_STATE_UNSPECIFIED = 0;
+  BOOK_STATE_PUBLISHED = 2;
+}`);
+  });
+});

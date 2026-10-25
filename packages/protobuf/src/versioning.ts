@@ -112,6 +112,7 @@ export function computeAutoReservationsForModel(
   }
 
   const allVersions =
+    versioning.getVersion(program, currentVersion.namespace)?.getVersions() ??
     versioning.getAllVersions(program, originalModel) ??
     versioning.getVersions(program, originalModel)[1]?.getVersions();
   if (!allVersions) {
@@ -200,6 +201,7 @@ export function computeAutoReservationsForUnion(
   }
 
   const allVersions =
+    versioning.getVersion(program, currentVersion.namespace)?.getVersions() ??
     versioning.getAllVersions(program, originalUnion) ??
     versioning.getVersions(program, originalUnion)[1]?.getVersions();
   if (!allVersions) {
@@ -231,6 +233,86 @@ export function computeAutoReservationsForUnion(
   return helpers.result;
 }
 
+function getAvailabilityMapForVersions(
+  program: Program,
+  versioning: VersioningModule,
+  target: Type,
+  allVersions: Version[],
+): Map<string, import("@typespec/versioning").Availability> | undefined {
+  const direct = versioning.getAvailabilityMap(program, target);
+  if (direct) {
+    return direct;
+  }
+
+  let added = versioning.getAddedOnVersions(program, target) ?? [];
+  let removed = versioning.getRemovedOnVersions(program, target) ?? [];
+  const typeChanged = versioning.getTypeChangedFrom(program, target);
+  const returnTypeChanged = versioning.getReturnTypeChangedFrom(program, target);
+
+  let parentAvail: Map<string, import("@typespec/versioning").Availability> | undefined;
+  if (target.kind === "ModelProperty" && target.model) {
+    parentAvail = getAvailabilityMapForVersions(program, versioning, target.model, allVersions);
+  } else if (target.kind === "Operation" && target.interface) {
+    parentAvail = getAvailabilityMapForVersions(program, versioning, target.interface, allVersions);
+  }
+
+  if (
+    !added.length &&
+    !removed.length &&
+    typeChanged === undefined &&
+    returnTypeChanged === undefined &&
+    parentAvail === undefined
+  ) {
+    return undefined;
+  }
+
+  let parentAdded = allVersions[0];
+  let parentRemoved: Version | undefined;
+  if (parentAvail) {
+    for (const [k, v] of parentAvail.entries()) {
+      if (v === versioning.Availability.Added) {
+        parentAdded = allVersions.find((x) => x.name === k) ?? parentAdded;
+        break;
+      }
+    }
+    for (const [k, v] of parentAvail.entries()) {
+      if (v === versioning.Availability.Removed) {
+        parentRemoved = allVersions.find((x) => x.name === k);
+        break;
+      }
+    }
+  }
+
+  if (!added.length && !removed.length) {
+    added = [parentAdded];
+  } else if (removed.length && (!added.length || removed[0].index < added[0].index)) {
+    added = [parentAdded, ...added];
+  }
+
+  if (!removed.length && parentRemoved && (!added.length || added[0].index < parentRemoved.index)) {
+    removed = [parentRemoved];
+  }
+
+  const avail = new Map<string, import("@typespec/versioning").Availability>();
+  let isAvail = false;
+  for (const ver of allVersions) {
+    const add = added.find((x) => x.index === ver.index);
+    const rem = removed.find((x) => x.index === ver.index);
+    if (rem) {
+      isAvail = false;
+      avail.set(ver.name, versioning.Availability.Removed);
+    } else if (add) {
+      isAvail = true;
+      avail.set(ver.name, versioning.Availability.Added);
+    } else if (isAvail) {
+      avail.set(ver.name, versioning.Availability.Available);
+    } else {
+      avail.set(ver.name, versioning.Availability.Unavailable);
+    }
+  }
+  return avail;
+}
+
 function createReservationCollector(
   program: Program,
   versioning: VersioningModule,
@@ -243,7 +325,7 @@ function createReservationCollector(
   const seenNames = new Set<string>();
 
   function isAvailableAt(target: Type, version: Version): boolean {
-    const avail = versioning.getAvailabilityMap(program, target);
+    const avail = getAvailabilityMapForVersions(program, versioning, target, allVersions);
     if (!avail) {
       return true;
     }
@@ -252,7 +334,7 @@ function createReservationCollector(
   }
 
   function wasAvailableBeforeAndUnavailableAt(target: Type): boolean {
-    const avail = versioning.getAvailabilityMap(program, target);
+    const avail = getAvailabilityMapForVersions(program, versioning, target, allVersions);
     if (!avail) {
       return false;
     }
@@ -444,13 +526,13 @@ export function validateDeprecatedChannelGraduation(
     decl: Type,
     allVersions: Version[],
   ): Map<string, import("@typespec/versioning").Availability> | undefined {
-    const avail = versioning.getAvailabilityMap(program, decl);
+    const avail = getAvailabilityMapForVersions(program, versioning, decl, allVersions);
     if (avail) {
       return avail;
     }
     const parent = getParentType(decl);
     if (parent) {
-      const parentAvail = versioning.getAvailabilityMap(program, parent);
+      const parentAvail = getAvailabilityMapForVersions(program, versioning, parent, allVersions);
       if (parentAvail) {
         return parentAvail;
       }
@@ -472,7 +554,8 @@ export function validateDeprecatedChannelGraduation(
     }
     const allVersions =
       versioning.getAllVersions(program, decl) ??
-      versioning.getVersions(program, decl)[1]?.getVersions();
+      versioning.getVersions(program, decl)[1]?.getVersions() ??
+      versioning.getVersions(program, packageNs)[1]?.getVersions();
     if (!allVersions) {
       return;
     }
@@ -488,7 +571,9 @@ export function validateDeprecatedChannelGraduation(
     }
 
     const parent = getParentType(decl);
-    const parentAvail = parent ? versioning.getAvailabilityMap(program, parent) : undefined;
+    const parentAvail = parent
+      ? getAvailabilityMapForVersions(program, versioning, parent, allVersions)
+      : undefined;
 
     const graduatedVer = allVersions.find((v) => {
       if (v.index <= addedVer!.index) {
