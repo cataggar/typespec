@@ -227,6 +227,24 @@ export const TypeSpecProtobufLibrary = createTypeSpecLibrary({
         default: paramMessage`the ${"role"} type of 'LongRunningOperation' must be a named model that is emitted as a message, not an array, map, or anonymous model`,
       },
     },
+    "invalid-version-identifier": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`version '${"version"}' does not follow AIP-185 channel-based versioning format (expected 'v<major>[alpha|beta][<channelVersion>]', such as 'v1', 'v1beta', 'v1alpha', or 'v1beta1')`,
+      },
+    },
+    "cross-package-version-import": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`package '${"sourcePackage"}' imports from versioned package '${"targetPackage"}' with a different version (AIP-185 / AIP-215 require versioned packages to be self-contained)`,
+      },
+    },
+    "deprecated-channel-graduation": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`deprecated declaration '${"name"}' added in stability channel '${"addedVersion"}' should not graduate to '${"targetVersion"}' (AIP-185)`,
+      },
+    },
   },
   emitter: { options: EmitterOptionsSchema },
 });

@@ -99,8 +99,12 @@ function* writeMessage(decl: ProtoMessageDeclaration, indentLevel: number): Iter
   const head = `message ${decl.name} {`;
   const tail = "}";
 
-  if (decl.declarations.length > 0 || decl.reservations?.length) {
+  if (decl.deprecated || decl.declarations.length > 0 || decl.reservations?.length) {
     yield head;
+    if (decl.deprecated) {
+      yield "  option deprecated = true;";
+      if (decl.reservations?.length || decl.declarations.length > 0) yield "";
+    }
     yield* indent(writeReservations(decl));
     yield* indent(flatMap(decl.declarations, (decl) => writeDeclaration(decl, indentLevel + 1)));
     yield tail;
@@ -130,8 +134,12 @@ function* writeService(decl: ProtoServiceDeclaration, indentLevel: number): Iter
   const head = `service ${decl.name} {`;
   const tail = "}";
 
-  if (decl.operations.length > 0) {
+  if (decl.deprecated || decl.operations.length > 0) {
     yield head;
+    if (decl.deprecated) {
+      yield "  option deprecated = true;";
+      if (decl.operations.length > 0) yield "";
+    }
     yield* indent(flatMap(decl.operations, (decl) => writeDeclaration(decl, indentLevel + 1)));
     yield tail;
   } else yield head + tail;
@@ -219,8 +227,9 @@ function* writeEnum(decl: ProtoEnumDeclaration, indentLevel: number): Iterable<s
   yield* writeBlockDocumentationComment(decl);
 
   yield `enum ${decl.name} {`;
-  if (decl.allowAlias) {
-    yield "  option allow_alias = true;";
+  if (decl.deprecated || decl.allowAlias) {
+    if (decl.deprecated) yield "  option deprecated = true;";
+    if (decl.allowAlias) yield "  option allow_alias = true;";
 
     if (decl.variants.length > 0) yield "";
   }
@@ -229,14 +238,18 @@ function* writeEnum(decl: ProtoEnumDeclaration, indentLevel: number): Iterable<s
 }
 
 function writeVariant(decl: ProtoEnumVariantDeclaration, indentLevel: number): Iterable<string> {
-  const output = `${decl.name} = ${decl.value};`;
+  const options = decl.deprecated ? " [deprecated = true]" : "";
+  const output = `${decl.name} = ${decl.value}${options};`;
 
   return writeDocumentationCommentFlexible(decl, output, indentLevel);
 }
 
 function writeField(decl: ProtoFieldDeclaration, indentLevel: number): Iterable<string> {
   const prefix = decl.repeated ? "repeated " : decl.optional ? "optional " : "";
-  const output = prefix + `${writeType(decl.type)} ${decl.name} = ${decl.index};`;
+  const entries = Object.entries(decl.options ?? {}).filter(([, v]) => v !== undefined);
+  const options =
+    entries.length > 0 ? ` [${entries.map(([k, v]) => `${k} = ${v}`).join(", ")}]` : "";
+  const output = prefix + `${writeType(decl.type)} ${decl.name} = ${decl.index}${options};`;
 
   return writeDocumentationCommentFlexible(decl, output, indentLevel);
 }

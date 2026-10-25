@@ -207,6 +207,7 @@ export interface ProtoDeclarationCommon {
 export interface ProtoServiceDeclaration extends ProtoDeclarationCommon {
   kind: "service";
   name: string;
+  deprecated?: boolean;
   operations: ProtoMethodDeclaration[];
 }
 
@@ -264,6 +265,7 @@ export type ProtoMessageBodyDeclaration =
 export interface ProtoMessageDeclaration extends ProtoDeclarationCommon {
   kind: "message";
   name: string;
+  deprecated?: boolean;
   declarations: Array<ProtoMessageBodyDeclaration>;
   reservations?: Array<string | number | [number, number]>;
 }
@@ -310,6 +312,7 @@ export interface ProtoOneOfDeclaration extends ProtoDeclarationCommon {
 export interface ProtoEnumDeclaration extends ProtoDeclarationCommon {
   kind: "enum";
   name: string;
+  deprecated?: boolean;
   allowAlias?: boolean;
   variants: ProtoEnumVariantDeclaration[];
 }
@@ -320,5 +323,6 @@ export interface ProtoEnumDeclaration extends ProtoDeclarationCommon {
 export interface ProtoEnumVariantDeclaration extends ProtoDeclarationCommon {
   kind: "variant";
   name: string;
+  deprecated?: boolean;
   value: number;
 }
